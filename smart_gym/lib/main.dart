@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Smart Gym Home Page'),
+      home: const MyHomePage(title: 'Smart Gym'),
     );
   }
 }
@@ -49,10 +49,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedPage = 0;
+  String title = 'Workout';
 
   void _onPageTapped(int index) {
     setState(() {
       _selectedPage = index;
+      title = 'Workout';
     });
   }
 
@@ -71,9 +73,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
-          ),
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Text(title),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -101,3 +104,36 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+// RC: Not going to use routes for now, just going to change what gets displayed on the page
+// class WorkoutRoute extends StatelessWidget {
+//   const WorkoutRoute({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Workout'),
+//       ),
+//       body: Center(
+//         child: const Text('Workout'),
+//       ),
+//     );
+//   }
+// }
+
+// class HistoryRoute extends StatelessWidget {
+//   const HistoryRoute({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('History'),
+//       ),
+//       body: Center(
+//         child: const Text('Workout'),
+//       ),
+//     );
+//   }
+// }
