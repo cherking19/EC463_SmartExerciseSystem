@@ -49,12 +49,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedPage = 0;
-  String title = 'Workout';
+  static List<String> pageTitles = ['Workout', 'History', 'Social', 'Settings'];
+  String pageTitle = pageTitles[0];
 
   void _onPageTapped(int index) {
     setState(() {
       _selectedPage = index;
-      title = 'Workout';
+      pageTitle = pageTitles[index];
     });
   }
 
@@ -75,7 +76,17 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Text(title),
+        child: Container(
+          alignment: Alignment.topLeft,
+          // color: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(pageTitle),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
