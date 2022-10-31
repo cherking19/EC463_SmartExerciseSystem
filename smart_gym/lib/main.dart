@@ -49,13 +49,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedPage = 0;
-  static List<String> pageTitles = ['Workout', 'History', 'Social', 'Settings'];
-  String pageTitle = pageTitles[0];
+  // static List<String> pageTitles = ['Workout', 'History', 'Social', 'Settings'];
+  // String pageTitle = pageTitles[0];
+  List<Widget> bodyWidgets = [
+    WorkoutPage(),
+    HistoryPage(),
+    SocialPage(),
+    SettingsPage(),
+  ];
 
   void _onPageTapped(int index) {
     setState(() {
       _selectedPage = index;
-      pageTitle = pageTitles[index];
+      // pageTitle = pageTitles[index];
     });
   }
 
@@ -73,27 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Container(
-            alignment: Alignment.topLeft,
-            // color: Colors.blue,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  pageTitle,
-                  style: TextStyle(fontSize: 18.0),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      body: bodyWidgets[_selectedPage],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -117,6 +103,122 @@ class _MyHomePageState extends State<MyHomePage> {
         selectedItemColor: Colors.blue,
         onTap: _onPageTapped,
         type: BottomNavigationBarType.fixed,
+      ),
+    );
+  }
+}
+
+class WorkoutPage extends StatelessWidget {
+  WorkoutPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Container(
+          alignment: Alignment.topLeft,
+          // color: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Workout',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HistoryPage extends StatelessWidget {
+  HistoryPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Container(
+          alignment: Alignment.topLeft,
+          // color: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'History',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SocialPage extends StatelessWidget {
+  SocialPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Container(
+          alignment: Alignment.topLeft,
+          // color: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Social',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  SettingsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Container(
+          alignment: Alignment.topLeft,
+          // color: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Settings',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
