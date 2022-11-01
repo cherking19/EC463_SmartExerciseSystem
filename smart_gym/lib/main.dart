@@ -52,10 +52,10 @@ class _MyHomePageState extends State<MyHomePage> {
   // static List<String> pageTitles = ['Workout', 'History', 'Social', 'Settings'];
   // String pageTitle = pageTitles[0];
   List<Widget> bodyWidgets = [
-    WorkoutPage(),
-    HistoryPage(),
-    SocialPage(),
-    SettingsPage(),
+    const WorkoutPage(),
+    const HistoryPage(),
+    const SocialPage(),
+    const SettingsPage(),
   ];
 
   void _onPageTapped(int index) {
@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class WorkoutPage extends StatelessWidget {
-  WorkoutPage({Key? key}) : super(key: key);
+  const WorkoutPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class WorkoutPage extends StatelessWidget {
       // Center is a layout widget. It takes a single child and positions it
       // in the middle of the parent.
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Container(
           alignment: Alignment.topLeft,
           // color: Colors.blue,
@@ -125,9 +125,19 @@ class WorkoutPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Text(
+              const Text(
                 'Workout',
                 style: TextStyle(fontSize: 18.0),
+              ),
+              TextButton(
+                child: const Text('Create Workout'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CreateWorkoutRoute()),
+                  );
+                },
               ),
             ],
           ),
@@ -137,8 +147,75 @@ class WorkoutPage extends StatelessWidget {
   }
 }
 
+class CreateWorkoutRoute extends StatelessWidget {
+  const CreateWorkoutRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create Workout'),
+      ),
+      body: const CreateWorkoutForm(),
+    );
+  }
+}
+
+class CreateWorkoutForm extends StatefulWidget {
+  const CreateWorkoutForm({super.key});
+
+  @override
+  CreateWorkoutFormState createState() {
+    return CreateWorkoutFormState();
+  }
+}
+
+class CreateWorkoutFormState extends State<CreateWorkoutForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Workout Name',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a name';
+                }
+                return null;
+              },
+            ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: TextButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Creating Workout')),
+                      );
+                    }
+                  },
+                  child: const Text('Create'),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class HistoryPage extends StatelessWidget {
-  HistoryPage({Key? key}) : super(key: key);
+  const HistoryPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -146,14 +223,14 @@ class HistoryPage extends StatelessWidget {
       // Center is a layout widget. It takes a single child and positions it
       // in the middle of the parent.
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Container(
           alignment: Alignment.topLeft,
           // color: Colors.blue,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
+            children: const <Widget>[
               Text(
                 'History',
                 style: TextStyle(fontSize: 18.0),
@@ -167,7 +244,7 @@ class HistoryPage extends StatelessWidget {
 }
 
 class SocialPage extends StatelessWidget {
-  SocialPage({Key? key}) : super(key: key);
+  const SocialPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -175,14 +252,14 @@ class SocialPage extends StatelessWidget {
       // Center is a layout widget. It takes a single child and positions it
       // in the middle of the parent.
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Container(
           alignment: Alignment.topLeft,
           // color: Colors.blue,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
+            children: const <Widget>[
               Text(
                 'Social',
                 style: TextStyle(fontSize: 18.0),
@@ -196,7 +273,7 @@ class SocialPage extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
-  SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -204,14 +281,14 @@ class SettingsPage extends StatelessWidget {
       // Center is a layout widget. It takes a single child and positions it
       // in the middle of the parent.
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Container(
           alignment: Alignment.topLeft,
           // color: Colors.blue,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
+            children: const <Widget>[
               Text(
                 'Settings',
                 style: TextStyle(fontSize: 18.0),
