@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'workout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -173,6 +174,13 @@ class CreateWorkoutForm extends StatefulWidget {
 class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   final _formKey = GlobalKey<FormState>();
 
+  WorkoutRoutine routine = WorkoutRoutine();
+
+  void addExercise() {
+    int index = routine.addExercise();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -191,6 +199,22 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                 }
                 return null;
               },
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(8.0),
+              itemCount: routine.getExercises().length,
+              itemBuilder: (BuildContext context, int index) {
+                return Text('Exercise $index');
+              },
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+              child: Text('Add Exercise'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: addExercise,
             ),
             Expanded(
               child: Align(
