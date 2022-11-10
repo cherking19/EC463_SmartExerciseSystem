@@ -173,12 +173,41 @@ class CreateWorkoutForm extends StatefulWidget {
 
 class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   final _formKey = GlobalKey<FormState>();
+  bool _isExerciseErrorVisible = false;
 
   WorkoutRoutine routine = WorkoutRoutine();
 
   void addExercise() {
     int index = routine.addExercise();
-    setState(() {});
+    setState(() {
+      _isExerciseErrorVisible = false;
+    });
+  }
+
+  bool validateExercises() {
+    if (routine.getExercises().isEmpty) {
+      setState(() {
+        _isExerciseErrorVisible = true;
+      });
+
+      return false;
+    }
+
+    _isExerciseErrorVisible = false;
+
+    return true;
+  }
+
+  void updateExerciseName(int index, String name) {
+    setState(() {
+      routine.updateExerciseName(index, name);
+    });
+  }
+
+  void deleteExercise(int index) {
+    setState(() {
+      routine.deleteExercise(index);
+    });
   }
 
   @override
@@ -200,17 +229,37 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                 return null;
               },
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(8.0),
-              itemCount: routine.getExercises().length,
-              itemBuilder: (BuildContext context, int index) {
-                return Text('Exercise $index');
-              },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(8.0),
+                itemCount: routine.getExercises().length,
+                itemBuilder: (BuildContext context, int index) {
+                  // print('build ' + routine.getExercises()[index].getName());
+
+                  return ExerciseWidget(
+                    index: index,
+                    name: routine.getExercises()[index].getName(),
+                    updateName: updateExerciseName,
+                    delete: deleteExercise,
+                  );
+                },
+              ),
             ),
             const Padding(
               padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
               child: Text('Add Exercise'),
+            ),
+            Visibility(
+              visible: _isExerciseErrorVisible,
+              child: const Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                child: Text(
+                  'Please add at least 1 exercise',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
             ),
             IconButton(
               icon: const Icon(Icons.add),
@@ -221,7 +270,8 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
+                    if (_formKey.currentState!.validate() &
+                        validateExercises()) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Creating Workout')),
                       );
@@ -324,36 +374,3 @@ class SettingsPage extends StatelessWidget {
     );
   }
 }
-
-// RC: Not going to use routes for now, just going to change what gets displayed on the page
-// class WorkoutRoute extends StatelessWidget {
-//   const WorkoutRoute({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Workout'),
-//       ),
-//       body: Center(
-//         child: const Text('Workout'),
-//       ),
-//     );
-//   }
-// }
-
-// class HistoryRoute extends StatelessWidget {
-//   const HistoryRoute({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('History'),
-//       ),
-//       body: Center(
-//         child: const Text('Workout'),
-//       ),
-//     );
-//   }
-// }
