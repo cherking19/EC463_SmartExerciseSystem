@@ -173,6 +173,7 @@ class CreateWorkoutForm extends StatefulWidget {
 
 class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _setsRepsController = TextEditingController();
   bool _isExerciseErrorVisible = false;
 
   WorkoutRoutine routine = WorkoutRoutine();
@@ -210,15 +211,31 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
     });
   }
 
+  void addSet(int index) {
+    setState(() {
+      routine.addSet(index);
+    });
+  }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _setsRepsController.addListener(() {
+
+  //   })
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextFormField(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextFormField(
               decoration: const InputDecoration(
                 labelText: 'Workout Name',
               ),
@@ -229,60 +246,55 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                 return null;
               },
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+          ),
+          Flexible(
+            child: Scrollbar(
               child: ListView.builder(
-                shrinkWrap: true,
                 padding: const EdgeInsets.all(8.0),
                 itemCount: routine.getExercises().length,
                 itemBuilder: (BuildContext context, int index) {
-                  // print('build ' + routine.getExercises()[index].getName());
-
                   return ExerciseWidget(
                     index: index,
                     name: routine.getExercises()[index].getName(),
+                    sets: routine.getSets(index),
+                    formKey: _formKey,
                     updateName: updateExerciseName,
                     delete: deleteExercise,
+                    addSet: addSet,
                   );
                 },
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
-              child: Text('Add Exercise'),
-            ),
-            Visibility(
-              visible: _isExerciseErrorVisible,
-              child: const Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-                child: Text(
-                  'Please add at least 1 exercise',
-                  style: TextStyle(color: Colors.red),
-                ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+            child: Text('Add Exercise'),
+          ),
+          Visibility(
+            visible: _isExerciseErrorVisible,
+            child: const Padding(
+              padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+              child: Text(
+                'Please add at least 1 exercise',
+                style: TextStyle(color: Colors.red),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: addExercise,
-            ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: TextButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate() &
-                        validateExercises()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Creating Workout')),
-                      );
-                    }
-                  },
-                  child: const Text('Create'),
-                ),
-              ),
-            )
-          ],
-        ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: addExercise,
+          ),
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate() & validateExercises()) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Creating Workout')),
+                );
+              }
+            },
+            child: const Text('Create'),
+          ),
+        ],
       ),
     );
   }
