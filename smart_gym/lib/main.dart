@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'workout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -199,7 +202,7 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   }
 
   void addExercise() {
-    int index = routine.addExercise();
+    routine.addExercise();
     setState(() {
       _isExerciseErrorVisible = false;
     });
@@ -242,6 +245,12 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
     });
   }
 
+  void setWeightSameFlag(int index, bool value) {
+    setState(() {
+      routine.setWeightSameFlag(index, value);
+    });
+  }
+
   void setRepsSameFlag(int index, bool value) {
     setState(() {
       routine.setRepsSameFlag(index, value);
@@ -251,6 +260,12 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   void setRestSameFlag(int index, bool value) {
     setState(() {
       routine.setRestSameFlag(index, value);
+    });
+  }
+
+  void setWeight(int exerciseIndex, int setIndex, int weight) {
+    setState(() {
+      routine.setWeight(exerciseIndex, setIndex, weight);
     });
   }
 
@@ -269,6 +284,12 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   void setRest(int exerciseIndex, int setIndex, int rest) {
     setState(() {
       routine.setRest(exerciseIndex, setIndex, rest);
+    });
+  }
+
+  void setWeightSame(int index, int weight) {
+    setState(() {
+      routine.setWeightSame(index, weight);
     });
   }
 
@@ -335,10 +356,13 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                     updateName: updateExerciseName,
                     delete: deleteExercise,
                     addSet: addSet,
+                    setWeight: setWeight,
                     setReps: setReps,
                     setRest: setRest,
+                    setWeightSameFlag: setWeightSameFlag,
                     setRepsSameFlag: setRepsSameFlag,
                     setRestSameFlag: setRestSameFlag,
+                    setWeightSame: setWeightSame,
                     setRepsSame: setRepsSame,
                     setRestSame: setRestSame,
                     deleteSet: deleteSet,
@@ -366,12 +390,19 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
             onPressed: addExercise,
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 if (validateRoutine()) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Creating Workout')),
                   );
+                  String workout = jsonEncode(routine);
+                  print(workout);
+
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  bool result = await prefs.setString('workout', workout);
+                  print(result);
                 } else {
                   showInvalidDialog(context);
                 }
