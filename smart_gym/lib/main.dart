@@ -74,6 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    // return GestureDetector(
+    //   onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+    //   child:
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -105,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _onPageTapped,
         type: BottomNavigationBarType.fixed,
       ),
+      // ),
     );
   }
 }
@@ -173,10 +177,26 @@ class CreateWorkoutForm extends StatefulWidget {
 
 class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _setsRepsController = TextEditingController();
+  // final TextEditingController _setsRepsController = TextEditingController();
   bool _isExerciseErrorVisible = false;
 
   WorkoutRoutine routine = WorkoutRoutine();
+
+  void showInvalidDialog(BuildContext context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Missing Entries'),
+        content: const Text('Please make sure all fields are filled'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   void addExercise() {
     int index = routine.addExercise();
@@ -185,19 +205,24 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
     });
   }
 
-  bool validateExercises() {
-    if (routine.getExercises().isEmpty) {
-      setState(() {
-        _isExerciseErrorVisible = true;
-      });
-
-      return false;
-    }
-
-    _isExerciseErrorVisible = false;
-
-    return true;
+  bool validateRoutine() {
+    print(routine.toString());
+    return routine.validateRoutine();
   }
+
+  // bool validateExercises() {
+  //   if (routine.getExercises().isEmpty || routine.anyEmptySets()) {
+  //     setState(() {
+  //       _isExerciseErrorVisible = true;
+  //     });
+
+  //     return false;
+  //   }
+
+  //   _isExerciseErrorVisible = false;
+
+  //   return true;
+  // }
 
   void updateExerciseName(int index, String name) {
     setState(() {
@@ -214,6 +239,48 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   void addSet(int index) {
     setState(() {
       routine.addSet(index);
+    });
+  }
+
+  void setRepsSameFlag(int index, bool value) {
+    setState(() {
+      routine.setRepsSameFlag(index, value);
+    });
+  }
+
+  void setRestSameFlag(int index, bool value) {
+    setState(() {
+      routine.setRestSameFlag(index, value);
+    });
+  }
+
+  void setReps(int exerciseIndex, int setIndex, int reps) {
+    setState(() {
+      routine.setReps(exerciseIndex, setIndex, reps);
+    });
+  }
+
+  void setRepsSame(int index, int reps) {
+    setState(() {
+      routine.setRepsSame(index, reps);
+    });
+  }
+
+  void setRest(int exerciseIndex, int setIndex, int rest) {
+    setState(() {
+      routine.setRest(exerciseIndex, setIndex, rest);
+    });
+  }
+
+  void setRestSame(int index, int rest) {
+    setState(() {
+      routine.setRestSame(index, rest);
+    });
+  }
+
+  void deleteSet(int exerciseIndex, int setIndex) {
+    setState(() {
+      routine.deleteSet(exerciseIndex, setIndex);
     });
   }
 
@@ -245,6 +312,9 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                 }
                 return null;
               },
+              onChanged: (value) {
+                routine.setName(value);
+              },
             ),
           ),
           Flexible(
@@ -257,10 +327,21 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                     index: index,
                     name: routine.getExercises()[index].getName(),
                     sets: routine.getSets(index),
-                    formKey: _formKey,
+                    onlyExercise: routine.getExercises().length == 1,
+                    // sameRepsFlag:
+                    //     routine.getExercises()[index].getRepsSameFlag(),
+                    // sameRestFlag:
+                    //     routine.getExercises()[index].getRestSameFlag(),
                     updateName: updateExerciseName,
                     delete: deleteExercise,
                     addSet: addSet,
+                    setReps: setReps,
+                    setRest: setRest,
+                    setRepsSameFlag: setRepsSameFlag,
+                    setRestSameFlag: setRestSameFlag,
+                    setRepsSame: setRepsSame,
+                    setRestSame: setRestSame,
+                    deleteSet: deleteSet,
                   );
                 },
               ),
@@ -286,10 +367,14 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
           ),
           TextButton(
             onPressed: () {
-              if (_formKey.currentState!.validate() & validateExercises()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Creating Workout')),
-                );
+              if (_formKey.currentState!.validate()) {
+                if (validateRoutine()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Creating Workout')),
+                  );
+                } else {
+                  showInvalidDialog(context);
+                }
               }
             },
             child: const Text('Create'),
