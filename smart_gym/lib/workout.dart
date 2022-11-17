@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
+// import 'dart:convert';
+
+// part 'set.g.dart';
 
 const List<String> exerciseChoices = <String>[
   'Squat',
@@ -27,9 +30,9 @@ class WorkoutRoutine {
     return WorkoutRoutine();
   }
 
-  Map<String, dynamic> toJson() {
-    return {"name": _name, "exercises": jsonEncode(_exercises)};
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {"name": _name, "exercises": jsonEncode(_exercises)};
+  // }
 
   bool validateRoutine() {
     if (_name.isEmpty) {
@@ -142,7 +145,7 @@ class Exercise {
 
   Exercise() {
     _name = exerciseChoices.first;
-    _sets = [Set()];
+    _sets = [Set(0, 0, 0)];
     _sameWeight = false;
     _sameReps = false;
     _sameRest = false;
@@ -153,15 +156,15 @@ class Exercise {
     return '$_name: $_sets ';
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "name": _name,
-      "sameWeight": _sameWeight,
-      "sameReps": _sameReps,
-      "sameRest": _sameRest,
-      "sets": jsonEncode(_sets)
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     "name": _name,
+  //     "sameWeight": _sameWeight,
+  //     "sameReps": _sameReps,
+  //     "sameRest": _sameRest,
+  //     "sets": jsonEncode(_sets)
+  //   };
+  // }
 
   bool validateExercise() {
     if (_name.isEmpty) {
@@ -183,7 +186,7 @@ class Exercise {
 
   // adds a set to the exercise. Does not initialize the set to any useful properties
   void addSet() {
-    Set newSet = Set();
+    Set newSet = Set(0, 0, 0);
 
     if (getWeightSameFlag()) {
       newSet.setWeight(_sets[0].getWeight());
@@ -205,14 +208,17 @@ class Exercise {
   }
 
   bool getWeightSameFlag() {
+    // print('weight $_sameWeight');
     return _sameWeight;
   }
 
   bool getRepsSameFlag() {
+    // print('reps $_sameReps');
     return _sameReps;
   }
 
   bool getRestSameFlag() {
+    // print('rest $_sameRest');
     return _sameRest;
   }
 
@@ -268,11 +274,12 @@ class Set {
   // the rest time in seconds. Should be greater than 0
   int _rest = 0;
 
-  Set() {
-    _reps = 0;
-    _rest = 0;
-    _weight = 0;
-  }
+  Set(this._weight, this._reps, this._rest);
+  // {
+  //   _reps = 0;
+  //   _rest = 0;
+  //   _weight = 0;
+  // }
 
   @override
   String toString() {
@@ -282,6 +289,8 @@ class Set {
   Map<String, dynamic> toJson() {
     return {"weight": _weight, "reps": _reps, "rest": _rest};
   }
+
+  // factory Set.fromJson(Map<String, dynamic> json) => _$SetFromJson(json);
 
   bool validateSet() {
     return _reps > 0 && _rest > 0 && _weight > 0;
@@ -321,8 +330,9 @@ class ExerciseWidget extends StatefulWidget {
   final String name;
   final List<Set> sets;
   final bool onlyExercise;
-  // final bool sameRepsFlag;
-  // final bool sameRestFlag;
+  final bool sameWeightFlag;
+  final bool sameRepsFlag;
+  final bool sameRestFlag;
   final Function updateName;
   final Function delete;
   final Function addSet;
@@ -343,8 +353,9 @@ class ExerciseWidget extends StatefulWidget {
     required this.name,
     required this.sets,
     required this.onlyExercise,
-    // required this.sameRepsFlag,
-    // required this.sameRestFlag,
+    required this.sameWeightFlag,
+    required this.sameRepsFlag,
+    required this.sameRestFlag,
     required this.updateName,
     required this.delete,
     required this.addSet,
@@ -378,8 +389,9 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     EdgeInsets dropdownPadding = widget.onlyExercise
         ? const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0)
         : const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0);
-    // isSetsRepsSame = widget.sameRepsFlag;
-    // isSetsRestSame = widget.sameRestFlag;
+    isSetsWeightSame = widget.sameWeightFlag;
+    isSetsRepsSame = widget.sameRepsFlag;
+    isSetsRestSame = widget.sameRestFlag;
 
     return Column(
       children: [
@@ -661,7 +673,11 @@ class _SetsWidgetState extends State<SetsWidget> {
         }
       }
     } catch (e) {
-      _repsController.text = "";
+      if (widget.set.getReps() > 0) {
+        _repsController.text = widget.set.getReps().toString();
+      } else {
+        _repsController.text = "";
+      }
       showInputDialog(context);
     }
   }
@@ -692,7 +708,12 @@ class _SetsWidgetState extends State<SetsWidget> {
         }
       }
     } catch (e) {
-      _restController.text = "";
+      if (widget.set.getRest() > 0) {
+        _restController.text = widget.set.getRest().toString();
+      } else {
+        _restController.text = "";
+      }
+
       showInputDialog(context);
     }
   }
@@ -719,7 +740,11 @@ class _SetsWidgetState extends State<SetsWidget> {
         }
       }
     } catch (e) {
-      _weightController.text = "";
+      if (widget.set.getWeight() > 0) {
+        _weightController.text = widget.set.getWeight().toString();
+      } else {
+        _weightController.text = "";
+      }
       showInputDialog(context);
     }
   }
@@ -740,14 +765,14 @@ class _SetsWidgetState extends State<SetsWidget> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // _repsController.addListener(() {
-    //   var reps = int.parse(_repsController.text);
-    //   print(reps);
-    // });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // _repsController.addListener(() {
+  //   //   var reps = int.parse(_repsController.text);
+  //   //   print(reps);
+  //   // });
+  // }
 
   @override
   void dispose() {
@@ -762,14 +787,20 @@ class _SetsWidgetState extends State<SetsWidget> {
   Widget build(BuildContext context) {
     if (widget.set.getWeight() > 0) {
       _weightController.text = widget.set.getWeight().toString();
+    } else {
+      _weightController.text = '';
     }
 
     if (widget.set.getReps() > 0) {
       _repsController.text = widget.set.getReps().toString();
+    } else {
+      _repsController.text = '';
     }
 
     if (widget.set.getRest() > 0) {
       _restController.text = widget.set.getRest().toString();
+    } else {
+      _restController.text = '';
     }
 
     return Padding(

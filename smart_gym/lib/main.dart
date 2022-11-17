@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'workout.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -144,6 +144,16 @@ class WorkoutPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const CreateWorkoutRoute()),
+                  );
+                },
+              ),
+              TextButton(
+                child: const Text('View Workouts'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ViewWorkoutRoute()),
                   );
                 },
               ),
@@ -349,10 +359,12 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                     name: routine.getExercises()[index].getName(),
                     sets: routine.getSets(index),
                     onlyExercise: routine.getExercises().length == 1,
-                    // sameRepsFlag:
-                    //     routine.getExercises()[index].getRepsSameFlag(),
-                    // sameRestFlag:
-                    //     routine.getExercises()[index].getRestSameFlag(),
+                    sameWeightFlag:
+                        routine.getExercises()[index].getWeightSameFlag(),
+                    sameRepsFlag:
+                        routine.getExercises()[index].getRepsSameFlag(),
+                    sameRestFlag:
+                        routine.getExercises()[index].getRestSameFlag(),
                     updateName: updateExerciseName,
                     delete: deleteExercise,
                     addSet: addSet,
@@ -396,13 +408,13 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Creating Workout')),
                   );
-                  String workout = jsonEncode(routine);
-                  print(workout);
+                  // String workout = jsonEncode(routine);
+                  // print(workout);
 
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  bool result = await prefs.setString('workout', workout);
-                  print(result);
+                  // SharedPreferences prefs =
+                  //     await SharedPreferences.getInstance();
+                  // bool result = await prefs.setString('workout', workout);
+                  // print(result);
                 } else {
                   showInvalidDialog(context);
                 }
@@ -413,6 +425,43 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
         ],
       ),
     );
+  }
+}
+
+class ViewWorkoutRoute extends StatelessWidget {
+  const ViewWorkoutRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('View Workouts'),
+      ),
+      body: const ViewWorkout(),
+    );
+  }
+}
+
+class ViewWorkout extends StatefulWidget {
+  const ViewWorkout({super.key});
+
+  @override
+  ViewWorkoutState createState() {
+    return ViewWorkoutState();
+  }
+}
+
+class ViewWorkoutState extends State<ViewWorkout> {
+  void loadWorkouts() async {
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String p = prefs.getString('workout') ?? "";
+    // Map userMap = jsonDecode(p);
+    // var workout = WorkoutRoutine.fromJson(userMap);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column();
   }
 }
 
