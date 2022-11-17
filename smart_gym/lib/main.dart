@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'workout.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -544,7 +543,7 @@ class SettingsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
-            children: const <Widget>[
+            children: <Widget>[
               Text(
                 'Hello ${FirebaseAuth.instance.currentUser!.displayName.toString()}',
                 style: TextStyle(fontSize: 18.0),
