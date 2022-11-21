@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 // import 'dart:convert';
 
-// part 'set.g.dart';
+part 'workout.g.dart';
 
 const List<String> exerciseChoices = <String>[
   'Squat',
@@ -189,15 +189,15 @@ class Exercise {
     Set newSet = Set(0, 0, 0);
 
     if (getWeightSameFlag()) {
-      newSet.setWeight(_sets[0].getWeight());
+      newSet.setWeight(_sets[0].weight);
     }
 
     if (getRepsSameFlag()) {
-      newSet.setReps(_sets[0].getReps());
+      newSet.setReps(_sets[0].reps);
     }
 
     if (getRestSameFlag()) {
-      newSet.setRest(_sets[0].getRest());
+      newSet.setRest(_sets[0].rest);
     }
 
     _sets.add(newSet);
@@ -265,6 +265,7 @@ class Exercise {
   }
 }
 
+@JsonSerializable()
 class Set {
   int _weight = 0;
 
@@ -274,23 +275,20 @@ class Set {
   // the rest time in seconds. Should be greater than 0
   int _rest = 0;
 
-  Set(this._weight, this._reps, this._rest);
-  // {
-  //   _reps = 0;
-  //   _rest = 0;
-  //   _weight = 0;
-  // }
+  Set(int weight, int reps, int rest) {
+    _reps = reps;
+    _rest = rest;
+    _weight = weight;
+  }
 
   @override
   String toString() {
     return 'weight: $_weight, reps: $_reps, rest: $_rest ';
   }
 
-  Map<String, dynamic> toJson() {
-    return {"weight": _weight, "reps": _reps, "rest": _rest};
-  }
+  factory Set.fromJson(Map<String, dynamic> json) => _$SetFromJson(json);
 
-  // factory Set.fromJson(Map<String, dynamic> json) => _$SetFromJson(json);
+  Map<String, dynamic> toJson() => _$SetToJson(this);
 
   bool validateSet() {
     return _reps > 0 && _rest > 0 && _weight > 0;
@@ -302,7 +300,7 @@ class Set {
     _reps = reps;
   }
 
-  int getReps() {
+  int get reps {
     return _reps;
   }
 
@@ -312,7 +310,7 @@ class Set {
     _rest = rest;
   }
 
-  int getRest() {
+  int get rest {
     return _rest;
   }
 
@@ -320,7 +318,7 @@ class Set {
     _weight = weight;
   }
 
-  int getWeight() {
+  int get weight {
     return _weight;
   }
 }
@@ -435,8 +433,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                     isSetsWeightSame = value!;
                     widget.setWeightSameFlag(widget.index, value);
                     if (isSetsWeightSame) {
-                      widget.setWeightSame(
-                          widget.index, widget.sets[0].getWeight());
+                      widget.setWeightSame(widget.index, widget.sets[0].weight);
                     }
                   });
                 },
@@ -450,8 +447,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                     isSetsRepsSame = value!;
                     widget.setRepsSameFlag(widget.index, value);
                     if (isSetsRepsSame) {
-                      widget.setRepsSame(
-                          widget.index, widget.sets[0].getReps());
+                      widget.setRepsSame(widget.index, widget.sets[0].reps);
                     }
                   });
                 },
@@ -465,8 +461,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                     isSetsRestSame = value!;
                     widget.setRestSameFlag(widget.index, value);
                     if (isSetsRestSame) {
-                      widget.setRestSame(
-                          widget.index, widget.sets[0].getRest());
+                      widget.setRestSame(widget.index, widget.sets[0].rest);
                     }
                   });
                 },
@@ -645,9 +640,9 @@ class _SetsWidgetState extends State<SetsWidget> {
     if (_repsController.text.isEmpty) {
       // widget.setReps(widget.exerciseIndex, widget.setIndex, 0);
       // if (widget.isSameReps) {
-      //   widget.setRepsSame(widget.exerciseIndex, widget.set.getReps());
+      //   widget.setRepsSame(widget.exerciseIndex, widget.set.reps);
       // }
-      if (widget.set.getReps() > 0) {
+      if (widget.set.reps > 0) {
         setState(() {});
         showInputDialog(context);
       }
@@ -663,12 +658,12 @@ class _SetsWidgetState extends State<SetsWidget> {
       } else {
         widget.setReps(widget.exerciseIndex, widget.setIndex, reps);
         if (widget.isSameReps) {
-          widget.setRepsSame(widget.exerciseIndex, widget.set.getReps());
+          widget.setRepsSame(widget.exerciseIndex, widget.set.reps);
         }
       }
     } catch (e) {
-      if (widget.set.getReps() > 0) {
-        _repsController.text = widget.set.getReps().toString();
+      if (widget.set.reps > 0) {
+        _repsController.text = widget.set.reps.toString();
       } else {
         _repsController.text = "";
       }
@@ -680,9 +675,9 @@ class _SetsWidgetState extends State<SetsWidget> {
     if (_restController.text.isEmpty) {
       // widget.setRest(widget.exerciseIndex, widget.setIndex, 0);
       // if (widget.isSameRest) {
-      //   widget.setRestSame(widget.exerciseIndex, widget.set.getRest());
+      //   widget.setRestSame(widget.exerciseIndex, widget.set.rest);
       // }
-      if (widget.set.getRest() > 0) {
+      if (widget.set.rest > 0) {
         setState(() {});
         showInputDialog(context);
       }
@@ -698,12 +693,12 @@ class _SetsWidgetState extends State<SetsWidget> {
       } else {
         widget.setRest(widget.exerciseIndex, widget.setIndex, rest);
         if (widget.isSameRest) {
-          widget.setRestSame(widget.exerciseIndex, widget.set.getRest());
+          widget.setRestSame(widget.exerciseIndex, widget.set.rest);
         }
       }
     } catch (e) {
-      if (widget.set.getRest() > 0) {
-        _restController.text = widget.set.getRest().toString();
+      if (widget.set.rest > 0) {
+        _restController.text = widget.set.rest.toString();
       } else {
         _restController.text = "";
       }
@@ -714,7 +709,7 @@ class _SetsWidgetState extends State<SetsWidget> {
 
   void checkWeightInput(BuildContext context) {
     if (_weightController.text.isEmpty) {
-      if (widget.set.getWeight() > 0) {
+      if (widget.set.weight > 0) {
         setState(() {});
         showInputDialog(context);
       }
@@ -730,12 +725,12 @@ class _SetsWidgetState extends State<SetsWidget> {
       } else {
         widget.setWeight(widget.exerciseIndex, widget.setIndex, weight);
         if (widget.isSameWeight) {
-          widget.setWeightSame(widget.exerciseIndex, widget.set.getWeight());
+          widget.setWeightSame(widget.exerciseIndex, widget.set.weight);
         }
       }
     } catch (e) {
-      if (widget.set.getWeight() > 0) {
-        _weightController.text = widget.set.getWeight().toString();
+      if (widget.set.weight > 0) {
+        _weightController.text = widget.set.weight.toString();
       } else {
         _weightController.text = "";
       }
@@ -779,20 +774,20 @@ class _SetsWidgetState extends State<SetsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.set.getWeight() > 0) {
-      _weightController.text = widget.set.getWeight().toString();
+    if (widget.set.weight > 0) {
+      _weightController.text = widget.set.weight.toString();
     } else {
       _weightController.text = '';
     }
 
-    if (widget.set.getReps() > 0) {
-      _repsController.text = widget.set.getReps().toString();
+    if (widget.set.reps > 0) {
+      _repsController.text = widget.set.reps.toString();
     } else {
       _repsController.text = '';
     }
 
-    if (widget.set.getRest() > 0) {
-      _restController.text = widget.set.getRest().toString();
+    if (widget.set.rest > 0) {
+      _restController.text = widget.set.rest.toString();
     } else {
       _restController.text = '';
     }
