@@ -394,6 +394,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     isSetsRestSame = widget.sameRestFlag;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           children: [
@@ -474,51 +475,50 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
             ],
           ),
         ),
-        Container(
-          // Expanded(
-          height: 195,
-          // fit: FlexFit.loose,
-          child: Scrollbar(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8.0),
-              // shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.sets.length,
-              itemBuilder: (BuildContext context, int index) {
-                // return Text('Set');
-                return Container(
-                  width: 100,
-                  child: SetsWidget(
-                    exerciseIndex: widget.index,
-                    setIndex: index,
-                    isSameWeight: isSetsWeightSame,
-                    isSameReps: isSetsRepsSame,
-                    isSameRest: isSetsRestSame,
-                    set: widget.sets[index],
-                    onlySet: widget.sets.length == 1,
-                    setWeight: widget.setWeight,
-                    setReps: widget.setReps,
-                    setRest: widget.setRest,
-                    setWeightSame: widget.setWeightSame,
-                    setRepsSame: widget.setRepsSame,
-                    setRestSame: widget.setRestSame,
-                    delete: widget.deleteSet,
-                  ),
-                );
-                // TextFormField(validator: (value) {
-                //   if (value == null || value.isEmpty) {
-                //     return 'Please enter a rep number';
-                //   }
-                //   return null;
-                // });
-              },
-            ),
-          ),
-        ),
         const Padding(
           padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
           child: Text('Add Set'),
         ),
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            widget.addSet(widget.index);
+          },
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                // reverse: true,
+                child: Row(
+                  children: List.generate(
+                    widget.sets.length,
+                    (index) => SetsWidget(
+                      exerciseIndex: widget.index,
+                      setIndex: index,
+                      isSameWeight: isSetsWeightSame,
+                      isSameReps: isSetsRepsSame,
+                      isSameRest: isSetsRestSame,
+                      set: widget.sets[index],
+                      onlySet: widget.sets.length == 1,
+                      setWeight: widget.setWeight,
+                      setReps: widget.setReps,
+                      setRest: widget.setRest,
+                      setWeightSame: widget.setWeightSame,
+                      setRepsSame: widget.setRepsSame,
+                      setRestSame: widget.setRestSame,
+                      delete: widget.deleteSet,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
         // Visibility(
         //   visible: _isExerciseSetsErrorVisible,
         //   child: const Padding(
@@ -529,12 +529,6 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
         //     ),
         //   ),
         // ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            widget.addSet(widget.index);
-          },
-        ),
       ],
     );
     // );
@@ -806,6 +800,7 @@ class _SetsWidgetState extends State<SetsWidget> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 6.0),
