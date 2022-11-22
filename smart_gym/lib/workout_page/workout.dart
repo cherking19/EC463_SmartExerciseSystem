@@ -5,6 +5,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'workout.g.dart';
 
+const String routinesJsonKey = 'routines';
+
 const List<String> exerciseChoices = <String>[
   'Squat',
   'Bench Press',
@@ -14,11 +16,33 @@ const List<String> exerciseChoices = <String>[
 ];
 
 @JsonSerializable(explicitToJson: true)
-class WorkoutRoutine {
+class Routines {
+  List<Workout> _workouts = [];
+
+  Routines(List<Workout> workouts) {
+    _workouts = workouts;
+  }
+
+  factory Routines.fromJson(Map<String, dynamic> json) =>
+      _$RoutinesFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RoutinesToJson(this);
+
+  List<Workout> get workouts {
+    return _workouts;
+  }
+
+  void addWorkout(Workout workout) {
+    _workouts.add(workout);
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Workout {
   String _name = '';
   List<Exercise> _exercises = [];
 
-  WorkoutRoutine(String name, List<Exercise> exercises) {
+  Workout(String name, List<Exercise> exercises) {
     _name = name;
     _exercises = exercises;
   }
@@ -28,10 +52,10 @@ class WorkoutRoutine {
     return ('$_name: $_exercises,');
   }
 
-  factory WorkoutRoutine.fromJson(Map<String, dynamic> json) =>
-      _$WorkoutRoutineFromJson(json);
+  factory Workout.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WorkoutRoutineToJson(this);
+  Map<String, dynamic> toJson() => _$WorkoutToJson(this);
 
   // factory WorkoutRoutine.fromJson(Map<String, dynamic> parsedJson) {
   //   return WorkoutRoutine();

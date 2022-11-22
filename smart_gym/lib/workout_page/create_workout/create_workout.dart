@@ -33,7 +33,7 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   // final TextEditingController _setsRepsController = TextEditingController();
   bool _isExerciseErrorVisible = false;
 
-  WorkoutRoutine routine = WorkoutRoutine('', [
+  Workout workout = Workout('', [
     Exercise(
         exerciseChoices.first,
         [
@@ -65,7 +65,7 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   }
 
   void addExercise() {
-    routine.addExercise();
+    workout.addExercise();
     setState(() {
       _isExerciseErrorVisible = false;
     });
@@ -73,7 +73,7 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
 
   bool validateRoutine() {
     // print(routine.toString());
-    return routine.validateRoutine();
+    return workout.validateRoutine();
   }
 
   // bool validateExercises() {
@@ -92,79 +92,79 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
 
   void updateExerciseName(int index, String name) {
     setState(() {
-      routine.updateExerciseName(index, name);
+      workout.updateExerciseName(index, name);
     });
   }
 
   void deleteExercise(int index) {
     setState(() {
-      routine.deleteExercise(index);
+      workout.deleteExercise(index);
     });
   }
 
   void addSet(int index) {
     setState(() {
-      routine.addSet(index);
+      workout.addSet(index);
     });
   }
 
   void setWeightSameFlag(int index, bool value) {
     setState(() {
-      routine.setWeightSameFlag(index, value);
+      workout.setWeightSameFlag(index, value);
     });
   }
 
   void setRepsSameFlag(int index, bool value) {
     setState(() {
-      routine.setRepsSameFlag(index, value);
+      workout.setRepsSameFlag(index, value);
     });
   }
 
   void setRestSameFlag(int index, bool value) {
     setState(() {
-      routine.setRestSameFlag(index, value);
+      workout.setRestSameFlag(index, value);
     });
   }
 
   void setWeight(int exerciseIndex, int setIndex, int weight) {
     setState(() {
-      routine.setWeight(exerciseIndex, setIndex, weight);
+      workout.setWeight(exerciseIndex, setIndex, weight);
     });
   }
 
   void setReps(int exerciseIndex, int setIndex, int reps) {
     setState(() {
-      routine.setReps(exerciseIndex, setIndex, reps);
+      workout.setReps(exerciseIndex, setIndex, reps);
     });
   }
 
   void setRepsSame(int index, int reps) {
     setState(() {
-      routine.setRepsSame(index, reps);
+      workout.setRepsSame(index, reps);
     });
   }
 
   void setRest(int exerciseIndex, int setIndex, int rest) {
     setState(() {
-      routine.setRest(exerciseIndex, setIndex, rest);
+      workout.setRest(exerciseIndex, setIndex, rest);
     });
   }
 
   void setWeightSame(int index, int weight) {
     setState(() {
-      routine.setWeightSame(index, weight);
+      workout.setWeightSame(index, weight);
     });
   }
 
   void setRestSame(int index, int rest) {
     setState(() {
-      routine.setRestSame(index, rest);
+      workout.setRestSame(index, rest);
     });
   }
 
   void deleteSet(int exerciseIndex, int setIndex) {
     setState(() {
-      routine.deleteSet(exerciseIndex, setIndex);
+      workout.deleteSet(exerciseIndex, setIndex);
     });
   }
 
@@ -197,7 +197,7 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                 return null;
               },
               onChanged: (value) {
-                routine.setName(value);
+                workout.setName(value);
               },
             ),
           ),
@@ -205,16 +205,16 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
             child: Scrollbar(
               child: ListView.builder(
                 padding: const EdgeInsets.all(8.0),
-                itemCount: routine.exercises.length,
+                itemCount: workout.exercises.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ExerciseWidget(
                     index: index,
-                    name: routine.exercises[index].name,
-                    sets: routine.getSets(index),
-                    onlyExercise: routine.exercises.length == 1,
-                    sameWeightFlag: routine.exercises[index].sameWeight,
-                    sameRepsFlag: routine.exercises[index].sameReps,
-                    sameRestFlag: routine.exercises[index].sameRest,
+                    name: workout.exercises[index].name,
+                    sets: workout.getSets(index),
+                    onlyExercise: workout.exercises.length == 1,
+                    sameWeightFlag: workout.exercises[index].sameWeight,
+                    sameRepsFlag: workout.exercises[index].sameReps,
+                    sameRestFlag: workout.exercises[index].sameRest,
                     updateName: updateExerciseName,
                     delete: deleteExercise,
                     addSet: addSet,
@@ -255,18 +255,32 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 if (validateRoutine()) {
+                  // print(routine.getSets(index));
+                  // print(routine.toJson());
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  // prefs.clear();
+                  String routinesJson = prefs.getString(routinesJsonKey) ?? "";
+                  Routines routines;
+                  if (routinesJson.isEmpty) {
+                    routines = Routines([]);
+                  } else {
+                    routines = Routines.fromJson(jsonDecode(routinesJson));
+                  }
+
+                  routines.addWorkout(workout);
+                  routinesJson = jsonEncode(routines.toJson());
+
+                  // String workoutJson = jsonEncode(workout.toJson());
+                  // print(workoutJson);
+
+                  bool result =
+                      await prefs.setString(routinesJsonKey, routinesJson);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Creating Workout')),
                   );
-                  // print(routine.getSets(index));
-                  // print(routine.toJson());
-                  String workout = jsonEncode(routine.toJson());
-                  print(workout);
-
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  bool result = await prefs.setString('workout', workout);
-                  print(result);
+                  Navigator.pop(context);
+                  // print(result);
                 } else {
                   showInvalidDialog(context);
                 }
