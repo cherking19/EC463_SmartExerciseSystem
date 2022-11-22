@@ -12,13 +12,14 @@ const List<String> exerciseChoices = <String>[
   'Barbell Row'
 ];
 
+@JsonSerializable(explicitToJson: true)
 class WorkoutRoutine {
   String _name = '';
   List<Exercise> _exercises = [];
 
-  WorkoutRoutine() {
-    _name = '';
-    _exercises = [Exercise()];
+  WorkoutRoutine(String name, List<Exercise> exercises) {
+    _name = name;
+    _exercises = exercises;
   }
 
   @override
@@ -26,9 +27,14 @@ class WorkoutRoutine {
     return ('$_name: $_exercises,');
   }
 
-  factory WorkoutRoutine.fromJson(Map<String, dynamic> parsedJson) {
-    return WorkoutRoutine();
-  }
+  factory WorkoutRoutine.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutRoutineFromJson(json);
+
+  Map<String, dynamic> toJson() => _$WorkoutRoutineToJson(this);
+
+  // factory WorkoutRoutine.fromJson(Map<String, dynamic> parsedJson) {
+  //   return WorkoutRoutine();
+  // }
 
   // Map<String, dynamic> toJson() {
   //   return {"name": _name, "exercises": jsonEncode(_exercises)};
@@ -52,12 +58,27 @@ class WorkoutRoutine {
     _name = name;
   }
 
+  String get name {
+    return _name;
+  }
+
   int addExercise() {
-    _exercises.add(Exercise());
+    _exercises.add(Exercise(
+        exerciseChoices.first,
+        [
+          Set(
+            0,
+            0,
+            0,
+          )
+        ],
+        false,
+        false,
+        false));
     return _exercises.length - 1;
   }
 
-  List<Exercise> getExercises() {
+  List<Exercise> get exercises {
     return _exercises;
   }
 
@@ -136,6 +157,7 @@ class WorkoutRoutine {
   }
 }
 
+@JsonSerializable(explicitToJson: true)
 class Exercise {
   String _name = '';
   List<Set> _sets = [];
@@ -143,18 +165,24 @@ class Exercise {
   bool _sameReps = false;
   bool _sameRest = false;
 
-  Exercise() {
-    _name = exerciseChoices.first;
-    _sets = [Set(0, 0, 0)];
-    _sameWeight = false;
-    _sameReps = false;
-    _sameRest = false;
+  Exercise(String name, List<Set> sets, bool sameWeight, bool sameReps,
+      bool sameRest) {
+    _name = name;
+    _sets = sets;
+    _sameWeight = sameWeight;
+    _sameReps = sameReps;
+    _sameRest = sameRest;
   }
 
   @override
   String toString() {
     return '$_name: $_sets ';
   }
+
+  factory Exercise.fromJson(Map<String, dynamic> json) =>
+      _$ExerciseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ExerciseToJson(this);
 
   // Map<String, dynamic> toJson() {
   //   return {
@@ -180,23 +208,27 @@ class Exercise {
     return true;
   }
 
-  String getName() {
+  String get name {
     return _name;
+  }
+
+  List<Set> get sets {
+    return _sets;
   }
 
   // adds a set to the exercise. Does not initialize the set to any useful properties
   void addSet() {
     Set newSet = Set(0, 0, 0);
 
-    if (getWeightSameFlag()) {
+    if (sameWeight) {
       newSet.setWeight(_sets[0].weight);
     }
 
-    if (getRepsSameFlag()) {
+    if (sameReps) {
       newSet.setReps(_sets[0].reps);
     }
 
-    if (getRestSameFlag()) {
+    if (sameRest) {
       newSet.setRest(_sets[0].rest);
     }
 
@@ -207,17 +239,17 @@ class Exercise {
     _sets.removeAt(index);
   }
 
-  bool getWeightSameFlag() {
+  bool get sameWeight {
     // print('weight $_sameWeight');
     return _sameWeight;
   }
 
-  bool getRepsSameFlag() {
+  bool get sameReps {
     // print('reps $_sameReps');
     return _sameReps;
   }
 
-  bool getRestSameFlag() {
+  bool get sameRest {
     // print('rest $_sameRest');
     return _sameRest;
   }
