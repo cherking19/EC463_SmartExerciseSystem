@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
 // import 'dart:convert';
 
@@ -668,12 +669,7 @@ class _SetsWidgetState extends State<SetsWidget> {
   final TextEditingController _weightController = TextEditingController();
 
   void checkRepsInput(BuildContext context) {
-// print(value);
     if (_repsController.text.isEmpty) {
-      // widget.setReps(widget.exerciseIndex, widget.setIndex, 0);
-      // if (widget.isSameReps) {
-      //   widget.setRepsSame(widget.exerciseIndex, widget.set.reps);
-      // }
       if (widget.set.reps > 0) {
         setState(() {});
         showInputDialog(context);
@@ -705,10 +701,6 @@ class _SetsWidgetState extends State<SetsWidget> {
 
   void checkRestInput(BuildContext context) {
     if (_restController.text.isEmpty) {
-      // widget.setRest(widget.exerciseIndex, widget.setIndex, 0);
-      // if (widget.isSameRest) {
-      //   widget.setRestSame(widget.exerciseIndex, widget.set.rest);
-      // }
       if (widget.set.rest > 0) {
         setState(() {});
         showInputDialog(context);
@@ -846,6 +838,10 @@ class _SetsWidgetState extends State<SetsWidget> {
                     contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
                   ),
                   controller: _weightController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
                 ),
                 onFocusChange: (hasFocus) {
                   if (!hasFocus) {
@@ -868,6 +864,10 @@ class _SetsWidgetState extends State<SetsWidget> {
                     contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
                   ),
                   controller: _repsController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
                 ),
                 onFocusChange: (hasFocus) {
                   if (!hasFocus) {
@@ -890,6 +890,10 @@ class _SetsWidgetState extends State<SetsWidget> {
                     contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
                   ),
                   controller: _restController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
                 ),
                 onFocusChange: (hasFocus) {
                   if (!hasFocus) {
