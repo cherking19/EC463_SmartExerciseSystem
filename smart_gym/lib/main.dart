@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 import 'dart:convert';
 import 'workout.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +32,9 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const SignInScreen(), //MyHomePage(title: 'Smart Gym'),//
+      home: const MyHomePage(
+          title:
+              'Smart Gym'), //const SignInScreen(), //MyHomePage(title: 'Smart Gym'),//
     );
   }
 }
@@ -198,7 +200,20 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   // final TextEditingController _setsRepsController = TextEditingController();
   bool _isExerciseErrorVisible = false;
 
-  WorkoutRoutine routine = WorkoutRoutine();
+  WorkoutRoutine routine = WorkoutRoutine('', [
+    Exercise(
+        exerciseChoices.first,
+        [
+          Set(
+            0,
+            0,
+            0,
+          )
+        ],
+        false,
+        false,
+        false),
+  ]);
 
   void showInvalidDialog(BuildContext context) {
     showDialog<String>(
@@ -224,12 +239,12 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   }
 
   bool validateRoutine() {
-    print(routine.toString());
+    // print(routine.toString());
     return routine.validateRoutine();
   }
 
   // bool validateExercises() {
-  //   if (routine.getExercises().isEmpty || routine.anyEmptySets()) {
+  //   if (routine.exercises.isEmpty || routine.anyEmptySets()) {
   //     setState(() {
   //       _isExerciseErrorVisible = true;
   //     });
@@ -357,19 +372,16 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
             child: Scrollbar(
               child: ListView.builder(
                 padding: const EdgeInsets.all(8.0),
-                itemCount: routine.getExercises().length,
+                itemCount: routine.exercises.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ExerciseWidget(
                     index: index,
-                    name: routine.getExercises()[index].getName(),
+                    name: routine.exercises[index].name,
                     sets: routine.getSets(index),
-                    onlyExercise: routine.getExercises().length == 1,
-                    sameWeightFlag:
-                        routine.getExercises()[index].getWeightSameFlag(),
-                    sameRepsFlag:
-                        routine.getExercises()[index].getRepsSameFlag(),
-                    sameRestFlag:
-                        routine.getExercises()[index].getRestSameFlag(),
+                    onlyExercise: routine.exercises.length == 1,
+                    sameWeightFlag: routine.exercises[index].sameWeight,
+                    sameRepsFlag: routine.exercises[index].sameReps,
+                    sameRestFlag: routine.exercises[index].sameRest,
                     updateName: updateExerciseName,
                     delete: deleteExercise,
                     addSet: addSet,
@@ -413,13 +425,15 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Creating Workout')),
                   );
-                  // String workout = jsonEncode(routine);
-                  // print(workout);
+                  // print(routine.getSets(index));
+                  // print(routine.toJson());
+                  String workout = jsonEncode(routine.toJson());
+                  print(workout);
 
-                  // SharedPreferences prefs =
-                  //     await SharedPreferences.getInstance();
-                  // bool result = await prefs.setString('workout', workout);
-                  // print(result);
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  bool result = await prefs.setString('workout', workout);
+                  print(result);
                 } else {
                   showInvalidDialog(context);
                 }
@@ -458,14 +472,16 @@ class ViewWorkout extends StatefulWidget {
 
 class ViewWorkoutState extends State<ViewWorkout> {
   void loadWorkouts() async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String p = prefs.getString('workout') ?? "";
-    // Map userMap = jsonDecode(p);
-    // var workout = WorkoutRoutine.fromJson(userMap);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String p = prefs.getString('workout') ?? "";
+    Map<String, dynamic> userMap = jsonDecode(p);
+    WorkoutRoutine workout = WorkoutRoutine.fromJson(userMap);
+    print(workout);
   }
 
   @override
   Widget build(BuildContext context) {
+    loadWorkouts();
     return Column();
   }
 }
