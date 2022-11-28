@@ -538,7 +538,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
           },
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Scrollbar(
