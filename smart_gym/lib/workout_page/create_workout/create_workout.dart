@@ -176,6 +176,31 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
   //   })
   // }
 
+  Future<void> submitWorkout(
+      BuildContext context, VoidCallback onSuccess) async {
+    // print(routine.getSets(index));
+    // print(routine.toJson());
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.clear();
+    String routinesJson = prefs.getString(routinesJsonKey) ?? "";
+    Routines routines;
+    if (routinesJson.isEmpty) {
+      routines = Routines([]);
+    } else {
+      routines = Routines.fromJson(jsonDecode(routinesJson));
+    }
+
+    routines.addWorkout(workout);
+    routinesJson = jsonEncode(routines.toJson());
+
+    // String workoutJson = jsonEncode(workout.toJson());
+    // print(workoutJson);
+
+    await prefs.setString(routinesJsonKey, routinesJson);
+    // print(result);
+    onSuccess.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -252,35 +277,15 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
             onPressed: addExercise,
           ),
           TextButton(
-            onPressed: () async {
+            onPressed: () {
               if (_formKey.currentState!.validate()) {
                 if (validateRoutine()) {
-                  // print(routine.getSets(index));
-                  // print(routine.toJson());
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  // prefs.clear();
-                  String routinesJson = prefs.getString(routinesJsonKey) ?? "";
-                  Routines routines;
-                  if (routinesJson.isEmpty) {
-                    routines = Routines([]);
-                  } else {
-                    routines = Routines.fromJson(jsonDecode(routinesJson));
-                  }
-
-                  routines.addWorkout(workout);
-                  routinesJson = jsonEncode(routines.toJson());
-
-                  // String workoutJson = jsonEncode(workout.toJson());
-                  // print(workoutJson);
-
-                  bool result =
-                      await prefs.setString(routinesJsonKey, routinesJson);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Creating Workout')),
-                  );
-                  Navigator.pop(context);
-                  // print(result);
+                  submitWorkout(context, () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Creating Workout')),
+                    );
+                    Navigator.pop(context);
+                  });
                 } else {
                   showInvalidDialog(context);
                 }
