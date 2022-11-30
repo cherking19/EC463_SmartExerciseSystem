@@ -198,16 +198,16 @@ class SettingsPage extends StatelessWidget {
             children: <Widget>[
               Text(
                 'Hello ${FirebaseAuth.instance.currentUser!.displayName.toString()}',
-                style: TextStyle(fontSize: 18.0),
+                style: const TextStyle(fontSize: 18.0),
               ),
               ElevatedButton(
-                child: Text("Logout"),
+                child: const Text("Logout"),
                 onPressed: () {
                   FirebaseAuth.instance.signOut().then((value) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SignInScreen()));
+                            builder: (context) => const SignInScreen()));
                   });
                 },
               ),

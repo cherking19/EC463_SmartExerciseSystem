@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+// import 'package:flutter/src/widgets/container.dart';
+// import 'package:flutter/src/widgets/framework.dart';
 
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signup.dart';
@@ -17,8 +17,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,17 +36,17 @@ class _SignInScreenState extends State<SignInScreen> {
                 20, MediaQuery.of(context).size.height * .2, 20, 0),
             child: Column(children: <Widget>[
               logoWidget("assets/images/logo1.png"),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               reusableTextField("Enter Email", Icons.verified_user, false,
                   _emailTextController),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               reusableTextField("Enter Password", Icons.lock_outlined, true,
                   _passwordTextController),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               signInSignUpButton(context, true, () {
@@ -59,13 +59,13 @@ class _SignInScreenState extends State<SignInScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              MyHomePage(title: 'Smart Gym')));
+                              const MyHomePage(title: 'Smart Gym')));
                 }).onError((error, stackTrace) {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text("Error"),
-                      content: Text("${error.toString()}"),
+                      content: Text(error.toString()),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () {
@@ -98,7 +98,7 @@ class _SignInScreenState extends State<SignInScreen> {
         GestureDetector(
           onTap: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SignUpScreen()));
+                MaterialPageRoute(builder: (context) => const SignUpScreen()));
           },
           child: const Text(
             "Sign Up",
