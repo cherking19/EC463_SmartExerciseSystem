@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_gym/api.dart';
 import 'dart:convert';
 import '../workout.dart';
 
@@ -180,23 +181,25 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
       BuildContext context, VoidCallback onSuccess) async {
     // print(routine.getSets(index));
     // print(routine.toJson());
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.clear();
-    String routinesJson = prefs.getString(routinesJsonKey) ?? "";
-    Routines routines;
-    if (routinesJson.isEmpty) {
-      routines = Routines([]);
-    } else {
-      routines = Routines.fromJson(jsonDecode(routinesJson));
-    }
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // // prefs.clear();
+    // String routinesJson = prefs.getString(routinesJsonKey) ?? "";
+    // Routines routines;
+    // if (routinesJson.isEmpty) {
+    //   routines = Routines([]);
+    // } else {
+    //   routines = Routines.fromJson(jsonDecode(routinesJson));
+    // }
 
-    routines.addWorkout(workout);
-    routinesJson = jsonEncode(routines.toJson());
+    // routines.addWorkout(workout);
+    // routinesJson = jsonEncode(routines.toJson());
 
     // String workoutJson = jsonEncode(workout.toJson());
     // print(workoutJson);
 
-    await prefs.setString(routinesJsonKey, routinesJson);
+    addWorkout(workout);
+
+    // await prefs.setString(routinesJsonKey, routinesJson);
     // print(result);
     onSuccess.call();
   }
