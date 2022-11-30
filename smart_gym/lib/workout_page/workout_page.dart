@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'create_workout/create_workout.dart';
-import 'view_workout/view_workout.dart';
+import 'view_workout/view_workouts.dart';
 
 class WorkoutPage extends StatelessWidget {
   const WorkoutPage({Key? key}) : super(key: key);
@@ -39,7 +39,7 @@ class WorkoutPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const ViewWorkoutRoute()),
+                        builder: (context) => const ViewWorkoutsRoute()),
                   );
                 },
               ),

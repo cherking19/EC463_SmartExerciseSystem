@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+// import 'package:flutter/src/widgets/container.dart';
+// import 'package:flutter/src/widgets/framework.dart';
 
 import '../main.dart';
 import '../reusable_widgets/reusable_widgets.dart';
@@ -15,9 +15,9 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _nameTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,25 +41,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20, 120, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 120, 20, 0),
             child: Column(
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 reusableTextField("Enter Name", Icons.person_outline, false,
                     _nameTextController),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 reusableTextField("Enter Email", Icons.verified_user, false,
                     _emailTextController),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 reusableTextField("Enter Password", Icons.lock_outlined, true,
                     _passwordTextController),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 signInSignUpButton(context, false, () {
@@ -75,13 +75,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  MyHomePage(title: 'Smart Gym')));
+                                  const MyHomePage(title: 'Smart Gym')));
                     }).onError((error, stackTrace) {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
                           title: const Text("Error"),
-                          content: Text("${error.toString()}"),
+                          content: Text(error.toString()),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
@@ -101,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                           title: const Text("Error"),
-                          content: Text("Please Enter Name"),
+                          content: const Text("Please Enter Name"),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
