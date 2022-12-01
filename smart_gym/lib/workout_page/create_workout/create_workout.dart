@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_gym/utils/notifications.dart';
 import 'package:smart_gym/workout_page/widgets/workout_widgets.dart';
-import 'dart:convert';
 import '../workout.dart';
 
 class CreateWorkoutRoute extends StatelessWidget {
@@ -25,9 +21,33 @@ class CreateWorkoutWidget extends StatefulWidget {
   const CreateWorkoutWidget({super.key});
 
   @override
-  WorkoutFormState createState() {
-    return WorkoutFormState();
+  CreateWorkoutWidgetState createState() {
+    return CreateWorkoutWidgetState();
   }
 }
 
-class CreateWorkoutWidgetState extends State<
+class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return WorkoutForm(
+      editable: true,
+      workout: Workout(
+        '',
+        [
+          Exercise(
+              exerciseChoices.first,
+              [
+                Set(
+                  0,
+                  0,
+                  0,
+                )
+              ],
+              false,
+              false,
+              false),
+        ],
+      ),
+    );
+  }
+}

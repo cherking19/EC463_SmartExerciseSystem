@@ -109,7 +109,7 @@ class Workout {
     return _exercises;
   }
 
-  void set exercises(List<Exercise> exercises) {
+  set exercises(List<Exercise> exercises) {
     _exercises = exercises;
   }
 

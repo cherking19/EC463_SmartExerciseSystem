@@ -5,7 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../workout.dart';
 
 class WorkoutForm extends StatefulWidget {
-  const WorkoutForm({super.key});
+  final bool editable;
+  final Workout workout;
+
+  const WorkoutForm({
+    Key? key,
+    required this.editable,
+    required this.workout,
+  }) : super(key: key);
 
   @override
   WorkoutFormState createState() {
@@ -19,21 +26,6 @@ class WorkoutFormState extends State<WorkoutForm> {
   final WorkoutWidgetController submitController = WorkoutWidgetController();
   // final TextEditingController _setsRepsController = TextEditingController();
   // bool _isExerciseErrorVisible = false;
-
-  Workout workout = Workout('', [
-    Exercise(
-        exerciseChoices.first,
-        [
-          Set(
-            0,
-            0,
-            0,
-          )
-        ],
-        false,
-        false,
-        false),
-  ]);
 
   void showInvalidDialog(BuildContext context) {
     showDialog<String>(
@@ -53,13 +45,13 @@ class WorkoutFormState extends State<WorkoutForm> {
 
   bool validateRoutine() {
     // print(routine.toString());
-    return workout.validateRoutine();
+    return widget.workout.validateRoutine();
   }
 
   void getExercises(List<Exercise> exercises) {
-    print('getting');
-    workout.exercises = exercises;
-    print(workout);
+    // print('getting');
+    widget.workout.exercises = exercises;
+    // print(widget.workout);
   }
 
   Future<void> submitWorkout(
@@ -76,7 +68,7 @@ class WorkoutFormState extends State<WorkoutForm> {
       routines = Routines.fromJson(jsonDecode(routinesJson));
     }
 
-    routines.addWorkout(workout);
+    routines.addWorkout(widget.workout);
     routinesJson = jsonEncode(routines.toJson());
 
     // String workoutJson = jsonEncode(workout.toJson());
@@ -89,6 +81,9 @@ class WorkoutFormState extends State<WorkoutForm> {
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.workout);
+    nameController.text = widget.workout.name;
+
     return Form(
       key: _formKey,
       child: Column(
@@ -98,46 +93,36 @@ class WorkoutFormState extends State<WorkoutForm> {
           WorkoutName(
             formKey: _formKey,
             nameController: nameController,
+            editable: widget.editable,
           ),
           Expanded(
             child: ExercisesWidget(
               submitController: submitController,
               sendExercisesCallback: getExercises,
-              exercises: [
-                Exercise(
-                    exerciseChoices.first,
-                    [
-                      Set(
-                        0,
-                        0,
-                        0,
-                      )
-                    ],
-                    false,
-                    false,
-                    false),
-              ],
+              editable: widget.editable,
+              exercises: widget.workout.exercises,
             ),
           ),
-          TextButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                workout.name = nameController.text;
-                submitController.passDataToParent();
-                if (validateRoutine()) {
-                  submitWorkout(context, () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Creating Workout')),
-                    );
-                    Navigator.pop(context);
-                  });
-                } else {
-                  showInvalidDialog(context);
+          if (widget.editable)
+            TextButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  widget.workout.name = nameController.text;
+                  submitController.passDataToParent();
+                  if (validateRoutine()) {
+                    submitWorkout(context, () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Creating Workout')),
+                      );
+                      Navigator.pop(context);
+                    });
+                  } else {
+                    showInvalidDialog(context);
+                  }
                 }
-              }
-            },
-            child: const Text('Create'),
-          ),
+              },
+              child: const Text('Create'),
+            ),
         ],
       ),
     );
@@ -151,11 +136,13 @@ class WorkoutWidgetController {
 class WorkoutName extends StatelessWidget {
   final GlobalKey formKey;
   final TextEditingController nameController;
+  final bool editable;
 
   const WorkoutName({
     Key? key,
     required this.formKey,
     required this.nameController,
+    required this.editable,
   }) : super(key: key);
 
   @override
@@ -164,6 +151,7 @@ class WorkoutName extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: TextFormField(
         controller: nameController,
+        enabled: editable,
         decoration: const InputDecoration(
           labelText: 'Workout Name',
         ),
@@ -184,12 +172,14 @@ class WorkoutName extends StatelessWidget {
 class ExercisesWidget extends StatefulWidget {
   final WorkoutWidgetController submitController;
   final void Function(List<Exercise>) sendExercisesCallback;
+  final bool editable;
   final List<Exercise> exercises;
 
-  ExercisesWidget({
+  const ExercisesWidget({
     Key? key,
     required this.submitController,
     required this.sendExercisesCallback,
+    required this.editable,
     required this.exercises,
   }) : super(key: key);
 
@@ -301,7 +291,7 @@ class _ExercisesWidgetState extends State<ExercisesWidget> {
   }
 
   void submitExercises() {
-    print('submitting');
+    // print('submitting');
     widget.sendExercisesCallback(widget.exercises);
   }
 
@@ -316,6 +306,7 @@ class _ExercisesWidgetState extends State<ExercisesWidget> {
               itemCount: widget.exercises.length,
               itemBuilder: (BuildContext context, int index) {
                 return ExerciseWidget(
+                  editable: widget.editable,
                   index: index,
                   name: widget.exercises[index].name,
                   sets: widget.exercises[index].sets,
@@ -341,20 +332,26 @@ class _ExercisesWidgetState extends State<ExercisesWidget> {
             ),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
-          child: Text('Add Exercise'),
-        ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: addExercise,
-        ),
+        if (widget.editable)
+          Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+                child: Text('Add Exercise'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: addExercise,
+              ),
+            ],
+          )
       ],
     );
   }
 }
 
 class ExerciseWidget extends StatefulWidget {
+  final bool editable;
   final int index;
   final String name;
   final List<Set> sets;
@@ -378,6 +375,7 @@ class ExerciseWidget extends StatefulWidget {
 
   const ExerciseWidget({
     Key? key,
+    required this.editable,
     required this.index,
     required this.name,
     required this.sets,
@@ -435,13 +433,14 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
               child: Padding(
                 padding: dropdownPadding,
                 child: ExerciseNameDropdown(
+                  readOnly: !widget.editable,
                   index: widget.index,
                   name: widget.name,
                   updateName: widget.updateName,
                 ),
               ),
             ),
-            if (!widget.onlyExercise)
+            if (!widget.onlyExercise && widget.editable)
               IconButton(
                 icon: const Icon(Icons.close),
                 // padding: EdgeInsets.all(0.0),
@@ -452,65 +451,73 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
               ),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          child: Row(
+        if (widget.editable)
+          Column(
             children: [
-              Checkbox(
-                // checkColor: Color,
-                value: isSetsWeightSame,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isSetsWeightSame = value!;
-                    widget.setWeightSameFlag(widget.index, value);
-                    if (isSetsWeightSame) {
-                      widget.setWeightSame(widget.index, widget.sets[0].weight);
-                    }
-                  });
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      // checkColor: Color,
+                      value: isSetsWeightSame,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isSetsWeightSame = value!;
+                          widget.setWeightSameFlag(widget.index, value);
+                          if (isSetsWeightSame) {
+                            widget.setWeightSame(
+                                widget.index, widget.sets[0].weight);
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Same Weight'),
+                    Checkbox(
+                      // checkColor: Colors.white,
+                      value: isSetsRepsSame,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isSetsRepsSame = value!;
+                          widget.setRepsSameFlag(widget.index, value);
+                          if (isSetsRepsSame) {
+                            widget.setRepsSame(
+                                widget.index, widget.sets[0].reps);
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Same Reps'),
+                    Checkbox(
+                      // checkColor: Color,
+                      value: isSetsRestSame,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isSetsRestSame = value!;
+                          widget.setRestSameFlag(widget.index, value);
+                          if (isSetsRestSame) {
+                            widget.setRestSame(
+                                widget.index, widget.sets[0].rest);
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Same Rest'),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                child: Text('Add Set'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  widget.addSet(widget.index);
                 },
               ),
-              const Text('Same Weight'),
-              Checkbox(
-                // checkColor: Colors.white,
-                value: isSetsRepsSame,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isSetsRepsSame = value!;
-                    widget.setRepsSameFlag(widget.index, value);
-                    if (isSetsRepsSame) {
-                      widget.setRepsSame(widget.index, widget.sets[0].reps);
-                    }
-                  });
-                },
-              ),
-              const Text('Same Reps'),
-              Checkbox(
-                // checkColor: Color,
-                value: isSetsRestSame,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isSetsRestSame = value!;
-                    widget.setRestSameFlag(widget.index, value);
-                    if (isSetsRestSame) {
-                      widget.setRestSame(widget.index, widget.sets[0].rest);
-                    }
-                  });
-                },
-              ),
-              const Text('Same Rest'),
             ],
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-          child: Text('Add Set'),
-        ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            widget.addSet(widget.index);
-          },
-        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
           child: Align(
@@ -523,6 +530,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                   children: List.generate(
                     widget.sets.length,
                     (index) => SetsWidget(
+                      editable: widget.editable,
                       exerciseIndex: widget.index,
                       setIndex: index,
                       isSameWeight: isSetsWeightSame,
@@ -551,12 +559,14 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 }
 
 class ExerciseNameDropdown extends StatefulWidget {
+  final bool readOnly;
   final int index;
   final String name;
   final Function updateName;
 
   const ExerciseNameDropdown({
     Key? key,
+    required this.readOnly,
     required this.index,
     required this.updateName,
     required this.name,
@@ -578,9 +588,9 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
     // dropdownValue = widget.name;
     // print('dropdown ' + dropdownValue);
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setInitialName();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   setInitialName();
+    // });
   }
 
   @override
@@ -589,6 +599,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
 
     return DropdownButton<String>(
       value: widget.name,
+      disabledHint: Text(widget.name),
       icon: const Icon(Icons.arrow_downward),
       isExpanded: true,
       elevation: 16,
@@ -596,12 +607,14 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
         height: 2,
         color: Colors.blue,
       ),
-      onChanged: (String? value) {
-        setState(() {
-          // dropdownValue = value!;
-          widget.updateName(widget.index, value);
-        });
-      },
+      onChanged: widget.readOnly
+          ? null
+          : (String? value) {
+              setState(() {
+                // dropdownValue = value!;
+                widget.updateName(widget.index, value);
+              });
+            },
       items: exerciseChoices.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
@@ -613,6 +626,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
 }
 
 class SetsWidget extends StatefulWidget {
+  final bool editable;
   final int exerciseIndex;
   final int setIndex;
   final bool isSameWeight;
@@ -630,6 +644,7 @@ class SetsWidget extends StatefulWidget {
 
   const SetsWidget({
     Key? key,
+    required this.editable,
     required this.exerciseIndex,
     required this.setIndex,
     required this.isSameWeight,
@@ -809,6 +824,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               padding: const EdgeInsets.all(4.0),
               child: Focus(
                 child: TextField(
+                  enabled: widget.editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Weight (lb)',
@@ -835,6 +851,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               padding: const EdgeInsets.all(4.0),
               child: Focus(
                 child: TextField(
+                  enabled: widget.editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Reps',
@@ -861,6 +878,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               padding: const EdgeInsets.all(4.0),
               child: Focus(
                 child: TextField(
+                  enabled: widget.editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Rest (s)',
@@ -881,7 +899,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               ),
             ),
           ),
-          if (!widget.onlySet)
+          if (!widget.onlySet && widget.editable)
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {

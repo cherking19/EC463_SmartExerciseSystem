@@ -1,9 +1,10 @@
 // import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:smart_gym/workout_page/widgets/workout_widgets.dart';
 import '../workout.dart';
 
-class ViewWorkoutRoute extends StatelessWidget {
+class ViewWorkoutRoute extends StatefulWidget {
   // const ViewWorkoutRoute({super.key});
 
   final Workout workout;
@@ -24,41 +25,29 @@ class ViewWorkoutRoute extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(workout.name),
-      ),
-      body: const ViewWorkout(),
-    );
-  }
-
-  // State<ViewWorkoutRoute> createState() => _ViewWorkoutRouteState();
+  State<ViewWorkoutRoute> createState() => _ViewWorkoutRouteState();
 }
 
-class ViewWorkout extends StatelessWidget {
-  const ViewWorkout({super.key});
+class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
+  final bool editable = false;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [],
+    // print(widget.workout);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Viewing Workout'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: WorkoutForm(
+              editable: editable,
+              workout: widget.workout,
+            ),
+          )
+        ],
+      ),
     );
   }
 }
-
-// class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(widget.workoutName),
-//       ),
-//       body: Column(
-//         children: const [],
-//       ),
-//     );
-//   }
-// }
-
-// class _ViewWorkout
