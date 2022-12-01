@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_gym/workout_page/view_workout/view_workout.dart';
 import 'dart:convert';
 import '../workout.dart';
 
@@ -41,7 +42,14 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
     setState(() {});
   }
 
-  void openWorkout() {}
+  void openWorkout(Workout workout) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewWorkoutRoute(workout: workout),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +65,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
                   itemCount: workouts.length,
                   itemBuilder: (BuildContext context, int index) {
                     return TextButton(
-                      onPressed: openWorkout,
+                      onPressed: () => openWorkout(workouts[index]),
                       child: Text(workouts[index].name),
                     );
                   }),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_gym/utils/notifications.dart';
+import 'package:smart_gym/workout_page/widgets/workout_widgets.dart';
 import 'dart:convert';
 import '../workout.dart';
 
@@ -209,23 +211,24 @@ class CreateWorkoutFormState extends State<CreateWorkoutForm> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Workout Name',
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a name';
-                }
-                return null;
-              },
-              onChanged: (value) {
-                workout.setName(value);
-              },
-            ),
-          ),
+          WorkoutName(formKey: _formKey),
+          // Padding(
+          //   padding: const EdgeInsets.all(16.0),
+          //   child: TextFormField(
+          //     decoration: const InputDecoration(
+          //       labelText: 'Workout Name',
+          //     ),
+          //     validator: (value) {
+          //       if (value == null || value.isEmpty) {
+          //         return 'Please enter a name';
+          //       }
+          //       return null;
+          //     },
+          //     onChanged: (value) {
+          //       workout.setName(value);
+          //     },
+          //   ),
+          // ),
           Flexible(
             child: Scrollbar(
               child: ListView.builder(

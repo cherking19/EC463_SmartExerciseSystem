@@ -29,7 +29,8 @@ class WorkoutPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const CreateWorkoutRoute()),
+                      builder: (context) => const CreateWorkoutRoute(),
+                    ),
                   );
                 },
               ),
@@ -39,7 +40,8 @@ class WorkoutPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const ViewWorkoutsRoute()),
+                      builder: (context) => const ViewWorkoutsRoute(),
+                    ),
                   );
                 },
               ),
