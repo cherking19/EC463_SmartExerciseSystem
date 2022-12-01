@@ -1,94 +1,201 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:json_annotation/json_annotation.dart';
-// import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../workout.dart';
 
-part 'workout.g.dart';
+class WorkoutForm extends StatefulWidget {
+  final bool editable;
+  final Workout workout;
 
-const String routinesJsonKey = 'routines';
+  const WorkoutForm({
+    Key? key,
+    required this.editable,
+    required this.workout,
+  }) : super(key: key);
 
-const List<String> exerciseChoices = <String>[
-  'Squat',
-  'Bench Press',
-  'Deadlift',
-  'Overhead Press',
-  'Barbell Row'
-];
-
-@JsonSerializable(explicitToJson: true)
-class Routines {
-  List<Workout> _workouts = [];
-
-  Routines(List<Workout> workouts) {
-    _workouts = workouts;
-  }
-
-  factory Routines.fromJson(Map<String, dynamic> json) =>
-      _$RoutinesFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RoutinesToJson(this);
-
-  List<Workout> get workouts {
-    return _workouts;
-  }
-
-  void addWorkout(Workout workout) {
-    _workouts.add(workout);
+  @override
+  WorkoutFormState createState() {
+    return WorkoutFormState();
   }
 }
 
-@JsonSerializable(explicitToJson: true)
-class Workout {
-  String _name = '';
-  List<Exercise> _exercises = [];
+class WorkoutFormState extends State<WorkoutForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController nameController = TextEditingController();
+  final WorkoutWidgetController submitController = WorkoutWidgetController();
+  // final TextEditingController _setsRepsController = TextEditingController();
+  // bool _isExerciseErrorVisible = false;
 
-  Workout(String name, List<Exercise> exercises) {
-    _name = name;
-    _exercises = exercises;
+  void showInvalidDialog(BuildContext context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Missing Entries'),
+        content: const Text('Please make sure all fields are filled'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool validateRoutine() {
+    // print(routine.toString());
+    return widget.workout.validateRoutine();
+  }
+
+  void getExercises(List<Exercise> exercises) {
+    // print('getting');
+    widget.workout.exercises = exercises;
+    // print(widget.workout);
+  }
+
+  Future<void> submitWorkout(
+      BuildContext context, VoidCallback onSuccess) async {
+    // print(routine.getSets(index));
+    // print(routine.toJson());
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.clear();
+    String routinesJson = prefs.getString(routinesJsonKey) ?? "";
+    Routines routines;
+    if (routinesJson.isEmpty) {
+      routines = Routines([]);
+    } else {
+      routines = Routines.fromJson(jsonDecode(routinesJson));
+    }
+
+    routines.addWorkout(widget.workout);
+    routinesJson = jsonEncode(routines.toJson());
+
+    // String workoutJson = jsonEncode(workout.toJson());
+    // print(workoutJson);
+
+    await prefs.setString(routinesJsonKey, routinesJson);
+    // print(result);
+    onSuccess.call();
   }
 
   @override
-  String toString() {
-    return ('$_name: $_exercises,');
+  Widget build(BuildContext context) {
+    // print(widget.workout);
+    nameController.text = widget.workout.name;
+
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          WorkoutName(
+            formKey: _formKey,
+            nameController: nameController,
+            editable: widget.editable,
+          ),
+          Expanded(
+            child: ExercisesWidget(
+              submitController: submitController,
+              sendExercisesCallback: getExercises,
+              editable: widget.editable,
+              exercises: widget.workout.exercises,
+            ),
+          ),
+          if (widget.editable)
+            TextButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  widget.workout.name = nameController.text;
+                  submitController.passDataToParent();
+                  if (validateRoutine()) {
+                    submitWorkout(context, () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Creating Workout')),
+                      );
+                      Navigator.pop(context);
+                    });
+                  } else {
+                    showInvalidDialog(context);
+                  }
+                }
+              },
+              child: const Text('Create'),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class WorkoutWidgetController {
+  late void Function() passDataToParent;
+}
+
+class WorkoutName extends StatelessWidget {
+  final GlobalKey formKey;
+  final TextEditingController nameController;
+  final bool editable;
+
+  const WorkoutName({
+    Key? key,
+    required this.formKey,
+    required this.nameController,
+    required this.editable,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextFormField(
+        controller: nameController,
+        enabled: editable,
+        decoration: const InputDecoration(
+          labelText: 'Workout Name',
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a name';
+          }
+          return null;
+        },
+        // onChanged: (value) {
+        //   workout.setName(value);
+        // },
+      ),
+    );
+  }
+}
+
+class ExercisesWidget extends StatefulWidget {
+  final WorkoutWidgetController submitController;
+  final void Function(List<Exercise>) sendExercisesCallback;
+  final bool editable;
+  final List<Exercise> exercises;
+
+  const ExercisesWidget({
+    Key? key,
+    required this.submitController,
+    required this.sendExercisesCallback,
+    required this.editable,
+    required this.exercises,
+  }) : super(key: key);
+
+  @override
+  _ExercisesWidgetState createState() {
+    return _ExercisesWidgetState(submitController);
+  }
+}
+
+class _ExercisesWidgetState extends State<ExercisesWidget> {
+  _ExercisesWidgetState(WorkoutWidgetController submitController) {
+    submitController.passDataToParent = submitExercises;
   }
 
-  factory Workout.fromJson(Map<String, dynamic> json) =>
-      _$WorkoutFromJson(json);
-
-  Map<String, dynamic> toJson() => _$WorkoutToJson(this);
-
-  // factory WorkoutRoutine.fromJson(Map<String, dynamic> parsedJson) {
-  //   return WorkoutRoutine();
-  // }
-
-  // Map<String, dynamic> toJson() {
-  //   return {"name": _name, "exercises": jsonEncode(_exercises)};
-  // }
-
-  bool validateRoutine() {
-    if (_name.isEmpty) {
-      return false;
-    }
-
-    for (int i = 0; i < _exercises.length; i++) {
-      if (!_exercises[i].validateExercise()) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  String get name {
-    return _name;
-  }
-
-  set name(String name) {
-    _name = name;
-  }
-
-  int addExercise() {
-    _exercises.add(
+  void addExercise() {
+    widget.exercises.add(
       Exercise(
           exerciseChoices.first,
           [
@@ -102,295 +209,149 @@ class Workout {
           false,
           false),
     );
-    return _exercises.length - 1;
-  }
-
-  List<Exercise> get exercises {
-    return _exercises;
-  }
-
-  set exercises(List<Exercise> exercises) {
-    _exercises = exercises;
+    setState(() {});
   }
 
   void updateExerciseName(int index, String name) {
-    _exercises[index]._name = name;
-    // print(name);
+    setState(() {
+      widget.exercises[index].name = name;
+    });
   }
 
   void deleteExercise(int index) {
-    _exercises.removeAt(index);
-    // print(index);
-
-    // for (int i = 0; i < _exercises.length; i++) {
-    //   print(_exercises[i].getName());
-    // }
+    setState(() {
+      widget.exercises.removeAt(index);
+    });
   }
 
-  // adds a set to the exercise at the specified index. Does not initialize the set to any useful properties
   void addSet(int index) {
-    // assert(index > 0 && index < _exercises.length > )
-    _exercises[index].addSet();
+    setState(() {
+      widget.exercises[index].addSet();
+    });
   }
-
-  void deleteSet(int exerciseIndex, int setIndex) {
-    _exercises[exerciseIndex].deleteSet(setIndex);
-  }
-
-  List<Set> getSets(int index) {
-    return _exercises[index]._sets;
-  }
-
-  // bool anyEmptySets() {
-  //   for (int i = 0; i < _exercises.length; i++) {
-  //     if (_exercises[i]._sets.isEmpty) {
-  //       return true;
-  //     }
-  //   }
-
-  //   return false;
-  // }
 
   void setWeightSameFlag(int index, bool value) {
-    _exercises[index].sameWeight = value;
+    setState(() {
+      widget.exercises[index].sameWeight = value;
+    });
   }
 
   void setRepsSameFlag(int index, bool value) {
-    _exercises[index].sameReps = value;
+    setState(() {
+      widget.exercises[index].sameReps = value;
+    });
   }
 
   void setRestSameFlag(int index, bool value) {
-    _exercises[index].sameRest = value;
+    setState(() {
+      widget.exercises[index].sameRest = value;
+    });
   }
 
   void setWeight(int exerciseIndex, int setIndex, int weight) {
-    _exercises[exerciseIndex].setWeight(setIndex, weight);
+    setState(() {
+      widget.exercises[exerciseIndex].setWeight(setIndex, weight);
+    });
   }
 
   void setReps(int exerciseIndex, int setIndex, int reps) {
-    _exercises[exerciseIndex].setReps(setIndex, reps);
+    setState(() {
+      widget.exercises[exerciseIndex].setReps(setIndex, reps);
+    });
   }
 
   void setRepsSame(int index, int reps) {
-    _exercises[index].setRepsSame(reps);
+    setState(() {
+      widget.exercises[index].setRepsSame(reps);
+    });
   }
 
   void setRest(int exerciseIndex, int setIndex, int rest) {
-    _exercises[exerciseIndex].setRest(setIndex, rest);
+    setState(() {
+      widget.exercises[exerciseIndex].setRest(setIndex, rest);
+    });
   }
 
   void setWeightSame(int index, int weight) {
-    _exercises[index].setWeightSame(weight);
+    setState(() {
+      widget.exercises[index].setWeightSame(weight);
+    });
   }
 
   void setRestSame(int index, int rest) {
-    _exercises[index].setRestSame(rest);
+    setState(() {
+      widget.exercises[index].setRestSame(rest);
+    });
   }
-}
 
-@JsonSerializable(explicitToJson: true)
-class Exercise {
-  String _name = '';
-  List<Set> _sets = [];
-  bool _sameWeight = false;
-  bool _sameReps = false;
-  bool _sameRest = false;
+  void deleteSet(int exerciseIndex, int setIndex) {
+    setState(() {
+      widget.exercises[exerciseIndex].deleteSet(setIndex);
+    });
+  }
 
-  Exercise(String name, List<Set> sets, bool sameWeight, bool sameReps,
-      bool sameRest) {
-    _name = name;
-    _sets = sets;
-    _sameWeight = sameWeight;
-    _sameReps = sameReps;
-    _sameRest = sameRest;
+  void submitExercises() {
+    // print('submitting');
+    widget.sendExercisesCallback(widget.exercises);
   }
 
   @override
-  String toString() {
-    return '$_name: $_sets ';
-  }
-
-  factory Exercise.fromJson(Map<String, dynamic> json) =>
-      _$ExerciseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExerciseToJson(this);
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     "name": _name,
-  //     "sameWeight": _sameWeight,
-  //     "sameReps": _sameReps,
-  //     "sameRest": _sameRest,
-  //     "sets": jsonEncode(_sets)
-  //   };
-  // }
-
-  bool validateExercise() {
-    if (_name.isEmpty) {
-      return false;
-    }
-
-    for (int i = 0; i < _sets.length; i++) {
-      if (!_sets[i].validateSet()) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  String get name {
-    return _name;
-  }
-
-  set name(String name) {
-    _name = name;
-  }
-
-  List<Set> get sets {
-    return _sets;
-  }
-
-  // adds a set to the exercise. Does not initialize the set to any useful properties
-  void addSet() {
-    Set newSet = Set(0, 0, 0);
-
-    if (sameWeight) {
-      newSet.setWeight(_sets[0].weight);
-    }
-
-    if (sameReps) {
-      newSet.setReps(_sets[0].reps);
-    }
-
-    if (sameRest) {
-      newSet.setRest(_sets[0].rest);
-    }
-
-    _sets.add(newSet);
-  }
-
-  void deleteSet(int index) {
-    _sets.removeAt(index);
-  }
-
-  bool get sameWeight {
-    // print('weight $_sameWeight');
-    return _sameWeight;
-  }
-
-  bool get sameReps {
-    // print('reps $_sameReps');
-    return _sameReps;
-  }
-
-  bool get sameRest {
-    // print('rest $_sameRest');
-    return _sameRest;
-  }
-
-  set sameWeight(bool value) {
-    _sameWeight = value;
-  }
-
-  set sameReps(bool value) {
-    _sameReps = value;
-  }
-
-  set sameRest(bool value) {
-    _sameRest = value;
-  }
-
-  void setWeight(int index, int weight) {
-    _sets[index].setWeight(weight);
-  }
-
-  void setWeightSame(int weight) {
-    for (int i = 0; i < _sets.length; i++) {
-      _sets[i].setWeight(weight);
-    }
-  }
-
-  void setReps(int index, int reps) {
-    _sets[index].setReps(reps);
-  }
-
-  void setRepsSame(int reps) {
-    for (int i = 0; i < _sets.length; i++) {
-      _sets[i].setReps(reps);
-    }
-  }
-
-  void setRest(int index, int rest) {
-    _sets[index].setRest(rest);
-  }
-
-  void setRestSame(int rest) {
-    for (int i = 0; i < _sets.length; i++) {
-      _sets[i].setRest(rest);
-    }
-  }
-}
-
-@JsonSerializable()
-class Set {
-  int _weight = 0;
-
-  // the number of reps. In practice should be greater than 0
-  int _reps = 0;
-
-  // the rest time in seconds. Should be greater than 0
-  int _rest = 0;
-
-  Set(int weight, int reps, int rest) {
-    _reps = reps;
-    _rest = rest;
-    _weight = weight;
-  }
-
-  @override
-  String toString() {
-    return 'weight: $_weight, reps: $_reps, rest: $_rest ';
-  }
-
-  factory Set.fromJson(Map<String, dynamic> json) => _$SetFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SetToJson(this);
-
-  bool validateSet() {
-    return _reps > 0 && _rest > 0 && _weight > 0;
-  }
-
-  // set the reps of this set. Should be non-negative
-  void setReps(int reps) {
-    assert(reps >= 0, 'The passed reps is not non-negative');
-    _reps = reps;
-  }
-
-  int get reps {
-    return _reps;
-  }
-
-  // set the rest of this set in seconds. Should be non-negative
-  void setRest(int rest) {
-    assert(rest >= 0, 'The passed rest is not non-negative');
-    _rest = rest;
-  }
-
-  int get rest {
-    return _rest;
-  }
-
-  void setWeight(int weight) {
-    _weight = weight;
-  }
-
-  int get weight {
-    return _weight;
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Flexible(
+          child: Scrollbar(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8.0),
+              itemCount: widget.exercises.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ExerciseWidget(
+                  editable: widget.editable,
+                  index: index,
+                  name: widget.exercises[index].name,
+                  sets: widget.exercises[index].sets,
+                  onlyExercise: widget.exercises.length == 1,
+                  sameWeightFlag: widget.exercises[index].sameWeight,
+                  sameRepsFlag: widget.exercises[index].sameReps,
+                  sameRestFlag: widget.exercises[index].sameRest,
+                  updateName: updateExerciseName,
+                  delete: deleteExercise,
+                  addSet: addSet,
+                  setWeight: setWeight,
+                  setReps: setReps,
+                  setRest: setRest,
+                  setWeightSameFlag: setWeightSameFlag,
+                  setRepsSameFlag: setRepsSameFlag,
+                  setRestSameFlag: setRestSameFlag,
+                  setWeightSame: setWeightSame,
+                  setRepsSame: setRepsSame,
+                  setRestSame: setRestSame,
+                  deleteSet: deleteSet,
+                );
+              },
+            ),
+          ),
+        ),
+        if (widget.editable)
+          Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+                child: Text('Add Exercise'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: addExercise,
+              ),
+            ],
+          )
+      ],
+    );
   }
 }
 
 class ExerciseWidget extends StatefulWidget {
+  final bool editable;
   final int index;
   final String name;
   final List<Set> sets;
@@ -414,6 +375,7 @@ class ExerciseWidget extends StatefulWidget {
 
   const ExerciseWidget({
     Key? key,
+    required this.editable,
     required this.index,
     required this.name,
     required this.sets,
@@ -471,13 +433,14 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
               child: Padding(
                 padding: dropdownPadding,
                 child: ExerciseNameDropdown(
+                  readOnly: !widget.editable,
                   index: widget.index,
                   name: widget.name,
                   updateName: widget.updateName,
                 ),
               ),
             ),
-            if (!widget.onlyExercise)
+            if (!widget.onlyExercise && widget.editable)
               IconButton(
                 icon: const Icon(Icons.close),
                 // padding: EdgeInsets.all(0.0),
@@ -488,65 +451,73 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
               ),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          child: Row(
+        if (widget.editable)
+          Column(
             children: [
-              Checkbox(
-                // checkColor: Color,
-                value: isSetsWeightSame,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isSetsWeightSame = value!;
-                    widget.setWeightSameFlag(widget.index, value);
-                    if (isSetsWeightSame) {
-                      widget.setWeightSame(widget.index, widget.sets[0].weight);
-                    }
-                  });
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      // checkColor: Color,
+                      value: isSetsWeightSame,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isSetsWeightSame = value!;
+                          widget.setWeightSameFlag(widget.index, value);
+                          if (isSetsWeightSame) {
+                            widget.setWeightSame(
+                                widget.index, widget.sets[0].weight);
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Same Weight'),
+                    Checkbox(
+                      // checkColor: Colors.white,
+                      value: isSetsRepsSame,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isSetsRepsSame = value!;
+                          widget.setRepsSameFlag(widget.index, value);
+                          if (isSetsRepsSame) {
+                            widget.setRepsSame(
+                                widget.index, widget.sets[0].reps);
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Same Reps'),
+                    Checkbox(
+                      // checkColor: Color,
+                      value: isSetsRestSame,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isSetsRestSame = value!;
+                          widget.setRestSameFlag(widget.index, value);
+                          if (isSetsRestSame) {
+                            widget.setRestSame(
+                                widget.index, widget.sets[0].rest);
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Same Rest'),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                child: Text('Add Set'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  widget.addSet(widget.index);
                 },
               ),
-              const Text('Same Weight'),
-              Checkbox(
-                // checkColor: Colors.white,
-                value: isSetsRepsSame,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isSetsRepsSame = value!;
-                    widget.setRepsSameFlag(widget.index, value);
-                    if (isSetsRepsSame) {
-                      widget.setRepsSame(widget.index, widget.sets[0].reps);
-                    }
-                  });
-                },
-              ),
-              const Text('Same Reps'),
-              Checkbox(
-                // checkColor: Color,
-                value: isSetsRestSame,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isSetsRestSame = value!;
-                    widget.setRestSameFlag(widget.index, value);
-                    if (isSetsRestSame) {
-                      widget.setRestSame(widget.index, widget.sets[0].rest);
-                    }
-                  });
-                },
-              ),
-              const Text('Same Rest'),
             ],
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-          child: Text('Add Set'),
-        ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            widget.addSet(widget.index);
-          },
-        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
           child: Align(
@@ -559,6 +530,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                   children: List.generate(
                     widget.sets.length,
                     (index) => SetsWidget(
+                      editable: widget.editable,
                       exerciseIndex: widget.index,
                       setIndex: index,
                       isSameWeight: isSetsWeightSame,
@@ -580,17 +552,6 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
             ),
           ),
         ),
-
-        // Visibility(
-        //   visible: _isExerciseSetsErrorVisible,
-        //   child: const Padding(
-        //     padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-        //     child: Text(
-        //       'Please add at least 1 set',
-        //       style: TextStyle(color: Colors.red),
-        //     ),
-        //   ),
-        // ),
       ],
     );
     // );
@@ -598,12 +559,14 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 }
 
 class ExerciseNameDropdown extends StatefulWidget {
+  final bool readOnly;
   final int index;
   final String name;
   final Function updateName;
 
   const ExerciseNameDropdown({
     Key? key,
+    required this.readOnly,
     required this.index,
     required this.updateName,
     required this.name,
@@ -625,9 +588,9 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
     // dropdownValue = widget.name;
     // print('dropdown ' + dropdownValue);
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setInitialName();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   setInitialName();
+    // });
   }
 
   @override
@@ -636,6 +599,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
 
     return DropdownButton<String>(
       value: widget.name,
+      disabledHint: Text(widget.name),
       icon: const Icon(Icons.arrow_downward),
       isExpanded: true,
       elevation: 16,
@@ -643,12 +607,14 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
         height: 2,
         color: Colors.blue,
       ),
-      onChanged: (String? value) {
-        setState(() {
-          // dropdownValue = value!;
-          widget.updateName(widget.index, value);
-        });
-      },
+      onChanged: widget.readOnly
+          ? null
+          : (String? value) {
+              setState(() {
+                // dropdownValue = value!;
+                widget.updateName(widget.index, value);
+              });
+            },
       items: exerciseChoices.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
@@ -660,6 +626,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
 }
 
 class SetsWidget extends StatefulWidget {
+  final bool editable;
   final int exerciseIndex;
   final int setIndex;
   final bool isSameWeight;
@@ -677,6 +644,7 @@ class SetsWidget extends StatefulWidget {
 
   const SetsWidget({
     Key? key,
+    required this.editable,
     required this.exerciseIndex,
     required this.setIndex,
     required this.isSameWeight,
@@ -812,15 +780,6 @@ class _SetsWidgetState extends State<SetsWidget> {
     );
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // _repsController.addListener(() {
-  //   //   var reps = int.parse(_repsController.text);
-  //   //   print(reps);
-  //   // });
-  // }
-
   @override
   void dispose() {
     super.dispose();
@@ -865,6 +824,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               padding: const EdgeInsets.all(4.0),
               child: Focus(
                 child: TextField(
+                  enabled: widget.editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Weight (lb)',
@@ -891,6 +851,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               padding: const EdgeInsets.all(4.0),
               child: Focus(
                 child: TextField(
+                  enabled: widget.editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Reps',
@@ -917,6 +878,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               padding: const EdgeInsets.all(4.0),
               child: Focus(
                 child: TextField(
+                  enabled: widget.editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Rest (s)',
@@ -937,7 +899,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               ),
             ),
           ),
-          if (!widget.onlySet)
+          if (!widget.onlySet && widget.editable)
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
