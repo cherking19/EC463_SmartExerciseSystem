@@ -79,32 +79,38 @@ class Workout {
     return true;
   }
 
-  void setName(String name) {
-    _name = name;
-  }
-
   String get name {
     return _name;
   }
 
+  set name(String name) {
+    _name = name;
+  }
+
   int addExercise() {
-    _exercises.add(Exercise(
-        exerciseChoices.first,
-        [
-          Set(
-            0,
-            0,
-            0,
-          )
-        ],
-        false,
-        false,
-        false));
+    _exercises.add(
+      Exercise(
+          exerciseChoices.first,
+          [
+            Set(
+              0,
+              0,
+              0,
+            )
+          ],
+          false,
+          false,
+          false),
+    );
     return _exercises.length - 1;
   }
 
   List<Exercise> get exercises {
     return _exercises;
+  }
+
+  void set exercises(List<Exercise> exercises) {
+    _exercises = exercises;
   }
 
   void updateExerciseName(int index, String name) {
@@ -146,15 +152,15 @@ class Workout {
   // }
 
   void setWeightSameFlag(int index, bool value) {
-    _exercises[index].setWeightSameFlag(value);
+    _exercises[index].sameWeight = value;
   }
 
   void setRepsSameFlag(int index, bool value) {
-    _exercises[index].setRepsSameFlag(value);
+    _exercises[index].sameReps = value;
   }
 
   void setRestSameFlag(int index, bool value) {
-    _exercises[index].setRestSameFlag(value);
+    _exercises[index].sameRest = value;
   }
 
   void setWeight(int exerciseIndex, int setIndex, int weight) {
@@ -237,6 +243,10 @@ class Exercise {
     return _name;
   }
 
+  set name(String name) {
+    _name = name;
+  }
+
   List<Set> get sets {
     return _sets;
   }
@@ -279,15 +289,15 @@ class Exercise {
     return _sameRest;
   }
 
-  void setWeightSameFlag(bool value) {
+  set sameWeight(bool value) {
     _sameWeight = value;
   }
 
-  void setRepsSameFlag(bool value) {
+  set sameReps(bool value) {
     _sameReps = value;
   }
 
-  void setRestSameFlag(bool value) {
+  set sameRest(bool value) {
     _sameRest = value;
   }
 

@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const SignInScreen(), //MyHomePage(title: 'Smart Gym'),//
+      home: const MyHomePage(title: 'Smart Gym'), //const SignInScreen(),
     );
   }
 }
