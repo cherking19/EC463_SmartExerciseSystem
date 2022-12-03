@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/workout_page/view_workout/view_workout.dart';
-import 'dart:convert';
+import '../../utils/widget_utils.dart';
 import '../workout.dart';
 
 class ViewWorkoutsRoute extends StatelessWidget {
@@ -30,30 +31,54 @@ class ViewWorkouts extends StatefulWidget {
 class ViewWorkoutsState extends State<ViewWorkouts> {
   List<Workout> workouts = [];
 
-  void loadWorkouts() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String routinesJson = prefs.getString(routinesJsonKey) ?? "";
-    // Map<String, dynamic> routines = jsonDecode(routinesJson);
-    if (routinesJson.isNotEmpty) {
-      workouts = Routines.fromJson(jsonDecode(routinesJson)).workouts;
-    }
+  void initialLoadWorkouts() async {
     // print(workout);
-
+    workouts = (await loadRoutines()).workouts;
     setState(() {});
   }
 
-  void openWorkout(Workout workout) {
-    Navigator.push(
+  void deleteWorkout(int index) async {
+    setState(() {
+      workouts.removeAt(index);
+    });
+  }
+
+  void openWorkout(int index) {
+    Future result = Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ViewWorkoutRoute(workout: workout),
+        builder: (context) => ViewWorkoutRoute(
+          workout: workouts[index],
+          index: index,
+        ),
       ),
     );
+
+    result.then((value) {
+      Pair<bool, String> response = value as Pair<bool, String>;
+      if (response.a) {
+        if (response.b == 'Create') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(createSuccessSnackBar(context));
+        } else if (response.b == 'Delete') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(deleteSuccessSnackBar(context));
+        }
+      } else {
+        if (response.b == 'Create') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(createFailedSnackBar(context));
+        } else if (response.b == 'Delete') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(deleteFailedSnackBar(context));
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    loadWorkouts();
+    initialLoadWorkouts();
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -65,7 +90,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
                   itemCount: workouts.length,
                   itemBuilder: (BuildContext context, int index) {
                     return TextButton(
-                      onPressed: () => openWorkout(workouts[index]),
+                      onPressed: () => openWorkout(index),
                       child: Text(workouts[index].name),
                     );
                   }),
