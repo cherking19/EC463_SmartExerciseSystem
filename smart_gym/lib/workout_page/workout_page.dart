@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'create_workout/create_workout.dart';
 import 'view_workout/view_workouts.dart';
 
 class WorkoutPage extends StatelessWidget {
-  const WorkoutPage({Key? key}) : super(key: key);
+  // final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
+
+  const WorkoutPage({
+    Key? key,
+    // required this.scaffoldMessengerKey,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +32,22 @@ class WorkoutPage extends StatelessWidget {
               TextButton(
                 child: const Text('Create Workout'),
                 onPressed: () {
-                  Navigator.push(
+                  Future result = Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const CreateWorkoutRoute(),
                     ),
                   );
+
+                  result.then((value) {
+                    if (value) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(createSuccessSnackBar(context));
+                    } else {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(createFailedSnackBar(context));
+                    }
+                  });
                 },
               ),
               TextButton(

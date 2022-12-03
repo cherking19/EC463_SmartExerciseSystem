@@ -56,24 +56,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedPage = 0;
-  // static List<String> pageTitles = ['Workout', 'History', 'Social', 'Settings'];
-  // String pageTitle = pageTitles[0];
-  List<Widget> bodyWidgets = [
-    const WorkoutPage(),
-    const HistoryPage(),
-    const SocialPage(),
-    const SettingsPage(),
-  ];
-
   void _onPageTapped(int index) {
     setState(() {
       _selectedPage = index;
-      // pageTitle = pageTitles[index];
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> bodyWidgets = [
+      const WorkoutPage(),
+      const HistoryPage(),
+      const SocialPage(),
+      const SettingsPage(),
+    ];
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -131,7 +127,6 @@ class HistoryPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Container(
           alignment: Alignment.topLeft,
-          // color: Colors.blue,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,

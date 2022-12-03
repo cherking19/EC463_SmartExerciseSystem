@@ -5,8 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'workout.g.dart';
 
-const String routinesJsonKey = 'routines';
-
 const List<String> exerciseChoices = <String>[
   'Squat',
   'Bench Press',
@@ -33,7 +31,15 @@ class Routines {
   }
 
   void addWorkout(Workout workout) {
-    _workouts.add(workout);
+    workouts.add(workout);
+  }
+
+  void replaceWorkout(Workout workout, int index) {
+    workouts[index] = workout;
+  }
+
+  void deleteWorkout(int index) {
+    workouts.removeAt(index);
   }
 }
 
@@ -87,8 +93,16 @@ class Workout {
     _name = name;
   }
 
+  List<Exercise> get exercises {
+    return _exercises;
+  }
+
+  set exercises(List<Exercise> exercises) {
+    _exercises = exercises;
+  }
+
   int addExercise() {
-    _exercises.add(
+    exercises.add(
       Exercise(
           exerciseChoices.first,
           [
@@ -102,29 +116,17 @@ class Workout {
           false,
           false),
     );
-    return _exercises.length - 1;
+
+    return exercises.length - 1;
   }
 
-  List<Exercise> get exercises {
-    return _exercises;
-  }
-
-  set exercises(List<Exercise> exercises) {
-    _exercises = exercises;
+  void deleteExercise(int index) {
+    exercises.removeAt(index);
   }
 
   void updateExerciseName(int index, String name) {
     _exercises[index]._name = name;
     // print(name);
-  }
-
-  void deleteExercise(int index) {
-    _exercises.removeAt(index);
-    // print(index);
-
-    // for (int i = 0; i < _exercises.length; i++) {
-    //   print(_exercises[i].getName());
-    // }
   }
 
   // adds a set to the exercise at the specified index. Does not initialize the set to any useful properties
@@ -139,52 +141,6 @@ class Workout {
 
   List<Set> getSets(int index) {
     return _exercises[index]._sets;
-  }
-
-  // bool anyEmptySets() {
-  //   for (int i = 0; i < _exercises.length; i++) {
-  //     if (_exercises[i]._sets.isEmpty) {
-  //       return true;
-  //     }
-  //   }
-
-  //   return false;
-  // }
-
-  void setWeightSameFlag(int index, bool value) {
-    _exercises[index].sameWeight = value;
-  }
-
-  void setRepsSameFlag(int index, bool value) {
-    _exercises[index].sameReps = value;
-  }
-
-  void setRestSameFlag(int index, bool value) {
-    _exercises[index].sameRest = value;
-  }
-
-  void setWeight(int exerciseIndex, int setIndex, int weight) {
-    _exercises[exerciseIndex].setWeight(setIndex, weight);
-  }
-
-  void setReps(int exerciseIndex, int setIndex, int reps) {
-    _exercises[exerciseIndex].setReps(setIndex, reps);
-  }
-
-  void setRepsSame(int index, int reps) {
-    _exercises[index].setRepsSame(reps);
-  }
-
-  void setRest(int exerciseIndex, int setIndex, int rest) {
-    _exercises[exerciseIndex].setRest(setIndex, rest);
-  }
-
-  void setWeightSame(int index, int weight) {
-    _exercises[index].setWeightSame(weight);
-  }
-
-  void setRestSame(int index, int rest) {
-    _exercises[index].setRestSame(rest);
   }
 }
 
@@ -214,16 +170,6 @@ class Exercise {
       _$ExerciseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExerciseToJson(this);
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     "name": _name,
-  //     "sameWeight": _sameWeight,
-  //     "sameReps": _sameReps,
-  //     "sameRest": _sameRest,
-  //     "sets": jsonEncode(_sets)
-  //   };
-  // }
 
   bool validateExercise() {
     if (_name.isEmpty) {
@@ -256,18 +202,18 @@ class Exercise {
     Set newSet = Set(0, 0, 0);
 
     if (sameWeight) {
-      newSet.setWeight(_sets[0].weight);
+      newSet.weight = sets[0].weight;
     }
 
     if (sameReps) {
-      newSet.setReps(_sets[0].reps);
+      newSet.reps = sets[0].reps;
     }
 
     if (sameRest) {
-      newSet.setRest(_sets[0].rest);
+      newSet.rest = sets[0].rest;
     }
 
-    _sets.add(newSet);
+    sets.add(newSet);
   }
 
   void deleteSet(int index) {
@@ -291,43 +237,74 @@ class Exercise {
 
   set sameWeight(bool value) {
     _sameWeight = value;
+
+    if (sameWeight) {
+      for (Set set in sets) {
+        set.weight = sets[0].weight;
+      }
+    }
   }
 
   set sameReps(bool value) {
     _sameReps = value;
+
+    if (sameReps) {
+      for (Set set in sets) {
+        set.reps = sets[0].reps;
+      }
+    }
   }
 
   set sameRest(bool value) {
     _sameRest = value;
-  }
 
-  void setWeight(int index, int weight) {
-    _sets[index].setWeight(weight);
-  }
-
-  void setWeightSame(int weight) {
-    for (int i = 0; i < _sets.length; i++) {
-      _sets[i].setWeight(weight);
+    if (sameRest) {
+      for (Set set in sets) {
+        set.rest = sets[0].rest;
+      }
     }
   }
 
+  void setWeight(int index, int weight) {
+    if (sameWeight) {
+      print('same weight');
+      for (Set set in sets) {
+        set.weight = weight;
+      }
+    } else {
+      sets[index].weight = weight;
+    }
+  }
+
+  // void setWeightSame(int weight) {
+  //   for (int i = 0; i < _sets.length; i++) {
+  //     _sets[i].weight = weight;
+  //   }
+  // }
+
   void setReps(int index, int reps) {
-    _sets[index].setReps(reps);
+    if (sameReps) {
+      for (Set set in sets) {
+        set.reps = reps;
+      }
+    } else {
+      sets[index].reps = reps;
+    }
   }
 
   void setRepsSame(int reps) {
     for (int i = 0; i < _sets.length; i++) {
-      _sets[i].setReps(reps);
+      _sets[i].reps = reps;
     }
   }
 
   void setRest(int index, int rest) {
-    _sets[index].setRest(rest);
+    _sets[index].rest = rest;
   }
 
   void setRestSame(int rest) {
     for (int i = 0; i < _sets.length; i++) {
-      _sets[i].setRest(rest);
+      _sets[i].rest = rest;
     }
   }
 }
@@ -361,10 +338,8 @@ class Set {
     return _reps > 0 && _rest > 0 && _weight > 0;
   }
 
-  // set the reps of this set. Should be non-negative
-  void setReps(int reps) {
-    assert(reps >= 0, 'The passed reps is not non-negative');
-    _reps = reps;
+  set reps(int value) {
+    _reps = value;
   }
 
   int get reps {
@@ -372,17 +347,17 @@ class Set {
   }
 
   // set the rest of this set in seconds. Should be non-negative
-  void setRest(int rest) {
+  set rest(int value) {
     assert(rest >= 0, 'The passed rest is not non-negative');
-    _rest = rest;
+    _rest = value;
   }
 
   int get rest {
     return _rest;
   }
 
-  void setWeight(int weight) {
-    _weight = weight;
+  set weight(int value) {
+    _weight = value;
   }
 
   int get weight {
