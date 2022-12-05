@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/api.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/workout_page/widgets/workout_widgets.dart';
@@ -73,6 +74,7 @@ class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
   ) async {
     Routines routines = await loadRoutines();
     routines.addWorkout(workout);
+    addWorkout(workout);
 
     Future.delayed(const Duration(seconds: 2), () async {
       if (await saveRoutines(routines)) {
