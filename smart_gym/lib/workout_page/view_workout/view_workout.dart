@@ -67,30 +67,42 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
     _submitController.saveWorkout!();
   }
 
-  void cancelEdit() {
-    widget.workout = preSaveWorkout!;
+  void cancelEdit() async {
+    if (await showConfirmationDialog(
+      context,
+      confirmCancelDialogTitle,
+      confirmCancelDialogMessage,
+    )) {
+      widget.workout = preSaveWorkout!;
 
-    setState(() {
-      editable = false;
-    });
+      setState(() {
+        editable = false;
+      });
+    }
   }
 
   void deleteWorkout() async {
-    setState(() {
-      working = true;
-    });
+    if (await showConfirmationDialog(
+      context,
+      confirmDeleteDialogTitle,
+      confirmDeleteDialogMessage,
+    )) {
+      setState(() {
+        working = true;
+      });
 
-    Routines routines = await loadRoutines();
-    routines.deleteWorkout(widget.index);
+      Routines routines = await loadRoutines();
+      routines.deleteWorkout(widget.index);
 
-    Future.delayed(const Duration(seconds: 1), () async {
-      if (await saveRoutines(routines)) {
-        Navigator.of(context).pop(Pair(true, 'Delete'));
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(deleteFailedSnackBar(context));
-      }
-    });
+      Future.delayed(const Duration(seconds: 1), () async {
+        if (await saveRoutines(routines)) {
+          Navigator.of(context).pop(Pair(true, 'Delete'));
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(deleteFailedSnackBar(context));
+        }
+      });
+    }
   }
 
   @override
