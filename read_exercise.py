@@ -20,6 +20,8 @@ debug = False
 if(len(sys.argv)>1):
     debug=sys.argv[1]
 
+print("Please hold still in rest position for (3) seconds.")
+
 while(True):
     if sensor.in_waiting > 0:
         # Read data out of the buffer until a carraige return / new line is found
@@ -74,7 +76,8 @@ while(True):
                         still=0
                     if(still>=30):
                         start_y,start_p,start_r = yav,pav,rav
-                        print("calibration complete, starting point = ",yav,pav,rav)
+                        if(debug):
+                            print("calibration complete, starting point = ",yav,pav,rav)
                         still=0
                         # state=1
                         # curls=0
