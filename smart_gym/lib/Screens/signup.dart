@@ -71,11 +71,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         .then((value) {
                       FirebaseAuth.instance.currentUser
                           ?.updateDisplayName(_nameTextController.text);
-                      Navigator.push(
+                      Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const MyHomePage(title: 'Smart Gym')));
+                                  const MyHomePage(title: 'Smart Gym')),
+                                  (route) => false);
                     }).onError((error, stackTrace) {
                       showDialog(
                         context: context,
