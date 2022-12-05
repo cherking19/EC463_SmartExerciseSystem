@@ -67,88 +67,112 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
     _submitController.saveWorkout!();
   }
 
-  void cancelEdit() {
-    widget.workout = preSaveWorkout!;
+  void cancelEdit() async {
+    if (await showConfirmationDialog(
+      context,
+      confirmCancelDialogTitle,
+      confirmCancelDialogMessage,
+    )) {
+      widget.workout = preSaveWorkout!;
 
-    setState(() {
-      editable = false;
-    });
+      setState(() {
+        editable = false;
+      });
+    }
   }
 
   void deleteWorkout() async {
-    setState(() {
-      working = true;
-    });
+    if (await showConfirmationDialog(
+      context,
+      confirmDeleteDialogTitle,
+      confirmDeleteDialogMessage,
+    )) {
+      setState(() {
+        working = true;
+      });
 
-    Routines routines = await loadRoutines();
-    routines.deleteWorkout(widget.index);
+      Routines routines = await loadRoutines();
+      routines.deleteWorkout(widget.index);
 
-    Future.delayed(const Duration(seconds: 1), () async {
-      if (await saveRoutines(routines)) {
-        Navigator.of(context).pop(Pair(true, 'Delete'));
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(deleteFailedSnackBar(context));
-      }
-    });
+      Future.delayed(const Duration(seconds: 1), () async {
+        if (await saveRoutines(routines)) {
+          Navigator.of(context).pop(Pair(true, 'Delete'));
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(deleteFailedSnackBar(context));
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // print(widget.workout);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Viewing Workout'),
-      ),
-      body: Column(
-        children: [
-          if (!working)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: !editable ? openEdit : null,
-                  child: const Text('Edit'),
-                ),
-                TextButton(
-                  onPressed: editable ? saveEdit : null,
-                  child: const Text('Save'),
-                ),
-                TextButton(
-                  onPressed: editable ? cancelEdit : null,
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: deleteWorkout,
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Viewing Workout'),
+        ),
+        body: Column(
+          children: [
+            if (!working)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: !editable ? openEdit : null,
+                    child: const Text('Edit'),
                   ),
-                  child: const Text('Delete'),
-                ),
-              ],
-            ),
-          if (working)
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SizedBox(
-                height: 20.0,
-                width: 20.0,
-                child: CircularProgressIndicator(
-                  value: null,
+                  TextButton(
+                    onPressed: editable ? saveEdit : null,
+                    child: const Text('Save'),
+                  ),
+                  TextButton(
+                    onPressed: editable ? cancelEdit : null,
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: deleteWorkout,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
+                    child: const Text('Delete'),
+                  ),
+                ],
+              ),
+            if (working)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: SizedBox(
+                  height: 20.0,
+                  width: 20.0,
+                  child: CircularProgressIndicator(
+                    value: null,
+                  ),
                 ),
               ),
-            ),
-          Expanded(
-            child: WorkoutForm(
-              editable: editable,
-              viewing: true,
-              workout: widget.workout,
-              saveWorkout: updateWorkout,
-              submitController: _submitController,
-            ),
-          )
-        ],
+            Expanded(
+              child: WorkoutForm(
+                editable: editable,
+                viewing: true,
+                workout: widget.workout,
+                saveWorkout: updateWorkout,
+                submitController: _submitController,
+              ),
+            )
+          ],
+        ),
       ),
+      onWillPop: () async {
+        if (editable) {
+          return await showConfirmationDialog(
+            context,
+            confirmCancelDialogTitle,
+            confirmCancelDialogMessage,
+          );
+        }
+
+        return true;
+      },
     );
   }
 }
