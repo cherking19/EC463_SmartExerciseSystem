@@ -26,15 +26,18 @@ void loop() {
   // values for acceleration and rotation:
   float xAcc, yAcc, zAcc;
   float xGyro, yGyro, zGyro;
+//  float xm,ym,zm;
 
   // values for orientation:
   float roll, pitch, heading;
   // check if the IMU is ready to read:
   if (IMU.accelerationAvailable() &&
-      IMU.gyroscopeAvailable()) {
+      IMU.gyroscopeAvailable() &&
+      IMU.magneticFieldAvailable()) {
     // read accelerometer &and gyrometer:
     IMU.readAcceleration(xAcc, yAcc, zAcc);
     IMU.readGyroscope(xGyro, yGyro, zGyro);
+//    IMU.readMagneticField(xm,ym,zm);
 
     // update the filter, which computes orientation:
     filter.updateIMU(xGyro, yGyro, zGyro, xAcc, yAcc, zAcc);
