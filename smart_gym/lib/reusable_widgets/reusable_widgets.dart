@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+const String confirmCancelDialogTitle = 'Confirm Cancel';
+const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
+
+const String confirmDeleteDialogTitle = 'Confirm Delete';
+const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
+
 Image logoWidget(String imageName) {
   return Image.asset(
     imageName,
@@ -124,4 +130,31 @@ SnackBar deleteFailedSnackBar(BuildContext context) {
       },
     ),
   );
+}
+
+Future<bool> showConfirmationDialog(
+    BuildContext context, String title, String message) async {
+  return (await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            child: const Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+            child: const Text('No'),
+          ),
+        ],
+      );
+    },
+  ))!;
 }

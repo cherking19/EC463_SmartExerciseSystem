@@ -11,12 +11,27 @@ class CreateWorkoutRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Create Workout'),
+    return WillPopScope(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: const Text('Create Workout'),
+        ),
+        body: const CreateWorkoutWidget(),
       ),
-      body: const CreateWorkoutWidget(),
+      onWillPop: () async {
+        return await showConfirmationDialog(
+          context,
+          confirmCancelDialogTitle,
+          confirmCancelDialogMessage,
+        );
+        // print(result);
+        // return result;
+
+        // if (result) {
+        //   Navigator.of(context).pop();
+        // }
+      },
     );
   }
 }
