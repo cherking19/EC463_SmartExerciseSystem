@@ -395,36 +395,48 @@ class _SetsWidgetState extends State<SetsWidget> {
                 padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                 child: Row(
                   children: [
-                    Checkbox(
-                      value: widget.exercise.sameWeight,
-                      onChanged: (bool? value) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        setState(() {
-                          widget.exercise.sameWeight = value!;
-                        });
-                      },
-                    ),
-                    const Text('Same Weight'),
-                    Checkbox(
-                      value: widget.exercise.sameReps,
-                      onChanged: (bool? value) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        setState(() {
-                          widget.exercise.sameReps = value!;
-                        });
-                      },
-                    ),
-                    const Text('Same Reps'),
-                    Checkbox(
-                      value: widget.exercise.sameRest,
-                      onChanged: (bool? value) {
-                        setState(() {
+                    Expanded(
+                      child: Checkbox(
+                        value: widget.exercise.sameWeight,
+                        onChanged: (bool? value) {
                           FocusManager.instance.primaryFocus?.unfocus();
-                          widget.exercise.sameRest = value!;
-                        });
-                      },
+                          setState(() {
+                            widget.exercise.sameWeight = value!;
+                          });
+                        },
+                      ),
                     ),
-                    const Text('Same Rest'),
+                    Expanded(
+                      child: const Text('Same Weight'),
+                    ),
+                    Expanded(
+                      child: Checkbox(
+                        value: widget.exercise.sameReps,
+                        onChanged: (bool? value) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          setState(() {
+                            widget.exercise.sameReps = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: const Text('Same Reps'),
+                    ),
+                    Expanded(
+                      child: Checkbox(
+                        value: widget.exercise.sameRest,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            widget.exercise.sameRest = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: const Text('Same Rest'),
+                    ),
                   ],
                 ),
               ),
