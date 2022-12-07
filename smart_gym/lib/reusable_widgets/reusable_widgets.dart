@@ -106,6 +106,32 @@ SnackBar createFailedSnackBar(BuildContext context) {
   );
 }
 
+SnackBar editSuccessSnackBar(BuildContext context) {
+  return SnackBar(
+    content: const Text('Edit Success'),
+    backgroundColor: Colors.green,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+      },
+    ),
+  );
+}
+
+SnackBar editFailedSnackBar(BuildContext context) {
+  return SnackBar(
+    content: const Text('Edit Failed'),
+    backgroundColor: Colors.red,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+      },
+    ),
+  );
+}
+
 SnackBar deleteSuccessSnackBar(BuildContext context) {
   return SnackBar(
     content: const Text('Delete Success'),

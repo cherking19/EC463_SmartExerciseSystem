@@ -406,8 +406,8 @@ class _SetsWidgetState extends State<SetsWidget> {
                         },
                       ),
                     ),
-                    Expanded(
-                      child: const Text('Same Weight'),
+                    const Expanded(
+                      child: Text('Same Weight'),
                     ),
                     Expanded(
                       child: Checkbox(
@@ -420,8 +420,8 @@ class _SetsWidgetState extends State<SetsWidget> {
                         },
                       ),
                     ),
-                    Expanded(
-                      child: const Text('Same Reps'),
+                    const Expanded(
+                      child: Text('Same Reps'),
                     ),
                     Expanded(
                       child: Checkbox(
@@ -434,8 +434,8 @@ class _SetsWidgetState extends State<SetsWidget> {
                         },
                       ),
                     ),
-                    Expanded(
-                      child: const Text('Same Rest'),
+                    const Expanded(
+                      child: Text('Same Rest'),
                     ),
                   ],
                 ),

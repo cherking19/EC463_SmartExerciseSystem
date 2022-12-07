@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/workout_page/track_workout/track_workout.dart';
+import 'package:smart_gym/workout_page/workout.dart';
+import '../utils/widget_utils.dart';
 import 'create_workout/create_workout.dart';
 import 'view_workout/view_workouts.dart';
 
-class WorkoutPage extends StatelessWidget {
-  // final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
+class WorkoutPage extends StatefulWidget {
+  Workout? currentWorkout;
+  TrackedWorkout? trackedWorkout;
 
-  const WorkoutPage({
+  WorkoutPage({
     Key? key,
-    // required this.scaffoldMessengerKey,
+    required this.currentWorkout,
+    required this.trackedWorkout,
   }) : super(key: key);
+
+  @override
+  State<WorkoutPage> createState() {
+    return WorkoutPageState();
+  }
+}
+
+class WorkoutPageState extends State<WorkoutPage> {
+  void startTracking(Workout workout) {
+    widget.currentWorkout = workout;
+    widget.trackedWorkout = workout.getTrackedWorkout();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +38,6 @@ class WorkoutPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Container(
           alignment: Alignment.topLeft,
-          // color: Colors.blue,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -53,17 +70,75 @@ class WorkoutPage extends StatelessWidget {
               TextButton(
                 child: const Text('View Workouts'),
                 onPressed: () {
-                  Navigator.push(
+                  Future result = Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const ViewWorkoutsRoute(),
                     ),
                   );
+
+                  result.then((value) {
+                    if (value != null) {
+                      NavigatorResponse response = value as NavigatorResponse;
+
+                      if (response.action == 'Track') {
+                        startTracking(response.data as Workout);
+                      }
+                    }
+                  });
                 },
               ),
+              if (widget.currentWorkout != null)
+                WorkoutInProgressBar(
+                  workout: widget.currentWorkout!,
+                  trackedWorkout: widget.trackedWorkout!,
+                ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class WorkoutInProgressBar extends StatefulWidget {
+  final Workout workout;
+  final TrackedWorkout trackedWorkout;
+
+  const WorkoutInProgressBar({
+    Key? key,
+    required this.workout,
+    required this.trackedWorkout,
+  }) : super(key: key);
+
+  @override
+  State<WorkoutInProgressBar> createState() {
+    return WorkoutInProgressBarState();
+  }
+}
+
+class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
+  void openTracking() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrackWorkoutRoute(
+          workout: widget.workout,
+          trackedWorkout: widget.trackedWorkout,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: openTracking,
+      child: Column(
+        children: [
+          const Text('Workout In Progress'),
+          Text(widget.workout.name),
+        ],
       ),
     );
   }
