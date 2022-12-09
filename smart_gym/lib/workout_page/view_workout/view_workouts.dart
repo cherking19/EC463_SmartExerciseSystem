@@ -60,18 +60,18 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
       if (value != null) {
         NavigatorResponse response = value as NavigatorResponse;
 
-        if (response.action == 'Edit') {
+        if (response.action == editAction) {
           if (response.success) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(editSuccessSnackBar(context));
           }
-        } else if (response.action == 'Delete') {
+        } else if (response.action == deleteAction) {
           response.success
               ? ScaffoldMessenger.of(context)
                   .showSnackBar(deleteSuccessSnackBar(context))
               : ScaffoldMessenger.of(context)
                   .showSnackBar(deleteFailedSnackBar(context));
-        } else if (response.action == 'Track') {
+        } else if (response.action == trackAction) {
           Navigator.of(context).pop(response);
         }
       }

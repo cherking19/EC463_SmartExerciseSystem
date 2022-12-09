@@ -8,6 +8,11 @@
 //   );
 // }
 
+const String editAction = 'Edit';
+const String deleteAction = 'Delete';
+const String finishAction = 'Finish';
+const String trackAction = 'Track';
+
 class NavigatorResponse {
   bool success;
   String action;

@@ -24,9 +24,22 @@ class WorkoutPage extends StatefulWidget {
 
 class WorkoutPageState extends State<WorkoutPage> {
   void startTracking(Workout workout) {
-    widget.currentWorkout = workout;
-    widget.trackedWorkout = workout.getTrackedWorkout();
-    setState(() {});
+    if (widget.currentWorkout != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        workoutInProgressSnackBar(context),
+      );
+    } else {
+      widget.currentWorkout = workout;
+      widget.trackedWorkout = workout.getTrackedWorkout();
+      setState(() {});
+    }
+  }
+
+  void finishTracking() {
+    // print('finish');
+    setState(() {
+      widget.currentWorkout = null;
+    });
   }
 
   @override
@@ -92,6 +105,7 @@ class WorkoutPageState extends State<WorkoutPage> {
                 WorkoutInProgressBar(
                   workout: widget.currentWorkout!,
                   trackedWorkout: widget.trackedWorkout!,
+                  finishTracking: finishTracking,
                 ),
             ],
           ),
@@ -102,13 +116,15 @@ class WorkoutPageState extends State<WorkoutPage> {
 }
 
 class WorkoutInProgressBar extends StatefulWidget {
-  final Workout workout;
+  Workout? workout;
   final TrackedWorkout trackedWorkout;
+  final Function finishTracking;
 
-  const WorkoutInProgressBar({
+  WorkoutInProgressBar({
     Key? key,
     required this.workout,
     required this.trackedWorkout,
+    required this.finishTracking,
   }) : super(key: key);
 
   @override
@@ -119,15 +135,27 @@ class WorkoutInProgressBar extends StatefulWidget {
 
 class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
   void openTracking() {
-    Navigator.push(
+    Future result = Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => TrackWorkoutRoute(
-          workout: widget.workout,
+          workout: widget.workout!,
           trackedWorkout: widget.trackedWorkout,
         ),
       ),
     );
+
+    result.then((value) {
+      NavigatorResponse response = value as NavigatorResponse;
+
+      if (response.success) {
+        if (response.action == finishAction) {
+          // widget.workout = null;
+          // print('response');
+          widget.finishTracking();
+        }
+      }
+    });
   }
 
   @override
@@ -137,7 +165,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
       child: Column(
         children: [
           const Text('Workout In Progress'),
-          Text(widget.workout.name),
+          Text(widget.workout!.name),
         ],
       ),
     );

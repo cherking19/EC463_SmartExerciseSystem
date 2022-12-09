@@ -6,6 +6,9 @@ const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
 const String confirmDeleteDialogTitle = 'Confirm Delete';
 const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
 
+const String confirmFinishDialogTitle = 'Confirm Finish';
+const String confirmFinishDialogMessage = 'Are you sure you want to finish?';
+
 Image logoWidget(String imageName) {
   return Image.asset(
     imageName,
@@ -148,6 +151,19 @@ SnackBar deleteSuccessSnackBar(BuildContext context) {
 SnackBar deleteFailedSnackBar(BuildContext context) {
   return SnackBar(
     content: const Text('Delete Failed'),
+    backgroundColor: Colors.red,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+      },
+    ),
+  );
+}
+
+SnackBar workoutInProgressSnackBar(BuildContext context) {
+  return SnackBar(
+    content: const Text('There is already a workout in progress'),
     backgroundColor: Colors.red,
     action: SnackBarAction(
       label: 'OK',
