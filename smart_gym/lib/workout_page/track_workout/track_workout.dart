@@ -60,17 +60,26 @@ class TrackWorkout extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text(workout.name),
+          child: Text(
+            workout.name,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         Expanded(
           child: Scrollbar(
             child: ListView.builder(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               itemCount: workout.exercises.length,
               itemBuilder: (BuildContext context, int index) {
-                return TrackExercise(
-                  exercise: workout.exercises[index],
-                  trackedExercise: trackedWorkout.exercises[index],
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                  child: TrackExercise(
+                    exercise: workout.exercises[index],
+                    trackedExercise: trackedWorkout.exercises[index],
+                  ),
                 );
               },
             ),
@@ -87,7 +96,7 @@ class TrackWorkout extends StatelessWidget {
   }
 }
 
-class TrackExercise extends StatelessWidget {
+class TrackExercise extends StatefulWidget {
   final Exercise exercise;
   final TrackedExercise trackedExercise;
 
@@ -98,13 +107,25 @@ class TrackExercise extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  TrackExerciseState createState() {
+    return TrackExerciseState();
+  }
+}
+
+class TrackExerciseState extends State<TrackExercise> {
+  void update() {
+    print('update');
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(exercise.name),
+        Text(widget.exercise.name),
         Padding(
-          padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 0.0),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Scrollbar(
@@ -112,11 +133,13 @@ class TrackExercise extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: List.generate(
-                    exercise.sets.length,
+                    widget.exercise.sets.length,
                     (index) => TrackSet(
                       index: index,
-                      set: exercise.sets[index],
-                      trackedSet: trackedExercise.sets[index],
+                      // set: exercise.sets[index],
+
+                      trackedExercise: widget.trackedExercise,
+                      updateParent: update,
                     ),
                   ),
                 ),
@@ -131,14 +154,16 @@ class TrackExercise extends StatelessWidget {
 
 class TrackSet extends StatefulWidget {
   final int index;
-  final Set set;
-  final TrackedSet trackedSet;
+  // final Set set;
+  final TrackedExercise trackedExercise;
+  final Function updateParent;
 
   const TrackSet({
     Key? key,
     required this.index,
-    required this.set,
-    required this.trackedSet,
+    // required this.set,
+    required this.trackedExercise,
+    required this.updateParent,
   }) : super(key: key);
 
   @override
@@ -155,26 +180,43 @@ class TrackSetState extends State<TrackSet>
 
   void clickSet() {
     if (progressController.value == 0.0) {
-      repsDisplay = widget.trackedSet.total_reps.toString();
-      widget.trackedSet.reps_done = widget.trackedSet.total_reps;
+      widget.trackedExercise.sets[widget.index].reps_done =
+          widget.trackedExercise.sets[widget.index].total_reps;
+      repsDisplay =
+          widget.trackedExercise.sets[widget.index].reps_done.toString();
       progressController.animateTo(1.0);
+      widget.updateParent();
     } else {
-      widget.trackedSet.reps_done = widget.trackedSet.reps_done - 1;
-      repsDisplay = widget.trackedSet.reps_done.toString();
+      widget.trackedExercise.sets[widget.index].reps_done =
+          widget.trackedExercise.sets[widget.index].reps_done! - 1;
+      repsDisplay =
+          widget.trackedExercise.sets[widget.index].reps_done.toString();
       progressController.animateBack(
-          widget.trackedSet.reps_done / widget.trackedSet.total_reps);
+          widget.trackedExercise.sets[widget.index].reps_done! /
+              widget.trackedExercise.sets[widget.index].total_reps);
     }
   }
 
   @override
   void initState() {
+    // print('init');
     progressController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     )..addListener(() {
         setState(() {});
       });
-    repsDisplay = widget.trackedSet.total_reps.toString();
+
+    if (widget.trackedExercise.sets[widget.index].reps_done != null) {
+      repsDisplay =
+          widget.trackedExercise.sets[widget.index].reps_done.toString();
+      progressController.value =
+          widget.trackedExercise.sets[widget.index].reps_done! /
+              widget.trackedExercise.sets[widget.index].total_reps;
+    } else {
+      repsDisplay =
+          widget.trackedExercise.sets[widget.index].total_reps.toString();
+    }
     super.initState();
   }
 
@@ -186,26 +228,42 @@ class TrackSetState extends State<TrackSet>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Positioned(
-          right: 7,
-          child: SizedBox(
-            width: 50,
-            height: 50,
-            child: CircularProgressIndicator(
-              value: progressController.value,
+        Stack(
+          children: [
+            Positioned(
+              right: 7,
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: CircularProgressIndicator(
+                  value: progressController.value,
+                ),
+              ),
             ),
-          ),
+            TextButton(
+              onPressed: (widget.index != 0
+                      ? (widget.trackedExercise.sets[widget.index - 1]
+                              .reps_done !=
+                          null)
+                      : true)
+                  ? clickSet
+                  : null,
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.blue.withOpacity(0.0),
+                fixedSize: const Size(50, 50),
+                shape: const CircleBorder(),
+              ),
+              child: Text(repsDisplay),
+            ),
+          ],
         ),
-        TextButton(
-          onPressed: clickSet,
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.blue.withOpacity(0.0),
-            fixedSize: const Size(50, 50),
-            shape: const CircleBorder(),
+        Padding(
+          padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+          child: Text(
+            widget.trackedExercise.sets[widget.index].weight.toString(),
           ),
-          child: Text(repsDisplay),
         ),
       ],
     );

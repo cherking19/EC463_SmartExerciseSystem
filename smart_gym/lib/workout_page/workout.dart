@@ -353,7 +353,11 @@ class Set {
   }
 
   TrackedSet getTrackedSet() {
-    return TrackedSet(0, reps);
+    return TrackedSet(
+      null,
+      reps,
+      weight,
+    );
   }
 }
 
@@ -368,6 +372,11 @@ class TrackedWorkout {
   ) {
     _name = name;
     _exercises = exercises;
+  }
+
+  @override
+  String toString() {
+    return '$name: $exercises ';
   }
 
   factory TrackedWorkout.fromJson(Map<String, dynamic> json) =>
@@ -405,6 +414,11 @@ class TrackedExercise {
     _sets = sets;
   }
 
+  @override
+  String toString() {
+    return '$name: $sets ';
+  }
+
   factory TrackedExercise.fromJson(Map<String, dynamic> json) =>
       _$TrackedExerciseFromJson(json);
 
@@ -429,15 +443,23 @@ class TrackedExercise {
 
 @JsonSerializable()
 class TrackedSet {
-  int _reps_done = 0;
+  int? _reps_done = null;
   int _total_reps = 0;
+  int _weight = 0;
 
   TrackedSet(
-    int reps_done,
+    int? reps_done,
     int total_reps,
+    int weight,
   ) {
     _reps_done = reps_done;
     _total_reps = total_reps;
+    _weight = weight;
+  }
+
+  @override
+  String toString() {
+    return ('reps done: $reps_done, total reps: $total_reps');
   }
 
   factory TrackedSet.fromJson(Map<String, dynamic> json) =>
@@ -445,11 +467,11 @@ class TrackedSet {
 
   Map<String, dynamic> toJson() => _$TrackedSetToJson(this);
 
-  int get reps_done {
+  int? get reps_done {
     return _reps_done;
   }
 
-  set reps_done(int reps_done) {
+  set reps_done(int? reps_done) {
     _reps_done = reps_done;
   }
 
@@ -459,5 +481,13 @@ class TrackedSet {
 
   set total_reps(int total_reps) {
     _total_reps = total_reps;
+  }
+
+  int get weight {
+    return _weight;
+  }
+
+  set weight(int weight) {
+    _weight = weight;
   }
 }

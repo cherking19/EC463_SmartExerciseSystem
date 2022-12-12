@@ -146,15 +146,19 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
     );
 
     result.then((value) {
-      NavigatorResponse response = value as NavigatorResponse;
+      if (value != null) {
+        NavigatorResponse response = value as NavigatorResponse;
 
-      if (response.success) {
-        if (response.action == finishAction) {
-          // widget.workout = null;
-          // print('response');
-          widget.finishTracking();
+        if (response.success) {
+          if (response.action == finishAction) {
+            // widget.workout = null;
+            // print('response');
+            widget.finishTracking();
+          }
         }
       }
+
+      // print(widget.trackedWorkout);
     });
   }
 

@@ -87,12 +87,14 @@ Map<String, dynamic> _$TrackedExerciseToJson(TrackedExercise instance) =>
     };
 
 TrackedSet _$TrackedSetFromJson(Map<String, dynamic> json) => TrackedSet(
-      json['reps_done'] as int,
+      json['reps_done'] as int?,
       json['total_reps'] as int,
+      json['weight'] as int,
     );
 
 Map<String, dynamic> _$TrackedSetToJson(TrackedSet instance) =>
     <String, dynamic>{
       'reps_done': instance.reps_done,
       'total_reps': instance.total_reps,
+      'weight': instance.weight,
     };
