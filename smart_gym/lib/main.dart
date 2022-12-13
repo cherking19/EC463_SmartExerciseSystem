@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
+import 'package:smart_gym/services/TimerService.dart';
 // import 'workout_page/workout.dart';
 import 'workout_page/workout.dart';
 import 'workout_page/workout_page.dart';
@@ -9,7 +10,13 @@ import 'workout_page/workout_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  final TimerService timerService = TimerService();
+  runApp(
+    TimerServiceProvider(
+      service: timerService,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

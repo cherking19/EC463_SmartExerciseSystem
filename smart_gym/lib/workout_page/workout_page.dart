@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/workout_page/track_workout/track_workout.dart';
@@ -23,6 +25,9 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class WorkoutPageState extends State<WorkoutPage> {
+  // int rest = 0;
+  // Timer? timer;
+
   void startTracking(Workout workout) {
     if (widget.currentWorkout != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -32,35 +37,52 @@ class WorkoutPageState extends State<WorkoutPage> {
       widget.currentWorkout = workout;
       widget.trackedWorkout = workout.getTrackedWorkout();
       setState(() {});
-      Future result = Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TrackWorkoutRoute(
-              workout: widget.currentWorkout!,
-              trackedWorkout: widget.trackedWorkout!),
-        ),
-      );
-
-      result.then((value) {
-        if (value != null) {
-          NavigatorResponse response = value as NavigatorResponse;
-
-          if (response.success) {
-            if (response.action == finishAction) {
-              // widget.workout = null;
-              // print('response');
-              finishTracking();
-            }
-          }
-        }
-
-        // print(widget.trackedWorkout);
-      });
+      openTracking();
     }
   }
 
+  void openTracking() {
+    Future result = Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrackWorkoutRoute(
+          workout: widget.currentWorkout!,
+          trackedWorkout: widget.trackedWorkout!,
+          // rest: rest,
+        ),
+      ),
+    );
+
+    result.then((value) {
+      if (value != null) {
+        NavigatorResponse response = value as NavigatorResponse;
+
+        if (response.success) {
+          if (response.action == finishAction) {
+            finishTracking();
+          }
+        }
+      }
+    });
+  }
+
+  // void startTimer() {
+  //   Timer(
+  //     const Duration(seconds: 1),
+  //     countDown,
+  //   );
+  // }
+
+  // void countDown() {
+  //   if (rest > 0) {
+  //     timer = Timer(
+  //       const Duration(seconds: 1),
+  //       countDown,
+  //     );
+  //   }
+  // }
+
   void finishTracking() {
-    // print('finish');
     setState(() {
       widget.currentWorkout = null;
     });
@@ -129,7 +151,7 @@ class WorkoutPageState extends State<WorkoutPage> {
                 WorkoutInProgressBar(
                   workout: widget.currentWorkout!,
                   trackedWorkout: widget.trackedWorkout!,
-                  finishTracking: finishTracking,
+                  openTracking: openTracking,
                 ),
             ],
           ),
@@ -142,13 +164,13 @@ class WorkoutPageState extends State<WorkoutPage> {
 class WorkoutInProgressBar extends StatefulWidget {
   Workout? workout;
   final TrackedWorkout trackedWorkout;
-  final Function finishTracking;
+  final Function openTracking;
 
   WorkoutInProgressBar({
     Key? key,
     required this.workout,
     required this.trackedWorkout,
-    required this.finishTracking,
+    required this.openTracking,
   }) : super(key: key);
 
   @override
@@ -159,31 +181,7 @@ class WorkoutInProgressBar extends StatefulWidget {
 
 class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
   void openTracking() {
-    Future result = Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TrackWorkoutRoute(
-          workout: widget.workout!,
-          trackedWorkout: widget.trackedWorkout,
-        ),
-      ),
-    );
-
-    result.then((value) {
-      if (value != null) {
-        NavigatorResponse response = value as NavigatorResponse;
-
-        if (response.success) {
-          if (response.action == finishAction) {
-            // widget.workout = null;
-            // print('response');
-            widget.finishTracking();
-          }
-        }
-      }
-
-      // print(widget.trackedWorkout);
-    });
+    widget.openTracking();
   }
 
   @override

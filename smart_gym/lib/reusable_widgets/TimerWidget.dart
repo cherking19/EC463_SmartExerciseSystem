@@ -4,10 +4,12 @@ import '../utils/widget_utils.dart';
 
 class TimerWidget extends StatefulWidget {
   int seconds;
+  // int globalRest;
 
   TimerWidget({
     Key? key,
     required this.seconds,
+    // required this.globalRest,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,7 @@ class TimerWidgetState extends State<TimerWidget> {
   @override
   void initState() {
     if (widget.seconds > 0) {
+      // widget.globalRest = widget.seconds;
       timer = Timer(
         const Duration(seconds: 1),
         countDown,
@@ -33,34 +36,17 @@ class TimerWidgetState extends State<TimerWidget> {
 
   @override
   void dispose() {
-    print('dipose');
     if (timer != null) {
-      print('cancel');
       timer!.cancel();
     }
 
     super.dispose();
   }
 
-  // @override
-  // void didUpdateWidget(TimerWidget oldWidget) {
-  //   if (widget.seconds > 0) {
-  //     if (timer != null) {
-  //       timer!.cancel();
-  //     }
-
-  //     timer = Timer(
-  //       const Duration(seconds: 1),
-  //       countDown,
-  //     );
-  //   }
-
-  //   super.didUpdateWidget(oldWidget);
-  // }
-
   void countDown() {
     setState(() {
       widget.seconds -= 1;
+      // widget.globalRest = widget.seconds;
     });
 
     if (widget.seconds > 0) {
@@ -73,7 +59,10 @@ class TimerWidgetState extends State<TimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
-    return Text(getFormattedDuration(Duration(seconds: widget.seconds)));
+    return Text(
+      getFormattedDuration(
+        Duration(seconds: widget.seconds),
+      ),
+    );
   }
 }

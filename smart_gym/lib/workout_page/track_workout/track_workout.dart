@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/workout_page/workout.dart';
 
@@ -8,11 +9,13 @@ import '../../reusable_widgets/TimerWidget.dart';
 class TrackWorkoutRoute extends StatelessWidget {
   final Workout workout;
   final TrackedWorkout trackedWorkout;
+  // int rest;
 
-  const TrackWorkoutRoute({
+  TrackWorkoutRoute({
     Key? key,
     required this.workout,
     required this.trackedWorkout,
+    // required this.rest,
   }) : super(key: key);
 
   @override
@@ -24,6 +27,7 @@ class TrackWorkoutRoute extends StatelessWidget {
       body: TrackWorkout(
         workout: workout,
         trackedWorkout: trackedWorkout,
+        // rest: rest,
       ),
     );
   }
@@ -32,11 +36,13 @@ class TrackWorkoutRoute extends StatelessWidget {
 class TrackWorkout extends StatefulWidget {
   final Workout workout;
   final TrackedWorkout trackedWorkout;
+  // int rest;
 
-  const TrackWorkout({
+  TrackWorkout({
     Key? key,
     required this.workout,
     required this.trackedWorkout,
+    // required this.rest,
   }) : super(key: key);
 
   @override
@@ -44,25 +50,20 @@ class TrackWorkout extends StatefulWidget {
 }
 
 class TrackWorkoutState extends State<TrackWorkout> {
-  int? rest;
-  TimerWidget? timer;
+  // TimerWidget? timer;
 
   void startTimer(int seconds) {
-    // print('set state timer');
-    // print(seconds);
     // setState(() {
-    //   timer = null;
+    //   timer = TimerWidget(
+    //     key: UniqueKey(),
+    //     seconds: seconds,
+    //     // globalRest: widget.rest,
+    //   );
     // });
-
-    setState(() {
-      timer = TimerWidget(
-        key: UniqueKey(),
-        seconds: seconds,
-      );
-    });
+    TimerService.of(context).restart(seconds);
   }
 
-  void finishWorkout(BuildContext context) {
+  void stopWorkout(BuildContext context) {
     if (!widget.trackedWorkout.isWorkoutDone()) {
       Future result = showConfirmationDialog(
         context,
@@ -72,59 +73,75 @@ class TrackWorkoutState extends State<TrackWorkout> {
 
       result.then((value) {
         if (value) {
-          Navigator.of(context).pop(
-            NavigatorResponse(true, finishAction, null),
-          );
+          finishWorkout(context);
         }
       });
     } else {
-      Navigator.of(context).pop(
-        NavigatorResponse(true, finishAction, null),
-      );
+      finishWorkout(context);
     }
+  }
+
+  void finishWorkout(BuildContext context) {
+    TimerService.of(context).stop();
+    Navigator.of(context).pop(
+      NavigatorResponse(true, finishAction, null),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            widget.workout.name,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Scrollbar(
-            child: ListView.builder(
+    return AnimatedBuilder(
+      animation: TimerService.of(context),
+      builder: (context, child) {
+        return Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
               padding: const EdgeInsets.all(16.0),
-              itemCount: widget.workout.exercises.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
-                  child: TrackExercise(
-                    exercise: widget.workout.exercises[index],
-                    trackedExercise: widget.trackedWorkout.exercises[index],
-                    startTimer: startTimer,
-                  ),
-                );
-              },
+              child: Text(
+                widget.workout.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
-        ),
-        if (timer != null) timer!,
-        TextButton(
-          onPressed: () {
-            finishWorkout(context);
-          },
-          child: const Text('Finish'),
-        ),
-      ],
+            Expanded(
+              child: Scrollbar(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16.0),
+                  itemCount: widget.workout.exercises.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                      child: TrackExercise(
+                        exercise: widget.workout.exercises[index],
+                        trackedExercise: widget.trackedWorkout.exercises[index],
+                        startTimer: startTimer,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            // if (timer != null) timer!,
+            if (TimerService.of(context).isRunning)
+              Text(
+                getFormattedDuration(
+                  Duration(
+                    seconds: TimerService.of(context).elapsed,
+                  ),
+                ),
+              ),
+            TextButton(
+              onPressed: () {
+                stopWorkout(context);
+              },
+              child: const Text('Finish'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
