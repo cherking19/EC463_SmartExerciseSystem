@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/workout_page/workout.dart';
 import '../utils/widget_utils.dart';
@@ -65,22 +66,6 @@ class WorkoutPageState extends State<WorkoutPage> {
       }
     });
   }
-
-  // void startTimer() {
-  //   Timer(
-  //     const Duration(seconds: 1),
-  //     countDown,
-  //   );
-  // }
-
-  // void countDown() {
-  //   if (rest > 0) {
-  //     timer = Timer(
-  //       const Duration(seconds: 1),
-  //       countDown,
-  //     );
-  //   }
-  // }
 
   void finishTracking() {
     setState(() {
@@ -148,10 +133,15 @@ class WorkoutPageState extends State<WorkoutPage> {
                 },
               ),
               if (widget.currentWorkout != null)
-                WorkoutInProgressBar(
-                  workout: widget.currentWorkout!,
-                  trackedWorkout: widget.trackedWorkout!,
-                  openTracking: openTracking,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: WorkoutInProgressBar(
+                      workout: widget.currentWorkout!,
+                      trackedWorkout: widget.trackedWorkout!,
+                      openTracking: openTracking,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -186,14 +176,76 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: openTracking,
-      child: Column(
-        children: [
-          const Text('Workout In Progress'),
-          Text(widget.workout!.name),
-        ],
-      ),
+    return AnimatedBuilder(
+      animation: TimerService.of(context),
+      builder: (context, child) {
+        return ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(10),
+            padding: const EdgeInsets.all(12.0),
+          ),
+          onPressed: openTracking,
+          child: Padding(
+            padding: const EdgeInsets.all(
+              0.0,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: Row(
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.workout!.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      const Text(
+                        'In Progress',
+                      ),
+                    ],
+                  ),
+                  if (TimerService.of(context).isRunning)
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              getFormattedDuration(
+                                Duration(
+                                    seconds: TimerService.of(context).elapsed),
+                              ),
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              getFormattedDuration(
+                                Duration(
+                                    seconds: TimerService.of(context).duration),
+                              ),
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

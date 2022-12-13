@@ -6,6 +6,7 @@ class TimerService extends ChangeNotifier {
   int _duration = 0;
   int _elapsed = 0;
 
+  int get duration => _duration;
   int get elapsed => _elapsed;
 
   bool get isRunning => _timer != null;
