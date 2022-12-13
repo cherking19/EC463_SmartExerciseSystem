@@ -3,6 +3,8 @@ import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/workout_page/workout.dart';
 
+import '../../reusable_widgets/TimerWidget.dart';
+
 class TrackWorkoutRoute extends StatelessWidget {
   final Workout workout;
   final TrackedWorkout trackedWorkout;
@@ -27,7 +29,7 @@ class TrackWorkoutRoute extends StatelessWidget {
   }
 }
 
-class TrackWorkout extends StatelessWidget {
+class TrackWorkout extends StatefulWidget {
   final Workout workout;
   final TrackedWorkout trackedWorkout;
 
@@ -37,20 +39,49 @@ class TrackWorkout extends StatelessWidget {
     required this.trackedWorkout,
   }) : super(key: key);
 
-  void finishWorkout(BuildContext context) {
-    Future result = showConfirmationDialog(
-      context,
-      confirmFinishDialogTitle,
-      confirmFinishDialogMessage,
-    );
+  @override
+  State<TrackWorkout> createState() => TrackWorkoutState();
+}
 
-    result.then((value) {
-      if (value) {
-        Navigator.of(context).pop(
-          NavigatorResponse(true, finishAction, null),
-        );
-      }
+class TrackWorkoutState extends State<TrackWorkout> {
+  int? rest;
+  TimerWidget? timer;
+
+  void startTimer(int seconds) {
+    // print('set state timer');
+    // print(seconds);
+    // setState(() {
+    //   timer = null;
+    // });
+
+    setState(() {
+      timer = TimerWidget(
+        key: UniqueKey(),
+        seconds: seconds,
+      );
     });
+  }
+
+  void finishWorkout(BuildContext context) {
+    if (!widget.trackedWorkout.isWorkoutDone()) {
+      Future result = showConfirmationDialog(
+        context,
+        confirmFinishDialogTitle,
+        confirmFinishDialogMessage,
+      );
+
+      result.then((value) {
+        if (value) {
+          Navigator.of(context).pop(
+            NavigatorResponse(true, finishAction, null),
+          );
+        }
+      });
+    } else {
+      Navigator.of(context).pop(
+        NavigatorResponse(true, finishAction, null),
+      );
+    }
   }
 
   @override
@@ -61,7 +92,7 @@ class TrackWorkout extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            workout.name,
+            widget.workout.name,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -72,19 +103,21 @@ class TrackWorkout extends StatelessWidget {
           child: Scrollbar(
             child: ListView.builder(
               padding: const EdgeInsets.all(16.0),
-              itemCount: workout.exercises.length,
+              itemCount: widget.workout.exercises.length,
               itemBuilder: (BuildContext context, int index) {
                 return Padding(
-                  padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
                   child: TrackExercise(
-                    exercise: workout.exercises[index],
-                    trackedExercise: trackedWorkout.exercises[index],
+                    exercise: widget.workout.exercises[index],
+                    trackedExercise: widget.trackedWorkout.exercises[index],
+                    startTimer: startTimer,
                   ),
                 );
               },
             ),
           ),
         ),
+        if (timer != null) timer!,
         TextButton(
           onPressed: () {
             finishWorkout(context);
@@ -99,11 +132,13 @@ class TrackWorkout extends StatelessWidget {
 class TrackExercise extends StatefulWidget {
   final Exercise exercise;
   final TrackedExercise trackedExercise;
+  final Function startTimer;
 
   const TrackExercise({
     Key? key,
     required this.exercise,
     required this.trackedExercise,
+    required this.startTimer,
   }) : super(key: key);
 
   @override
@@ -114,7 +149,6 @@ class TrackExercise extends StatefulWidget {
 
 class TrackExerciseState extends State<TrackExercise> {
   void update() {
-    print('update');
     setState(() {});
   }
 
@@ -134,12 +168,15 @@ class TrackExerciseState extends State<TrackExercise> {
                 child: Row(
                   children: List.generate(
                     widget.exercise.sets.length,
-                    (index) => TrackSet(
-                      index: index,
-                      // set: exercise.sets[index],
-
-                      trackedExercise: widget.trackedExercise,
-                      updateParent: update,
+                    (index) => Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
+                      child: TrackSet(
+                        index: index,
+                        set: widget.exercise.sets[index],
+                        trackedExercise: widget.trackedExercise,
+                        updateParent: update,
+                        startTimer: widget.startTimer,
+                      ),
                     ),
                   ),
                 ),
@@ -154,16 +191,18 @@ class TrackExerciseState extends State<TrackExercise> {
 
 class TrackSet extends StatefulWidget {
   final int index;
-  // final Set set;
+  final Set set;
   final TrackedExercise trackedExercise;
   final Function updateParent;
+  final Function startTimer;
 
   const TrackSet({
     Key? key,
     required this.index,
-    // required this.set,
+    required this.set,
     required this.trackedExercise,
     required this.updateParent,
+    required this.startTimer,
   }) : super(key: key);
 
   @override
@@ -179,27 +218,29 @@ class TrackSetState extends State<TrackSet>
   // double progress = 0.0;
 
   void clickSet() {
+    if (widget.trackedExercise.sets[widget.index].reps_done == null) {
+      widget.startTimer(widget.set.rest);
+    }
+
     if (progressController.value == 0.0) {
       widget.trackedExercise.sets[widget.index].reps_done =
           widget.trackedExercise.sets[widget.index].total_reps;
-      repsDisplay =
-          widget.trackedExercise.sets[widget.index].reps_done.toString();
       progressController.animateTo(1.0);
       widget.updateParent();
     } else {
       widget.trackedExercise.sets[widget.index].reps_done =
           widget.trackedExercise.sets[widget.index].reps_done! - 1;
-      repsDisplay =
-          widget.trackedExercise.sets[widget.index].reps_done.toString();
       progressController.animateBack(
           widget.trackedExercise.sets[widget.index].reps_done! /
               widget.trackedExercise.sets[widget.index].total_reps);
     }
+
+    repsDisplay =
+        widget.trackedExercise.sets[widget.index].reps_done.toString();
   }
 
   @override
   void initState() {
-    // print('init');
     progressController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -260,7 +301,7 @@ class TrackSetState extends State<TrackSet>
           ],
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
           child: Text(
             widget.trackedExercise.sets[widget.index].weight.toString(),
           ),

@@ -32,6 +32,30 @@ class WorkoutPageState extends State<WorkoutPage> {
       widget.currentWorkout = workout;
       widget.trackedWorkout = workout.getTrackedWorkout();
       setState(() {});
+      Future result = Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TrackWorkoutRoute(
+              workout: widget.currentWorkout!,
+              trackedWorkout: widget.trackedWorkout!),
+        ),
+      );
+
+      result.then((value) {
+        if (value != null) {
+          NavigatorResponse response = value as NavigatorResponse;
+
+          if (response.success) {
+            if (response.action == finishAction) {
+              // widget.workout = null;
+              // print('response');
+              finishTracking();
+            }
+          }
+        }
+
+        // print(widget.trackedWorkout);
+      });
     }
   }
 

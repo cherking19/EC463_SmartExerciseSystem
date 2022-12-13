@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/TimerWidget.dart';
+import 'package:smart_gym/utils/widget_utils.dart';
 
 const String confirmCancelDialogTitle = 'Confirm Cancel';
 const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
@@ -7,7 +11,8 @@ const String confirmDeleteDialogTitle = 'Confirm Delete';
 const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
 
 const String confirmFinishDialogTitle = 'Confirm Finish';
-const String confirmFinishDialogMessage = 'Are you sure you want to finish?';
+const String confirmFinishDialogMessage =
+    'The workout is not complete. Are you sure you want to finish?';
 
 Image logoWidget(String imageName) {
   return Image.asset(

@@ -399,6 +399,16 @@ class TrackedWorkout {
   set exercises(List<TrackedExercise> exercises) {
     _exercises = exercises;
   }
+
+  bool isWorkoutDone() {
+    for (TrackedExercise exercise in exercises) {
+      if (!exercise.isExerciseDone()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 @JsonSerializable()
@@ -438,6 +448,16 @@ class TrackedExercise {
 
   set sets(List<TrackedSet> sets) {
     _sets = sets;
+  }
+
+  bool isExerciseDone() {
+    for (TrackedSet set in sets) {
+      if (set.reps_done == null) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 
