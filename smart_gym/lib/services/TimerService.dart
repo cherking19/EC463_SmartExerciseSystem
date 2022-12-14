@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 
 class TimerService extends ChangeNotifier {
   Timer? _timer;
+  // duration in seconds
   int _duration = 0;
-  int _elapsed = 0;
+
+  int _elapsedMilli = 0;
+  int _deltaMilli = 50;
+  // int _elapsed = 0;
 
   int get duration => _duration;
-  int get elapsed => _elapsed;
+  int get elapsedMilli => _elapsedMilli;
 
   bool get isRunning => _timer != null;
 
@@ -16,10 +20,12 @@ class TimerService extends ChangeNotifier {
   void restart(int duration) {
     stop();
     _duration = duration;
-    _elapsed = 0;
+    // _elapsedMilli = duration * 1000;
+    _elapsedMilli = 0;
     _timer = Timer.periodic(
-        const Duration(
-          seconds: 1,
+        Duration(
+          // seconds: 1,
+          milliseconds: _deltaMilli,
         ), (timer) {
       countUp();
     });
@@ -28,9 +34,12 @@ class TimerService extends ChangeNotifier {
   }
 
   void countUp() {
-    _elapsed++;
+    _elapsedMilli += _deltaMilli;
+    // print(_elapsedMilli);
 
-    if (_elapsed == _duration) {}
+    if (elapsedMilli == _duration * 1000) {
+      // stop();
+    }
 
     notifyListeners();
   }

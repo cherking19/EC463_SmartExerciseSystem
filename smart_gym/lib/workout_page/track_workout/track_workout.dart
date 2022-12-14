@@ -93,53 +93,66 @@ class TrackWorkoutState extends State<TrackWorkout> {
     return AnimatedBuilder(
       animation: TimerService.of(context),
       builder: (context, child) {
-        return Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                widget.workout.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  0.0,
+                  0.0,
+                  0.0,
+                  16.0,
                 ),
-              ),
-            ),
-            Expanded(
-              child: Scrollbar(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: widget.workout.exercises.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
-                      child: TrackExercise(
-                        exercise: widget.workout.exercises[index],
-                        trackedExercise: widget.trackedWorkout.exercises[index],
-                        startTimer: startTimer,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            // if (timer != null) timer!,
-            if (TimerService.of(context).isRunning)
-              Text(
-                getFormattedDuration(
-                  Duration(
-                    seconds: TimerService.of(context).elapsed,
+                child: Text(
+                  widget.workout.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            TextButton(
-              onPressed: () {
-                stopWorkout(context);
-              },
-              child: const Text('Finish'),
-            ),
-          ],
+              Expanded(
+                child: Scrollbar(
+                  child: ListView.builder(
+                    // padding: const EdgeInsets.all(16.0),
+                    itemCount: widget.workout.exercises.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                        child: TrackExercise(
+                          exercise: widget.workout.exercises[index],
+                          trackedExercise:
+                              widget.trackedWorkout.exercises[index],
+                          startTimer: startTimer,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              // if (timer != null) timer!,
+              if (TimerService.of(context).isRunning)
+                // Text(
+                //   getFormattedDuration(
+                //     Duration(
+                //       seconds: TimerService.of(context).elapsed,
+                //     ),
+                //   ),
+                // ),
+                const SizedBox(
+                  width: double.infinity,
+                  child: RestTimer(),
+                ),
+              TextButton(
+                onPressed: () {
+                  stopWorkout(context);
+                },
+                child: const Text('Finish'),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -171,37 +184,50 @@ class TrackExerciseState extends State<TrackExercise> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.exercise.name),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 0.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Scrollbar(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(
-                    widget.exercise.sets.length,
-                    (index) => Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
-                      child: TrackSet(
-                        index: index,
-                        set: widget.exercise.sets[index],
-                        trackedExercise: widget.trackedExercise,
-                        updateParent: update,
-                        startTimer: widget.startTimer,
+    return Container(
+      decoration: globalBoxDecoration,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.exercise.name,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 0.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Scrollbar(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(
+                        widget.exercise.sets.length,
+                        (index) => Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
+                          child: TrackSet(
+                            index: index,
+                            set: widget.exercise.sets[index],
+                            trackedExercise: widget.trackedExercise,
+                            updateParent: update,
+                            startTimer: widget.startTimer,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -232,7 +258,6 @@ class TrackSetState extends State<TrackSet>
     with SingleTickerProviderStateMixin {
   late AnimationController progressController;
   String repsDisplay = '';
-  // double progress = 0.0;
 
   void clickSet() {
     if (widget.trackedExercise.sets[widget.index].reps_done == null) {
@@ -260,7 +285,7 @@ class TrackSetState extends State<TrackSet>
   void initState() {
     progressController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: globalAnimationSpeed,
     )..addListener(() {
         setState(() {});
       });
@@ -309,7 +334,7 @@ class TrackSetState extends State<TrackSet>
                   ? clickSet
                   : null,
               style: TextButton.styleFrom(
-                backgroundColor: Colors.blue.withOpacity(0.0),
+                backgroundColor: const Color.fromARGB(255, 190, 190, 190),
                 fixedSize: const Size(50, 50),
                 shape: const CircleBorder(),
               ),
@@ -319,11 +344,128 @@ class TrackSetState extends State<TrackSet>
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
-          child: Text(
-            widget.trackedExercise.sets[widget.index].weight.toString(),
-          ),
+          child: WeightTooltip(
+              weight: widget.trackedExercise.sets[widget.index].weight),
+          // Text(
+          //   widget.trackedExercise.sets[widget.index].weight.toString(),
+          // ),
         ),
+        // const Text(
+        //   'lbs',
+        // ),
       ],
+    );
+  }
+}
+
+class WeightTooltip extends StatelessWidget {
+  final int weight;
+
+  const WeightTooltip({
+    Key? key,
+    required this.weight,
+  }) : super(key: key);
+
+  String trimPlate(double plate) {
+    int whole = plate.truncate();
+    double remainder = plate - whole;
+
+    if (remainder > 0) {
+      return plate.toString();
+    } else {
+      String plateS = plate.toString();
+      return plateS.substring(0, plateS.indexOf('.'));
+    }
+  }
+
+  String printPlates(List<double> plates) {
+    String config = '';
+
+    for (double plate in plates) {
+      config += '${trimPlate(plate)}, ';
+    }
+
+    return config.substring(0, config.length - 2);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // print('bye');
+    return Tooltip(
+      message:
+          'Plates per side\n${printPlates(calculatePlates(weight.toDouble()))}',
+      child: Text(
+        weight.toString(),
+      ),
+    );
+  }
+}
+
+class RestTimer extends StatefulWidget {
+  const RestTimer({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<RestTimer> createState() => RestTimerState();
+}
+
+class RestTimerState extends State<RestTimer> {
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: TimerService.of(context),
+      builder: (context, child) {
+        return Container(
+          decoration: globalBoxDecoration,
+          child: Align(
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    getFormattedDuration(
+                      Duration(
+                        seconds: TimerService.of(context).elapsedMilli ~/ 1000,
+                      ),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 6.0),
+                  child: TweenAnimationBuilder(
+                    tween: Tween<double>(
+                      begin: 0,
+                      end: TimerService.of(context).elapsedMilli /
+                          (TimerService.of(context).duration * 1000),
+                    ),
+                    duration: globalAnimationSpeed,
+                    builder: ((context, value, child) {
+                      // print(value);
+                      return LinearProgressIndicator(
+                        value: value,
+                        backgroundColor: const Color.fromARGB(
+                          0,
+                          0,
+                          0,
+                          0,
+                        ),
+                        // valueColor: const AlwaysStoppedAnimation<Color>(
+                        //   Colors.white,
+                        // ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

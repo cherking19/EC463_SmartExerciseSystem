@@ -32,3 +32,29 @@ String getFormattedDuration(Duration duration) {
 
   return "$twoDigitMinutes:$twoDigitSeconds";
 }
+
+const List<double> available_plates = [45, 25, 10, 5, 2.5];
+
+List<double> calculatePlates(double weight) {
+  // print(weight);
+  // print('hi');
+  List<double> plates = [];
+
+  weight -= 45;
+  weight /= 2;
+
+  for (double plate in available_plates) {
+    int num = weight ~/ plate;
+    weight -= plate * num;
+
+    for (int i = 0; i < num; i++) {
+      plates.add(plate);
+    }
+
+    if (weight == 0) {
+      return plates;
+    }
+  }
+
+  return plates;
+}

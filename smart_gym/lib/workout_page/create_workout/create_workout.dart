@@ -26,12 +26,6 @@ class CreateWorkoutRoute extends StatelessWidget {
           confirmCancelDialogTitle,
           confirmCancelDialogMessage,
         );
-        // print(result);
-        // return result;
-
-        // if (result) {
-        //   Navigator.of(context).pop();
-        // }
       },
     );
   }
