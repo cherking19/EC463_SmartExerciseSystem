@@ -2,13 +2,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
+import 'package:smart_gym/services/TimerService.dart';
 // import 'workout_page/workout.dart';
+import 'workout_page/workout.dart';
 import 'workout_page/workout_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  final TimerService timerService = TimerService();
+  runApp(
+    TimerServiceProvider(
+      service: timerService,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -55,7 +63,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Workout? currentWorkout;
+  TrackedWorkout? trackedWorkout;
   int _selectedPage = 0;
+  List<Widget> bodyWidgets = [];
+
   void _onPageTapped(int index) {
     setState(() {
       _selectedPage = index;
@@ -63,13 +75,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    List<Widget> bodyWidgets = [
-      const WorkoutPage(),
+  void initState() {
+    super.initState();
+
+    bodyWidgets = [
+      WorkoutPage(
+        currentWorkout: currentWorkout,
+        trackedWorkout: trackedWorkout,
+      ),
       const HistoryPage(),
       const SocialPage(),
       const SettingsPage(),
     ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //

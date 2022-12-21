@@ -14,7 +14,7 @@ class CreateWorkoutRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Create Workout'),
         ),
@@ -26,12 +26,6 @@ class CreateWorkoutRoute extends StatelessWidget {
           confirmCancelDialogTitle,
           confirmCancelDialogMessage,
         );
-        // print(result);
-        // return result;
-
-        // if (result) {
-        //   Navigator.of(context).pop();
-        // }
       },
     );
   }

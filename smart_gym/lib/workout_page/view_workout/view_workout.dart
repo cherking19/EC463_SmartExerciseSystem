@@ -44,12 +44,15 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
 
     Future.delayed(const Duration(seconds: 1), () async {
       if (await saveRoutines(routines)) {
-        Navigator.of(context).pop(Pair(true, 'Create'));
+        Navigator.of(context).pop(NavigatorResponse(true, 'Edit', null));
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(createFailedSnackBar(context));
+        ScaffoldMessenger.of(context).showSnackBar(editFailedSnackBar(context));
       }
     });
+  }
+
+  void trackWorkout() {
+    Navigator.of(context).pop(NavigatorResponse(true, 'Track', widget.workout));
   }
 
   void openEdit() {
@@ -96,10 +99,11 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
 
       Future.delayed(const Duration(seconds: 1), () async {
         if (await saveRoutines(routines)) {
-          Navigator.of(context).pop(Pair(true, 'Delete'));
+          Navigator.of(context).pop(NavigatorResponse(true, 'Delete', null));
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(deleteFailedSnackBar(context));
+          Navigator.of(context).pop(NavigatorResponse(false, 'Delete', null));
+          // ScaffoldMessenger.of(context)
+          // .showSnackBar(deleteFailedSnackBar(context));
         }
       });
     }
@@ -118,6 +122,10 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  TextButton(
+                    onPressed: trackWorkout,
+                    child: const Text('Track'),
+                  ),
                   TextButton(
                     onPressed: !editable ? openEdit : null,
                     child: const Text('Edit'),

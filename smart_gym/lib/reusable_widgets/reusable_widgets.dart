@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 const String confirmCancelDialogTitle = 'Confirm Cancel';
@@ -5,6 +6,22 @@ const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
 
 const String confirmDeleteDialogTitle = 'Confirm Delete';
 const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
+
+const String confirmFinishDialogTitle = 'Confirm Finish';
+const String confirmFinishDialogMessage =
+    'The workout is not complete. Are you sure you want to finish?';
+
+const BoxDecoration globalBoxDecoration = BoxDecoration(
+  color: globalContainerColor,
+  borderRadius: BorderRadius.all(
+    Radius.circular(globalBorderRadius),
+  ),
+);
+
+const double globalBorderRadius = 10.0;
+const Color globalContainerColor = Color.fromARGB(255, 220, 220, 220);
+
+const Duration globalAnimationSpeed = Duration(milliseconds: 500);
 
 Image logoWidget(String imageName) {
   return Image.asset(
@@ -106,6 +123,32 @@ SnackBar createFailedSnackBar(BuildContext context) {
   );
 }
 
+SnackBar editSuccessSnackBar(BuildContext context) {
+  return SnackBar(
+    content: const Text('Edit Success'),
+    backgroundColor: Colors.green,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+      },
+    ),
+  );
+}
+
+SnackBar editFailedSnackBar(BuildContext context) {
+  return SnackBar(
+    content: const Text('Edit Failed'),
+    backgroundColor: Colors.red,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+      },
+    ),
+  );
+}
+
 SnackBar deleteSuccessSnackBar(BuildContext context) {
   return SnackBar(
     content: const Text('Delete Success'),
@@ -132,9 +175,22 @@ SnackBar deleteFailedSnackBar(BuildContext context) {
   );
 }
 
+SnackBar workoutInProgressSnackBar(BuildContext context) {
+  return SnackBar(
+    content: const Text('There is already a workout in progress'),
+    backgroundColor: Colors.red,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+      },
+    ),
+  );
+}
+
 Future<bool> showConfirmationDialog(
     BuildContext context, String title, String message) async {
-  return (await showDialog<bool>(
+  bool? result = await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -156,5 +212,11 @@ Future<bool> showConfirmationDialog(
         ],
       );
     },
-  ))!;
+  );
+
+  if (result != null) {
+    return result;
+  } else {
+    return false;
+  }
 }

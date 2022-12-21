@@ -57,3 +57,44 @@ Map<String, dynamic> _$SetToJson(Set instance) => <String, dynamic>{
       'rest': instance.rest,
       'weight': instance.weight,
     };
+
+TrackedWorkout _$TrackedWorkoutFromJson(Map<String, dynamic> json) =>
+    TrackedWorkout(
+      json['name'] as String,
+      (json['exercises'] as List<dynamic>)
+          .map((e) => TrackedExercise.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$TrackedWorkoutToJson(TrackedWorkout instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'exercises': instance.exercises,
+    };
+
+TrackedExercise _$TrackedExerciseFromJson(Map<String, dynamic> json) =>
+    TrackedExercise(
+      json['name'] as String,
+      (json['sets'] as List<dynamic>)
+          .map((e) => TrackedSet.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$TrackedExerciseToJson(TrackedExercise instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'sets': instance.sets,
+    };
+
+TrackedSet _$TrackedSetFromJson(Map<String, dynamic> json) => TrackedSet(
+      json['reps_done'] as int?,
+      json['total_reps'] as int,
+      json['weight'] as int,
+    );
+
+Map<String, dynamic> _$TrackedSetToJson(TrackedSet instance) =>
+    <String, dynamic>{
+      'reps_done': instance.reps_done,
+      'total_reps': instance.total_reps,
+      'weight': instance.weight,
+    };

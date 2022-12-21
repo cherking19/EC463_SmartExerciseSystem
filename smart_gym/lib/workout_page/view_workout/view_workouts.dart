@@ -31,12 +31,7 @@ class ViewWorkouts extends StatefulWidget {
 
 class ViewWorkoutsState extends State<ViewWorkouts> {
   List<Workout> workouts = [];
-  @override 
-  void initState()
-  {
-    initialLoadWorkouts();
-    super.initState();
-  }
+
   void initialLoadWorkouts() async {
     // print(workout);
     //getWorkouts();
@@ -62,25 +57,32 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
     );
 
     result.then((value) {
-      Pair<bool, String> response = value as Pair<bool, String>;
-      if (response.a) {
-        if (response.b == 'Create') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(createSuccessSnackBar(context));
-        } else if (response.b == 'Delete') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(deleteSuccessSnackBar(context));
-        }
-      } else {
-        if (response.b == 'Create') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(createFailedSnackBar(context));
-        } else if (response.b == 'Delete') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(deleteFailedSnackBar(context));
+      if (value != null) {
+        NavigatorResponse response = value as NavigatorResponse;
+
+        if (response.action == editAction) {
+          if (response.success) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(editSuccessSnackBar(context));
+          }
+        } else if (response.action == deleteAction) {
+          response.success
+              ? ScaffoldMessenger.of(context)
+                  .showSnackBar(deleteSuccessSnackBar(context))
+              : ScaffoldMessenger.of(context)
+                  .showSnackBar(deleteFailedSnackBar(context));
+        } else if (response.action == trackAction) {
+          Navigator.of(context).pop(response);
         }
       }
     });
+  }
+
+  @override
+  void initState() {
+    // workouts = (await loadRoutines()).workouts;
+    initialLoadWorkouts();
+    super.initState();
   }
 
   @override
