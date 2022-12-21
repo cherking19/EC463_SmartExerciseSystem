@@ -50,16 +50,7 @@ class TrackWorkout extends StatefulWidget {
 }
 
 class TrackWorkoutState extends State<TrackWorkout> {
-  // TimerWidget? timer;
-
   void startTimer(int seconds) {
-    // setState(() {
-    //   timer = TimerWidget(
-    //     key: UniqueKey(),
-    //     seconds: seconds,
-    //     // globalRest: widget.rest,
-    //   );
-    // });
     TimerService.of(context).restart(seconds);
   }
 
@@ -87,6 +78,8 @@ class TrackWorkoutState extends State<TrackWorkout> {
       NavigatorResponse(true, finishAction, null),
     );
   }
+
+  void editWorkout(int index) {}
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +115,12 @@ class TrackWorkoutState extends State<TrackWorkout> {
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
                         child: TrackExercise(
+                          index: index,
                           exercise: widget.workout.exercises[index],
                           trackedExercise:
                               widget.trackedWorkout.exercises[index],
                           startTimer: startTimer,
+                          editWorkout: editWorkout,
                         ),
                       );
                     },
@@ -134,13 +129,6 @@ class TrackWorkoutState extends State<TrackWorkout> {
               ),
               // if (timer != null) timer!,
               if (TimerService.of(context).isRunning)
-                // Text(
-                //   getFormattedDuration(
-                //     Duration(
-                //       seconds: TimerService.of(context).elapsed,
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(
                   width: double.infinity,
                   child: RestTimer(),
@@ -160,15 +148,19 @@ class TrackWorkoutState extends State<TrackWorkout> {
 }
 
 class TrackExercise extends StatefulWidget {
+  final int index;
   final Exercise exercise;
   final TrackedExercise trackedExercise;
   final Function startTimer;
+  final Function editWorkout;
 
   const TrackExercise({
     Key? key,
+    required this.index,
     required this.exercise,
     required this.trackedExercise,
     required this.startTimer,
+    required this.editWorkout,
   }) : super(key: key);
 
   @override
@@ -182,24 +174,46 @@ class TrackExerciseState extends State<TrackExercise> {
     setState(() {});
   }
 
+  void editWorkout() {
+    widget.editWorkout(widget.index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: globalBoxDecoration,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 0.0, 6.0, 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.exercise.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
+                  child: Text(
+                    widget.exercise.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        editWorkout();
+                      },
+                      child: const Text('Edit'),
+                    ),
+                  ),
+                ),
+              ],
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 0.0),
+              padding: const EdgeInsets.fromLTRB(4.0, 4.0, 10.0, 0.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Scrollbar(
@@ -210,7 +224,7 @@ class TrackExerciseState extends State<TrackExercise> {
                         widget.exercise.sets.length,
                         (index) => Padding(
                           padding:
-                              const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
+                              const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 8.0),
                           child: TrackSet(
                             index: index,
                             set: widget.exercise.sets[index],

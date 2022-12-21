@@ -99,15 +99,21 @@ class WorkoutFormState extends State<WorkoutForm> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            WorkoutName(
-              formKey: _formKey,
-              editable: widget.editable,
-              workout: widget.workout,
-            ),
-            Expanded(
-              child: ExercisesWidget(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+              child: WorkoutName(
+                formKey: _formKey,
                 editable: widget.editable,
                 workout: widget.workout,
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                child: ExercisesWidget(
+                  editable: widget.editable,
+                  workout: widget.workout,
+                ),
               ),
             ),
             if (widget.editable && !widget.viewing && !saving)
@@ -156,24 +162,21 @@ class WorkoutName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     nameController.text = workout.name;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: TextFormField(
-        controller: nameController,
-        enabled: editable,
-        decoration: const InputDecoration(
-          labelText: 'Workout Name',
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter a name';
-          }
-          return null;
-        },
-        onChanged: (value) {
-          workout.name = value;
-        },
+    return TextFormField(
+      controller: nameController,
+      enabled: editable,
+      decoration: const InputDecoration(
+        labelText: 'Workout Name',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a name';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        workout.name = value;
+      },
     );
   }
 }
@@ -206,7 +209,7 @@ class _ExercisesWidgetState extends State<ExercisesWidget> {
         Flexible(
           child: Scrollbar(
             child: ListView.builder(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
               itemCount: widget.workout.exercises.length,
               itemBuilder: (BuildContext context, int index) {
                 return ExerciseWidget(
@@ -223,16 +226,23 @@ class _ExercisesWidgetState extends State<ExercisesWidget> {
           Column(
             children: [
               const Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+                padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 6.0),
                 child: Text('Add Exercise'),
               ),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  widget.workout.addExercise();
-                  setState(() {});
-                },
+              SizedBox(
+                height: 24.0,
+                width: 24.0,
+                child: IconButton(
+                  icon: const Icon(Icons.add),
+                  padding: const EdgeInsets.all(0.0),
+                  iconSize: 24.0,
+                  splashRadius: 24.0,
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    widget.workout.addExercise();
+                    setState(() {});
+                  },
+                ),
               ),
             ],
           )
@@ -268,6 +278,18 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     EdgeInsets dropdownPadding = onlyExercise
         ? const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0)
         : const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0);
+
+    // if (onlyExercise) {
+    dropdownPadding = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0);
+    // }
+
+    if (widget.editable) {
+      dropdownPadding = onlyExercise
+          ? const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0)
+          : const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0);
+    } else {
+      dropdownPadding = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0);
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -386,6 +408,53 @@ class _SetsWidgetState extends State<SetsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    EdgeInsets setWidgetItemPadding =
+        const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0);
+
+    List<Widget> sets = List<Widget>.generate(
+      widget.exercise.sets.length,
+      (index) => Padding(
+        padding: setWidgetItemPadding,
+        child: SetWidget(
+          editable: widget.editable,
+          exercise: widget.exercise,
+          index: index,
+          updateParent: update,
+        ),
+      ),
+    );
+    if (widget.editable) {
+      sets.add(
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 6.0),
+                child: Text('Add Set'),
+              ),
+              SizedBox(
+                height: 24.0,
+                width: 24.0,
+                child: IconButton(
+                  icon: const Icon(Icons.add),
+                  padding: const EdgeInsets.all(0.0),
+                  iconSize: 24.0,
+                  splashRadius: 24.0,
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      widget.exercise.addSet();
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Column(
       children: [
         if (widget.editable)
@@ -440,19 +509,6 @@ class _SetsWidgetState extends State<SetsWidget> {
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-                child: Text('Add Set'),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  setState(() {
-                    widget.exercise.addSet();
-                  });
-                },
-              ),
             ],
           ),
         Padding(
@@ -463,15 +519,7 @@ class _SetsWidgetState extends State<SetsWidget> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: List.generate(
-                    widget.exercise.sets.length,
-                    (index) => SetWidget(
-                      editable: widget.editable,
-                      exercise: widget.exercise,
-                      index: index,
-                      updateParent: update,
-                    ),
-                  ),
+                  children: sets,
                 ),
               ),
             ),
@@ -501,6 +549,8 @@ class SetWidget extends StatefulWidget {
 }
 
 class _SetWidgetState extends State<SetWidget> {
+  // double deleteSize = 100;
+
   final TextEditingController repsController = TextEditingController();
   final TextEditingController restController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
@@ -581,14 +631,47 @@ class _SetWidgetState extends State<SetWidget> {
 
     onlySet = widget.exercise.sets.length == 1;
 
+    // print(!onlySet && widget.editable);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 6.0),
-            child: Text('Set ${widget.index + 1}'),
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Text(
+                  'Set ${widget.index + 1}',
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+                if (!onlySet && widget.editable)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(6.0, 0.0, 0.0, 0.0),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        height: 16.0,
+                        width: 16.0,
+                        child: IconButton(
+                          icon: const Icon(Icons.close),
+                          padding: const EdgeInsets.all(0.0),
+                          iconSize: 16.0,
+                          splashRadius: 16.0,
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            widget.exercise.deleteSet(widget.index);
+                            widget.updateParent();
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
           SizedBox(
             width: 90,
@@ -668,15 +751,6 @@ class _SetWidgetState extends State<SetWidget> {
               ),
             ),
           ),
-          if (!onlySet && widget.editable)
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                widget.exercise.deleteSet(widget.index);
-                widget.updateParent();
-              },
-            ),
         ],
       ),
     );
