@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 // import 'workout_page/workout.dart';
 import 'workout_page/workout_page.dart';
+import 'Screens/ble_settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -204,10 +205,20 @@ class SettingsPage extends StatelessWidget {
                   });
                 },
               ),
+              ElevatedButton(
+                child: const Text("Bluetooth Settings"),
+                onPressed: () {
+                  Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FlutterBlueApp()));
+
+                },
+              ),
             ],
           ),
         ),
       ),
     );
+    
   }
+  
 }
