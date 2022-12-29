@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 const String confirmCancelDialogTitle = 'Confirm Cancel';
 const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
+const String confirmCancelWorkoutDialogMessage =
+    'Are you sure you want to cancel? If yes, the workout results will not be saved.';
 
 const String confirmDeleteDialogTitle = 'Confirm Delete';
 const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
@@ -10,6 +12,8 @@ const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
 const String confirmFinishDialogTitle = 'Confirm Finish';
 const String confirmFinishDialogMessage =
     'The workout is not complete. Are you sure you want to finish?';
+const String confirmNoStartDialogMessage =
+    'The workout has not been started. Are you sure you want to finish? If yes, no results will be saved.';
 
 const BoxDecoration globalBoxDecoration = BoxDecoration(
   color: globalContainerColor,

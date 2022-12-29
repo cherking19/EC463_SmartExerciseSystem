@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
-import 'package:smart_gym/workout_page/track_workout/track_workout.dart';
-import 'package:smart_gym/workout_page/workout.dart';
-import '../utils/widget_utils.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
+import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
+import 'package:smart_gym/pages/workout_page/workout.dart';
+import '../../utils/widget_utils.dart';
 import 'create_workout/create_workout.dart';
 import 'view_workout/view_workouts.dart';
 
@@ -25,7 +25,8 @@ class WorkoutPage extends StatefulWidget {
   }
 }
 
-class WorkoutPageState extends State<WorkoutPage> {
+class WorkoutPageState extends State<WorkoutPage>
+    with AutomaticKeepAliveClientMixin {
   void startTracking(Workout workout) {
     if (widget.currentWorkout != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,7 +47,6 @@ class WorkoutPageState extends State<WorkoutPage> {
         builder: (context) => TrackWorkoutRoute(
           workout: widget.currentWorkout!,
           trackedWorkout: widget.trackedWorkout!,
-          // rest: rest,
         ),
       ),
     );
@@ -58,6 +58,8 @@ class WorkoutPageState extends State<WorkoutPage> {
         if (response.success) {
           if (response.action == finishAction) {
             finishTracking();
+          } else if (response.action == cancelAction) {
+            cancelTracking();
           }
         }
       }
@@ -65,13 +67,25 @@ class WorkoutPageState extends State<WorkoutPage> {
   }
 
   void finishTracking() {
+    // print(widget.trackedWorkout);
+    saveTrackedWorkout(widget.trackedWorkout!);
+    setState(() {
+      widget.currentWorkout = null;
+    });
+  }
+
+  void cancelTracking() {
     setState(() {
       widget.currentWorkout = null;
     });
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Center(
       // Center is a layout widget. It takes a single child and positions it
       // in the middle of the parent.
@@ -83,16 +97,16 @@ class WorkoutPageState extends State<WorkoutPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
-                  child: Text(
-                    'Workout',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                ),
-              ),
+              // const Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: Padding(
+              //     padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+              //     child: Text(
+              //       'Workout',
+              //       style: TextStyle(fontSize: 18.0),
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
                 child: ElevatedButton(
@@ -142,7 +156,7 @@ class WorkoutPageState extends State<WorkoutPage> {
                     if (value != null) {
                       NavigatorResponse response = value as NavigatorResponse;
 
-                      if (response.action == 'Track') {
+                      if (response.action == trackAction) {
                         startTracking(response.data as Workout);
                       }
                     }
@@ -196,7 +210,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: TimerService.of(context),
+      animation: TimerService.ofSet(context),
       builder: (context, child) {
         // updateRestProgress();
         return ElevatedButton(
@@ -207,7 +221,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
           onPressed: openTracking,
           child: SizedBox(
             width: double.infinity,
-            height: TimerService.of(context).isRunning ? 75 : 65,
+            height: TimerService.ofSet(context).isRunning ? 75 : 65,
             child: Column(
               children: [
                 Padding(
@@ -229,7 +243,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                           ),
                         ],
                       ),
-                      if (TimerService.of(context).isRunning)
+                      if (TimerService.ofSet(context).isRunning)
                         Flexible(
                           fit: FlexFit.loose,
                           child: Align(
@@ -241,7 +255,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                                 Text(
                                   getFormattedDuration(
                                     Duration(
-                                        seconds: TimerService.of(context)
+                                        seconds: TimerService.ofSet(context)
                                                 .elapsedMilli ~/
                                             1000),
                                   ),
@@ -252,8 +266,8 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                                 Text(
                                   getFormattedDuration(
                                     Duration(
-                                        seconds:
-                                            TimerService.of(context).duration),
+                                        seconds: TimerService.ofSet(context)
+                                            .duration!),
                                   ),
                                   style: const TextStyle(
                                     fontSize: 16,
@@ -266,14 +280,14 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                     ],
                   ),
                 ),
-                if (TimerService.of(context).isRunning)
+                if (TimerService.ofSet(context).isRunning)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 6.0),
                     child: TweenAnimationBuilder(
                       tween: Tween<double>(
                         begin: 0,
-                        end: TimerService.of(context).elapsedMilli /
-                            (TimerService.of(context).duration * 1000),
+                        end: TimerService.ofSet(context).elapsedMilli /
+                            (TimerService.ofSet(context).duration! * 1000),
                       ),
                       duration: globalAnimationSpeed,
                       builder: ((context, value, child) {

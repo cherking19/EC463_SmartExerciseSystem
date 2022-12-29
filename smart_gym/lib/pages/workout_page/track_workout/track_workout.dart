@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-import 'package:smart_gym/workout_page/workout.dart';
-
-import '../../reusable_widgets/TimerWidget.dart';
+import 'package:smart_gym/pages/workout_page/workout.dart';
 
 class TrackWorkoutRoute extends StatelessWidget {
   final Workout workout;
   final TrackedWorkout trackedWorkout;
   // int rest;
 
-  TrackWorkoutRoute({
+  const TrackWorkoutRoute({
     Key? key,
     required this.workout,
     required this.trackedWorkout,
@@ -38,7 +36,7 @@ class TrackWorkout extends StatefulWidget {
   final TrackedWorkout trackedWorkout;
   // int rest;
 
-  TrackWorkout({
+  const TrackWorkout({
     Key? key,
     required this.workout,
     required this.trackedWorkout,
@@ -50,12 +48,37 @@ class TrackWorkout extends StatefulWidget {
 }
 
 class TrackWorkoutState extends State<TrackWorkout> {
-  void startTimer(int seconds) {
-    TimerService.of(context).restart(seconds);
+  List<bool> editable = [];
+
+  void startSetTimer(int seconds) {
+    TimerService.ofSet(context).restart(seconds);
+  }
+
+  void startWorkoutTimer() {
+    if (!TimerService.ofWorkout(context).isRunning) {
+      TimerService.ofWorkout(context).restart(null);
+      widget.trackedWorkout.dateStarted = DateTime.now();
+      // print('now time');
+    }
   }
 
   void stopWorkout(BuildContext context) {
-    if (!widget.trackedWorkout.isWorkoutDone()) {
+    if (!widget.trackedWorkout.isWorkoutStarted()) {
+      Future result = showConfirmationDialog(
+        context,
+        confirmFinishDialogTitle,
+        confirmNoStartDialogMessage,
+      );
+
+      result.then((value) {
+        if (value) {
+          finishTracking(context);
+          Navigator.of(context).pop(
+            NavigatorResponse(true, cancelAction, null),
+          );
+        }
+      });
+    } else if (!widget.trackedWorkout.isWorkoutDone()) {
       Future result = showConfirmationDialog(
         context,
         confirmFinishDialogTitle,
@@ -64,19 +87,42 @@ class TrackWorkoutState extends State<TrackWorkout> {
 
       result.then((value) {
         if (value) {
-          finishWorkout(context);
+          finishTracking(context);
+          Navigator.of(context).pop(
+            NavigatorResponse(true, finishAction, null),
+          );
         }
       });
     } else {
-      finishWorkout(context);
+      finishTracking(context);
+      Navigator.of(context).pop(
+        NavigatorResponse(true, finishAction, null),
+      );
     }
   }
 
-  void finishWorkout(BuildContext context) {
-    TimerService.of(context).stop();
-    Navigator.of(context).pop(
-      NavigatorResponse(true, finishAction, null),
+  void cancelWorkout(BuildContext context) {
+    Future result = showConfirmationDialog(
+      context,
+      confirmCancelDialogTitle,
+      confirmCancelWorkoutDialogMessage,
     );
+
+    result.then((value) {
+      if (value) {
+        finishTracking(context);
+        Navigator.of(context).pop(
+          NavigatorResponse(true, cancelAction, null),
+        );
+      }
+    });
+  }
+
+  void finishTracking(BuildContext context) {
+    TimerService.ofSet(context).stop();
+    TimerService.ofWorkout(context).stop();
+    widget.trackedWorkout.totalTime =
+        TimerService.ofWorkout(context).elapsedMilli ~/ 1000;
   }
 
   void editWorkout(int index) {}
@@ -84,27 +130,44 @@ class TrackWorkoutState extends State<TrackWorkout> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: TimerService.of(context),
+      animation: TimerService.ofSet(context),
       builder: (context, child) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(0.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  0.0,
-                  0.0,
-                  0.0,
-                  16.0,
-                ),
-                child: Text(
-                  widget.workout.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      widget.workout.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0.0, 0.0, 16.0, 0.0),
+                        child: Text(
+                          TimerService.ofWorkout(context).isRunning
+                              ? getFormattedDuration(
+                                  Duration(
+                                      seconds: TimerService.ofWorkout(context)
+                                              .elapsedMilli ~/
+                                          1000),
+                                )
+                              : '',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Expanded(
                 child: Scrollbar(
@@ -113,13 +176,16 @@ class TrackWorkoutState extends State<TrackWorkout> {
                     itemCount: widget.workout.exercises.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                        padding: index == widget.workout.exercises.length - 1
+                            ? const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0)
+                            : const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
                         child: TrackExercise(
                           index: index,
                           exercise: widget.workout.exercises[index],
                           trackedExercise:
                               widget.trackedWorkout.exercises[index],
-                          startTimer: startTimer,
+                          startSetTimer: startSetTimer,
+                          startWorkoutTimer: startWorkoutTimer,
                           editWorkout: editWorkout,
                         ),
                       );
@@ -127,18 +193,36 @@ class TrackWorkoutState extends State<TrackWorkout> {
                   ),
                 ),
               ),
-              // if (timer != null) timer!,
-              if (TimerService.of(context).isRunning)
-                const SizedBox(
-                  width: double.infinity,
-                  child: RestTimer(),
+              if (TimerService.ofSet(context).isRunning)
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: RestTimer(),
+                  ),
                 ),
-              TextButton(
-                onPressed: () {
-                  stopWorkout(context);
-                },
-                child: const Text('Finish'),
-              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      cancelWorkout(context);
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 255, 0, 0),
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      stopWorkout(context);
+                    },
+                    child: const Text('Finish'),
+                  ),
+                ],
+              )
             ],
           ),
         );
@@ -151,7 +235,8 @@ class TrackExercise extends StatefulWidget {
   final int index;
   final Exercise exercise;
   final TrackedExercise trackedExercise;
-  final Function startTimer;
+  final Function startSetTimer;
+  final Function startWorkoutTimer;
   final Function editWorkout;
 
   const TrackExercise({
@@ -159,7 +244,8 @@ class TrackExercise extends StatefulWidget {
     required this.index,
     required this.exercise,
     required this.trackedExercise,
-    required this.startTimer,
+    required this.startSetTimer,
+    required this.startWorkoutTimer,
     required this.editWorkout,
   }) : super(key: key);
 
@@ -230,7 +316,8 @@ class TrackExerciseState extends State<TrackExercise> {
                             set: widget.exercise.sets[index],
                             trackedExercise: widget.trackedExercise,
                             updateParent: update,
-                            startTimer: widget.startTimer,
+                            startSetTimer: widget.startSetTimer,
+                            startWorkoutTimer: widget.startWorkoutTimer,
                           ),
                         ),
                       ),
@@ -251,7 +338,8 @@ class TrackSet extends StatefulWidget {
   final Set set;
   final TrackedExercise trackedExercise;
   final Function updateParent;
-  final Function startTimer;
+  final Function startSetTimer;
+  final Function startWorkoutTimer;
 
   const TrackSet({
     Key? key,
@@ -259,7 +347,8 @@ class TrackSet extends StatefulWidget {
     required this.set,
     required this.trackedExercise,
     required this.updateParent,
-    required this.startTimer,
+    required this.startSetTimer,
+    required this.startWorkoutTimer,
   }) : super(key: key);
 
   @override
@@ -274,25 +363,26 @@ class TrackSetState extends State<TrackSet>
   String repsDisplay = '';
 
   void clickSet() {
-    if (widget.trackedExercise.sets[widget.index].reps_done == null) {
-      widget.startTimer(widget.set.rest);
+    if (widget.trackedExercise.sets[widget.index].repsDone == null) {
+      widget.startSetTimer(widget.set.rest);
     }
 
+    widget.startWorkoutTimer();
+
     if (progressController.value == 0.0) {
-      widget.trackedExercise.sets[widget.index].reps_done =
-          widget.trackedExercise.sets[widget.index].total_reps;
+      widget.trackedExercise.sets[widget.index].repsDone =
+          widget.trackedExercise.sets[widget.index].totalReps;
       progressController.animateTo(1.0);
       widget.updateParent();
     } else {
-      widget.trackedExercise.sets[widget.index].reps_done =
-          widget.trackedExercise.sets[widget.index].reps_done! - 1;
+      widget.trackedExercise.sets[widget.index].repsDone =
+          widget.trackedExercise.sets[widget.index].repsDone! - 1;
       progressController.animateBack(
-          widget.trackedExercise.sets[widget.index].reps_done! /
-              widget.trackedExercise.sets[widget.index].total_reps);
+          widget.trackedExercise.sets[widget.index].repsDone! /
+              widget.trackedExercise.sets[widget.index].totalReps);
     }
 
-    repsDisplay =
-        widget.trackedExercise.sets[widget.index].reps_done.toString();
+    repsDisplay = widget.trackedExercise.sets[widget.index].repsDone.toString();
   }
 
   @override
@@ -304,15 +394,15 @@ class TrackSetState extends State<TrackSet>
         setState(() {});
       });
 
-    if (widget.trackedExercise.sets[widget.index].reps_done != null) {
+    if (widget.trackedExercise.sets[widget.index].repsDone != null) {
       repsDisplay =
-          widget.trackedExercise.sets[widget.index].reps_done.toString();
+          widget.trackedExercise.sets[widget.index].repsDone.toString();
       progressController.value =
-          widget.trackedExercise.sets[widget.index].reps_done! /
-              widget.trackedExercise.sets[widget.index].total_reps;
+          widget.trackedExercise.sets[widget.index].repsDone! /
+              widget.trackedExercise.sets[widget.index].totalReps;
     } else {
       repsDisplay =
-          widget.trackedExercise.sets[widget.index].total_reps.toString();
+          widget.trackedExercise.sets[widget.index].totalReps.toString();
     }
     super.initState();
   }
@@ -342,7 +432,7 @@ class TrackSetState extends State<TrackSet>
             TextButton(
               onPressed: (widget.index != 0
                       ? (widget.trackedExercise.sets[widget.index - 1]
-                              .reps_done !=
+                              .repsDone !=
                           null)
                       : true)
                   ? clickSet
@@ -428,7 +518,7 @@ class RestTimerState extends State<RestTimer> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: TimerService.of(context),
+      animation: TimerService.ofSet(context),
       builder: (context, child) {
         return Container(
           decoration: globalBoxDecoration,
@@ -441,7 +531,8 @@ class RestTimerState extends State<RestTimer> {
                   child: Text(
                     getFormattedDuration(
                       Duration(
-                        seconds: TimerService.of(context).elapsedMilli ~/ 1000,
+                        seconds:
+                            TimerService.ofSet(context).elapsedMilli ~/ 1000,
                       ),
                     ),
                     style: const TextStyle(
@@ -454,8 +545,8 @@ class RestTimerState extends State<RestTimer> {
                   child: TweenAnimationBuilder(
                     tween: Tween<double>(
                       begin: 0,
-                      end: TimerService.of(context).elapsedMilli /
-                          (TimerService.of(context).duration * 1000),
+                      end: TimerService.ofSet(context).elapsedMilli /
+                          (TimerService.ofSet(context).duration! * 1000),
                     ),
                     duration: globalAnimationSpeed,
                     builder: ((context, value, child) {

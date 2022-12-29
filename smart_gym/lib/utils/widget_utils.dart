@@ -8,6 +8,7 @@
 //   );
 // }
 
+const String cancelAction = 'Cancel';
 const String editAction = 'Edit';
 const String deleteAction = 'Delete';
 const String finishAction = 'Finish';
@@ -33,7 +34,7 @@ String getFormattedDuration(Duration duration) {
   return "$twoDigitMinutes:$twoDigitSeconds";
 }
 
-const List<double> available_plates = [45, 25, 10, 5, 2.5];
+const List<double> availablePlates = [45, 25, 10, 5, 2.5];
 
 List<double> calculatePlates(double weight) {
   // print(weight);
@@ -43,7 +44,7 @@ List<double> calculatePlates(double weight) {
   weight -= 45;
   weight /= 2;
 
-  for (double plate in available_plates) {
+  for (double plate in availablePlates) {
     int num = weight ~/ plate;
     weight -= plate * num;
 

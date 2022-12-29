@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:smart_gym/workout_page/view_workout/view_workout.dart';
+import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
 import '../workout.dart';
 
 class WorkoutForm extends StatefulWidget {
