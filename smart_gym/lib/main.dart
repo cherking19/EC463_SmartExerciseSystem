@@ -3,17 +3,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/services/TimerService.dart';
-// import 'workout_page/workout.dart';
-import 'workout_page/workout.dart';
-import 'workout_page/workout_page.dart';
+import 'pages/history_page/history_page.dart';
+import 'pages/workout_page/workout.dart';
+import 'pages/workout_page/workout_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  final TimerService timerService = TimerService();
+  final TimerService setTimerService = TimerService();
+  final TimerService workoutTimerService = TimerService();
   runApp(
     TimerServiceProvider(
-      service: timerService,
+      setService: setTimerService,
+      workoutService: workoutTimerService,
       child: const MyApp(),
     ),
   );
@@ -38,6 +40,7 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        tabBarTheme: const TabBarTheme(),
       ),
       home: const SignInScreen(),
     );
@@ -67,8 +70,16 @@ class _MyHomePageState extends State<MyHomePage> {
   TrackedWorkout? trackedWorkout;
   int _selectedPage = 0;
   List<Widget> bodyWidgets = [];
+  PageController pageController = PageController(
+    initialPage: 0,
+  );
 
   void _onPageTapped(int index) {
+    pageController.animateToPage(index,
+        duration: const Duration(
+          milliseconds: 200,
+        ),
+        curve: Curves.easeIn);
     setState(() {
       _selectedPage = index;
     });
@@ -106,7 +117,16 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: bodyWidgets[_selectedPage],
+      body: PageView(
+          controller: pageController,
+          onPageChanged: (int index) {
+            setState(() {
+              _selectedPage = index;
+            });
+          },
+          children: bodyWidgets),
+
+      // bodyWidgets[_selectedPage],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -132,34 +152,6 @@ class _MyHomePageState extends State<MyHomePage> {
         type: BottomNavigationBarType.fixed,
       ),
       // ),
-    );
-  }
-}
-
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      // Center is a layout widget. It takes a single child and positions it
-      // in the middle of the parent.
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Container(
-          alignment: Alignment.topLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: const <Widget>[
-              Text(
-                'History',
-                style: TextStyle(fontSize: 18.0),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

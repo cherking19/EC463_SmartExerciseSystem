@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/api.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
-import 'package:smart_gym/workout_page/widgets/workout_widgets.dart';
+import 'package:smart_gym/pages/workout_page/widgets/workout_widgets.dart';
 import '../workout.dart';
 
 class CreateWorkoutRoute extends StatelessWidget {

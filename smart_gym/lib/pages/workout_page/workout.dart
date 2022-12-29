@@ -364,6 +364,9 @@ class Set {
 @JsonSerializable()
 class TrackedWorkout {
   String _name = '';
+  // in seconds
+  int? _totalTime;
+  DateTime? _dateStarted;
   List<TrackedExercise> _exercises = [];
 
   TrackedWorkout(
@@ -376,7 +379,7 @@ class TrackedWorkout {
 
   @override
   String toString() {
-    return '$name: $exercises ';
+    return '$name: time: $totalTime, date: $dateStarted $exercises ';
   }
 
   factory TrackedWorkout.fromJson(Map<String, dynamic> json) =>
@@ -392,12 +395,38 @@ class TrackedWorkout {
     _name = name;
   }
 
+  int? get totalTime {
+    return _totalTime;
+  }
+
+  set totalTime(int? time) {
+    _totalTime = time;
+  }
+
+  DateTime? get dateStarted {
+    return _dateStarted;
+  }
+
+  set dateStarted(DateTime? date) {
+    _dateStarted = date;
+  }
+
   List<TrackedExercise> get exercises {
     return _exercises;
   }
 
   set exercises(List<TrackedExercise> exercises) {
     _exercises = exercises;
+  }
+
+  bool isWorkoutStarted() {
+    for (TrackedExercise exercise in exercises) {
+      if (exercise.isExerciseStarted()) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   bool isWorkoutDone() {
@@ -450,9 +479,13 @@ class TrackedExercise {
     _sets = sets;
   }
 
+  bool isExerciseStarted() {
+    return sets[0].repsDone != null;
+  }
+
   bool isExerciseDone() {
     for (TrackedSet set in sets) {
-      if (set.reps_done == null) {
+      if (set.repsDone == null) {
         return false;
       }
     }
@@ -463,23 +496,23 @@ class TrackedExercise {
 
 @JsonSerializable()
 class TrackedSet {
-  int? _reps_done = null;
-  int _total_reps = 0;
+  int? _repsDone;
+  int _totalReps = 0;
   int _weight = 0;
 
   TrackedSet(
-    int? reps_done,
-    int total_reps,
+    int? repsDone,
+    int totalReps,
     int weight,
   ) {
-    _reps_done = reps_done;
-    _total_reps = total_reps;
+    _repsDone = repsDone;
+    _totalReps = totalReps;
     _weight = weight;
   }
 
   @override
   String toString() {
-    return ('reps done: $reps_done, total reps: $total_reps');
+    return ('reps done: $repsDone, total reps: $totalReps, weight: $weight');
   }
 
   factory TrackedSet.fromJson(Map<String, dynamic> json) =>
@@ -487,20 +520,20 @@ class TrackedSet {
 
   Map<String, dynamic> toJson() => _$TrackedSetToJson(this);
 
-  int? get reps_done {
-    return _reps_done;
+  int? get repsDone {
+    return _repsDone;
   }
 
-  set reps_done(int? reps_done) {
-    _reps_done = reps_done;
+  set repsDone(int? repsDone) {
+    _repsDone = repsDone;
   }
 
-  int get total_reps {
-    return _total_reps;
+  int get totalReps {
+    return _totalReps;
   }
 
-  set total_reps(int total_reps) {
-    _total_reps = total_reps;
+  set totalReps(int totalReps) {
+    _totalReps = totalReps;
   }
 
   int get weight {

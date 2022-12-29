@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 //import 'package:smart_gym/api.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
-import 'package:smart_gym/workout_page/view_workout/view_workout.dart';
-import '../../utils/widget_utils.dart';
+import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
+import '../../../utils/widget_utils.dart';
 import '../workout.dart';
 
 class ViewWorkoutsRoute extends StatelessWidget {
@@ -33,8 +33,6 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
   List<Workout> workouts = [];
 
   void initialLoadWorkouts() async {
-    // print(workout);
-    //getWorkouts();
     workouts = (await loadRoutines()).workouts;
     setState(() {});
   }
@@ -80,14 +78,12 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
 
   @override
   void initState() {
-    // workouts = (await loadRoutines()).workouts;
     initialLoadWorkouts();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    //initialLoadWorkouts();
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(

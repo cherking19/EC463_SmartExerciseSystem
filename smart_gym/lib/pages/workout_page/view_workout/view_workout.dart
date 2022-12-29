@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-import 'package:smart_gym/workout_page/widgets/workout_widgets.dart';
+import 'package:smart_gym/pages/workout_page/widgets/workout_widgets.dart';
 import '../workout.dart';
 
 class SubmitController {
@@ -159,12 +159,15 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                 ),
               ),
             Expanded(
-              child: WorkoutForm(
-                editable: editable,
-                viewing: true,
-                workout: widget.workout,
-                saveWorkout: updateWorkout,
-                submitController: _submitController,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                child: WorkoutForm(
+                  editable: editable,
+                  viewing: true,
+                  workout: widget.workout,
+                  saveWorkout: updateWorkout,
+                  submitController: _submitController,
+                ),
               ),
             )
           ],

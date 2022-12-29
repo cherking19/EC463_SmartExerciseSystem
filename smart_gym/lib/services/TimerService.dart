@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 class TimerService extends ChangeNotifier {
   Timer? _timer;
   // duration in seconds
-  int _duration = 0;
+  int? _duration = 0;
 
   int _elapsedMilli = 0;
-  int _deltaMilli = 50;
+  final int _deltaMilli = 50;
   // int _elapsed = 0;
 
-  int get duration => _duration;
+  int? get duration => _duration;
   int get elapsedMilli => _elapsedMilli;
 
   bool get isRunning => _timer != null;
 
   TimerService();
 
-  void restart(int duration) {
+  void restart(int? duration) {
     stop();
     _duration = duration;
     // _elapsedMilli = duration * 1000;
@@ -37,9 +37,9 @@ class TimerService extends ChangeNotifier {
     _elapsedMilli += _deltaMilli;
     // print(_elapsedMilli);
 
-    if (elapsedMilli == _duration * 1000) {
-      // stop();
-    }
+    // if (elapsedMilli == _duration * 1000) {
+    //   // stop();
+    // }
 
     notifyListeners();
   }
@@ -51,23 +51,32 @@ class TimerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  static TimerService of(BuildContext context) {
+  static TimerService ofSet(BuildContext context) {
     var provider =
         context.dependOnInheritedWidgetOfExactType<TimerServiceProvider>();
-    return provider!.service;
+    return provider!.setService;
+  }
+
+  static TimerService ofWorkout(BuildContext context) {
+    var provider =
+        context.dependOnInheritedWidgetOfExactType<TimerServiceProvider>();
+    return provider!.workoutService;
   }
 }
 
 class TimerServiceProvider extends InheritedWidget {
-  final TimerService service;
+  final TimerService setService;
+  final TimerService workoutService;
 
   const TimerServiceProvider({
     Key? key,
-    required this.service,
+    required this.setService,
+    required this.workoutService,
     required Widget child,
   }) : super(key: key, child: child);
 
   @override
   bool updateShouldNotify(TimerServiceProvider oldWidget) =>
-      service != oldWidget.service;
+      setService != oldWidget.setService ||
+      workoutService != oldWidget.workoutService;
 }

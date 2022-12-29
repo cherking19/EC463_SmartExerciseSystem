@@ -64,11 +64,17 @@ TrackedWorkout _$TrackedWorkoutFromJson(Map<String, dynamic> json) =>
       (json['exercises'] as List<dynamic>)
           .map((e) => TrackedExercise.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+    )
+      ..totalTime = json['totalTime'] as int?
+      ..dateStarted = json['dateStarted'] == null
+          ? null
+          : DateTime.parse(json['dateStarted'] as String);
 
 Map<String, dynamic> _$TrackedWorkoutToJson(TrackedWorkout instance) =>
     <String, dynamic>{
       'name': instance.name,
+      'totalTime': instance.totalTime,
+      'dateStarted': instance.dateStarted?.toIso8601String(),
       'exercises': instance.exercises,
     };
 
@@ -87,14 +93,14 @@ Map<String, dynamic> _$TrackedExerciseToJson(TrackedExercise instance) =>
     };
 
 TrackedSet _$TrackedSetFromJson(Map<String, dynamic> json) => TrackedSet(
-      json['reps_done'] as int?,
-      json['total_reps'] as int,
+      json['repsDone'] as int?,
+      json['totalReps'] as int,
       json['weight'] as int,
     );
 
 Map<String, dynamic> _$TrackedSetToJson(TrackedSet instance) =>
     <String, dynamic>{
-      'reps_done': instance.reps_done,
-      'total_reps': instance.total_reps,
+      'repsDone': instance.repsDone,
+      'totalReps': instance.totalReps,
       'weight': instance.weight,
     };
