@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 // import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
-import '../workout_page/workout.dart';
+import '../../workout_page/workout.dart';
 
 class ViewHistoryRoute extends StatelessWidget {
-  final TrackedWorkout workout;
+  final Workout workout;
 
   const ViewHistoryRoute({
     Key? key,
@@ -24,7 +26,7 @@ class ViewHistoryRoute extends StatelessWidget {
 }
 
 class ViewHistory extends StatefulWidget {
-  final TrackedWorkout workout;
+  final Workout workout;
 
   const ViewHistory({
     Key? key,
@@ -41,7 +43,13 @@ class ViewHistoryState extends State<ViewHistory> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [Text(widget.workout.name)],
+      children: [
+        // Text(widget.workout.name),
+        WorkoutWidget(
+          type: WidgetType.history,
+          workout: widget.workout,
+        )
+      ],
     );
   }
 }

@@ -1,6 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+enum WidgetType {
+  none,
+  create,
+  view,
+  track,
+  history,
+}
+
 const String confirmCancelDialogTitle = 'Confirm Cancel';
 const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
 const String confirmCancelWorkoutDialogMessage =

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-import 'package:smart_gym/pages/workout_page/widgets/workout_widgets.dart';
+import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
 import '../workout.dart';
 
 class SubmitController {
@@ -52,7 +52,8 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   }
 
   void trackWorkout() {
-    Navigator.of(context).pop(NavigatorResponse(true, 'Track', widget.workout));
+    Navigator.of(context)
+        .pop(NavigatorResponse(true, trackAction, widget.workout));
   }
 
   void openEdit() {

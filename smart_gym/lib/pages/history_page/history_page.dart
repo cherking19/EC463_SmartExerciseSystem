@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_gym/pages/history_page/view_history.dart';
+import 'package:smart_gym/pages/history_page/view_history/view_history.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../workout_page/workout.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +17,7 @@ class HistoryPage extends StatefulWidget {
 
 class HistoryPageState extends State<HistoryPage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
-  List<TrackedWorkout> finishedWorkouts = [];
+  List<Workout> finishedWorkouts = [];
   late TabController _tabController;
   bool recentFirst = true;
 
@@ -89,7 +89,7 @@ class HistoryPageState extends State<HistoryPage>
 }
 
 class HistoryList extends StatefulWidget {
-  final List<TrackedWorkout> workouts;
+  final List<Workout> workouts;
   final Function refresh;
 
   const HistoryList({
@@ -105,7 +105,7 @@ class HistoryList extends StatefulWidget {
 }
 
 class HistoryListState extends State<HistoryList> {
-  List<Widget> generateLabel(TrackedWorkout workout) {
+  List<Widget> generateLabel(Workout workout) {
     List<Widget> widgets = [
       Row(
         children: [
@@ -141,7 +141,7 @@ class HistoryListState extends State<HistoryList> {
     widget.refresh();
   }
 
-  void openWorkout(TrackedWorkout workout) {
+  void openWorkout(Workout workout) {
     Future result = Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {

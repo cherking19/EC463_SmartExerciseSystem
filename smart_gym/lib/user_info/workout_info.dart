@@ -23,22 +23,22 @@ Future<bool> saveRoutines(Routines routines) async {
   return await prefs.setString(routinesJsonKey, routinesJson);
 }
 
-Future<List<TrackedWorkout>> loadFinishedWorkouts() async {
+Future<List<Workout>> loadFinishedWorkouts() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String finishedWorkoutsJson = prefs.getString(finishedWorkoutsKey) ?? "";
-  List<TrackedWorkout> finishedWorouts = [];
+  List<Workout> finishedWorouts = [];
 
   if (finishedWorkoutsJson.isNotEmpty) {
     finishedWorouts = (jsonDecode(finishedWorkoutsJson) as List)
-        .map((i) => TrackedWorkout.fromJson(i))
+        .map((i) => Workout.fromJson(i))
         .toList();
   }
 
   return finishedWorouts;
 }
 
-Future<bool> saveTrackedWorkout(TrackedWorkout workout) async {
-  List<TrackedWorkout> finishedWorkouts = await loadFinishedWorkouts();
+Future<bool> saveTrackedWorkout(Workout workout) async {
+  List<Workout> finishedWorkouts = await loadFinishedWorkouts();
   finishedWorkouts.add(workout);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String finishedWorkoutsJson = jsonEncode(finishedWorkouts);
