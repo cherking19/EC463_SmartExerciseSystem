@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
-// import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/exercise_widgets/exercise_widget.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
@@ -54,7 +53,7 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                 child: Row(
                   children: [
                     Text(
-                      widget.workout.name,
+                      '${widget.workout.name} - ${DateFormat(DateFormat.ABBR_MONTH_DAY).format(widget.workout.dateStarted!)}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -95,7 +94,6 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                           index: index,
                           exercise: widget.workout.exercises[index],
                           startSetTimer: startSetTimer,
-                          // startWorkoutTimer: startWorkoutTimer,
                           editWorkout: () {},
                         ),
                       );

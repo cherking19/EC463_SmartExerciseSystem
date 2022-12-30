@@ -44,7 +44,6 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       set: set,
       updateParent: update,
       startSetTimer: widget.startSetTimer,
-      // startWorkoutTimer: widget.startWorkoutTimer,
     );
   }
 
