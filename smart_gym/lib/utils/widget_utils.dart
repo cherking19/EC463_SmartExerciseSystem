@@ -1,12 +1,4 @@
-// class Pair<T1, T2> {
-//   final T1 a;
-//   final T2 b;
-
-//   Pair(
-//     this.a,
-//     this.b,
-//   );
-// }
+const List<String> sundayWeekAbbr = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
 
 const String cancelAction = 'Cancel';
 const String editAction = 'Edit';
