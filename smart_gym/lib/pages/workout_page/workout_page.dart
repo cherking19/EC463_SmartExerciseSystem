@@ -2,21 +2,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
-import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
 import '../../utils/widget_utils.dart';
 import 'create_workout/create_workout.dart';
 import 'view_workout/view_workouts.dart';
 
 class WorkoutPage extends StatefulWidget {
-  Workout? currentWorkout;
-  TrackedWorkout? trackedWorkout;
+  Workout? workout;
 
   WorkoutPage({
     Key? key,
-    required this.currentWorkout,
-    required this.trackedWorkout,
+    required this.workout,
   }) : super(key: key);
 
   @override
@@ -27,14 +25,19 @@ class WorkoutPage extends StatefulWidget {
 
 class WorkoutPageState extends State<WorkoutPage>
     with AutomaticKeepAliveClientMixin {
+  void startWorkoutTimer() {
+    TimerService.ofWorkout(context).restart(null);
+    widget.workout!.dateStarted = DateTime.now();
+  }
+
   void startTracking(Workout workout) {
-    if (widget.currentWorkout != null) {
+    if (widget.workout != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         workoutInProgressSnackBar(context),
       );
     } else {
-      widget.currentWorkout = workout;
-      widget.trackedWorkout = workout.getTrackedWorkout();
+      widget.workout = workout;
+      startWorkoutTimer();
       setState(() {});
       openTracking();
     }
@@ -45,8 +48,7 @@ class WorkoutPageState extends State<WorkoutPage>
       context,
       MaterialPageRoute(
         builder: (context) => TrackWorkoutRoute(
-          workout: widget.currentWorkout!,
-          trackedWorkout: widget.trackedWorkout!,
+          workout: widget.workout!,
         ),
       ),
     );
@@ -66,17 +68,30 @@ class WorkoutPageState extends State<WorkoutPage>
     });
   }
 
+  void saveCurrentDuration() {
+    widget.workout!.duration =
+        TimerService.ofWorkout(context).elapsedMilli ~/ 1000;
+  }
+
+  void stopTimers() {
+    TimerService.ofSet(context).stop();
+    TimerService.ofWorkout(context).stop();
+  }
+
   void finishTracking() {
-    // print(widget.trackedWorkout);
-    saveTrackedWorkout(widget.trackedWorkout!);
+    saveCurrentDuration();
+    stopTimers();
+    saveTrackedWorkout(widget.workout!);
     setState(() {
-      widget.currentWorkout = null;
+      widget.workout = null;
     });
   }
 
   void cancelTracking() {
+    saveCurrentDuration();
+    stopTimers();
     setState(() {
-      widget.currentWorkout = null;
+      widget.workout = null;
     });
   }
 
@@ -97,16 +112,6 @@ class WorkoutPageState extends State<WorkoutPage>
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              // const Align(
-              //   alignment: Alignment.centerLeft,
-              //   child: Padding(
-              //     padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
-              //     child: Text(
-              //       'Workout',
-              //       style: TextStyle(fontSize: 18.0),
-              //     ),
-              //   ),
-              // ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
                 child: ElevatedButton(
@@ -163,13 +168,12 @@ class WorkoutPageState extends State<WorkoutPage>
                   });
                 },
               ),
-              if (widget.currentWorkout != null)
+              if (widget.workout != null)
                 Expanded(
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: WorkoutInProgressBar(
-                      workout: widget.currentWorkout!,
-                      trackedWorkout: widget.trackedWorkout!,
+                      workout: widget.workout!,
                       openTracking: openTracking,
                     ),
                   ),
@@ -184,13 +188,11 @@ class WorkoutPageState extends State<WorkoutPage>
 
 class WorkoutInProgressBar extends StatefulWidget {
   Workout? workout;
-  final TrackedWorkout trackedWorkout;
   final Function openTracking;
 
   WorkoutInProgressBar({
     Key? key,
     required this.workout,
-    required this.trackedWorkout,
     required this.openTracking,
   }) : super(key: key);
 
@@ -212,7 +214,6 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
     return AnimatedBuilder(
       animation: TimerService.ofSet(context),
       builder: (context, child) {
-        // updateRestProgress();
         return ElevatedButton(
           style: ElevatedButton.styleFrom(
             minimumSize: const Size.fromHeight(10),

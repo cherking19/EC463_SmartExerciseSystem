@@ -67,7 +67,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Workout? currentWorkout;
-  TrackedWorkout? trackedWorkout;
+  // TrackedWorkout? trackedWorkout;
   int _selectedPage = 0;
   List<Widget> bodyWidgets = [];
   PageController pageController = PageController(
@@ -91,8 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     bodyWidgets = [
       WorkoutPage(
-        currentWorkout: currentWorkout,
-        trackedWorkout: trackedWorkout,
+        workout: currentWorkout,
+        // trackedWorkout: trackedWorkout,
       ),
       const HistoryPage(),
       const SocialPage(),
