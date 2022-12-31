@@ -30,8 +30,9 @@ class HistoryPageState extends State<HistoryPage>
 
     // clearFinishedWorkouts();
 
-    // print(finishedWorkouts);
-
+    // for (int i = 0; i < finishedWorkouts.length; i++) {
+    //   print(finishedWorkouts[i].uuid);
+    // }
     setState(() {});
   }
 

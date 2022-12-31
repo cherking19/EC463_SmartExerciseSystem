@@ -58,21 +58,17 @@ class HistoryListState extends State<HistoryList>
     widget.refresh();
   }
 
-  // void openWorkout(Workout workout) {
-  //   Future result = Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) {
-  //       return ViewHistoryRoute(workout: workout);
-  //     }),
-  //   );
-  // }
-
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    if (widget.workouts.isEmpty) {
+      return noRecordedWidgets(context, refreshHistory);
+    }
+
     return Scrollbar(
       child: CustomRefreshIndicator(
         trigger: IndicatorTrigger.leadingEdge,
@@ -87,7 +83,11 @@ class HistoryListState extends State<HistoryList>
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  openWorkout(context, widget.workouts[index]);
+                  openViewWorkout(
+                    context,
+                    widget.workouts[index],
+                    refreshHistory,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),

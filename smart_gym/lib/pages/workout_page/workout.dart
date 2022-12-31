@@ -1,5 +1,7 @@
 // import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 // import 'dart:convert';
 
 part 'workout.g.dart';
@@ -47,6 +49,7 @@ class Workout {
   String _name = '';
   List<Exercise> _exercises = [];
 
+  String? _uuid;
   int? _duration;
   DateTime? _dateStarted;
 
@@ -106,18 +109,19 @@ class Workout {
   int addExercise() {
     exercises.add(
       Exercise(
-          exerciseChoices.first,
-          [
-            Set(
-              0,
-              0,
-              0,
-              null,
-            )
-          ],
-          false,
-          false,
-          false),
+        exerciseChoices.first,
+        [
+          Set(
+            0,
+            0,
+            0,
+            null,
+          )
+        ],
+        false,
+        false,
+        false,
+      ),
     );
 
     return exercises.length - 1;
@@ -125,6 +129,18 @@ class Workout {
 
   void deleteExercise(int index) {
     exercises.removeAt(index);
+  }
+
+  String? get uuid {
+    return _uuid;
+  }
+
+  set uuid(String? value) {
+    _uuid = value;
+  }
+
+  void generateRandomUuid() {
+    uuid = const Uuid().v4();
   }
 
   int? get duration {

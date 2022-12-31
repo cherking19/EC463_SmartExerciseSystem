@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';

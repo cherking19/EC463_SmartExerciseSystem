@@ -3,6 +3,8 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/history_page/view_history/view_history.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+// import 'package:smart_gym/utils/function_utils.dart';
+import 'package:smart_gym/utils/widget_utils.dart';
 
 enum WidgetType {
   none,
@@ -11,20 +13,6 @@ enum WidgetType {
   track,
   history,
 }
-
-const String confirmCancelDialogTitle = 'Confirm Cancel';
-const String confirmCancelDialogMessage = 'Are you sure you want to cancel?';
-const String confirmCancelWorkoutDialogMessage =
-    'Are you sure you want to cancel? If yes, the workout results will not be saved.';
-
-const String confirmDeleteDialogTitle = 'Confirm Delete';
-const String confirmDeleteDialogMessage = 'Are you sure you want to delete?';
-
-const String confirmFinishDialogTitle = 'Confirm Finish';
-const String confirmFinishDialogMessage =
-    'The workout is not complete. Are you sure you want to finish?';
-const String confirmNoStartDialogMessage =
-    'The workout has not been started. Are you sure you want to finish? If yes, no results will be saved.';
 
 const BoxDecoration globalBoxDecoration = BoxDecoration(
   color: globalContainerColor,
@@ -85,30 +73,31 @@ Container signInSignUpButton(
     margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
     decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
     child: ElevatedButton(
-        onPressed: () {
-          onTap();
-        },
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.pressed)) {
-              return Colors.black26;
-            }
-            return Colors.white;
-          }),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+      onPressed: () {
+        onTap();
+      },
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.black26;
+          }
+          return Colors.white;
+        }),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: Text(
-          isLogin ? 'Log In' : 'Sign Up',
-          style: const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        )),
+      ),
+      child: Text(
+        isLogin ? 'Log In' : 'Sign Up',
+        style: const TextStyle(
+          color: Colors.black87,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      ),
+    ),
   );
 }
 
@@ -201,39 +190,6 @@ SnackBar workoutInProgressSnackBar(BuildContext context) {
       },
     ),
   );
-}
-
-Future<bool> showConfirmationDialog(
-    BuildContext context, String title, String message) async {
-  bool? result = await showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-            child: const Text('Yes'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            child: const Text('No'),
-          ),
-        ],
-      );
-    },
-  );
-
-  if (result != null) {
-    return result;
-  } else {
-    return false;
-  }
 }
 
 // using CustomRefreshIndicator example
@@ -354,11 +310,60 @@ AnimatedBuilder customRefreshIndicatorLeading(
   );
 }
 
-void openWorkout(BuildContext context, Workout workout) {
+void openViewWorkout(BuildContext context, Workout workout, Function refresh) {
   Future result = Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) {
-      return ViewHistoryRoute(workout: workout);
-    }),
+    MaterialPageRoute(
+      builder: (context) {
+        return ViewHistoryRoute(workout: workout);
+      },
+    ),
+  );
+
+  result.then(
+    (value) {
+      if (value != null) {
+        NavigatorResponse response = value as NavigatorResponse;
+
+        if (response.success) {
+          if (response.action == deleteAction) {
+            refresh();
+          }
+        }
+
+        // responseCallback(response);
+      }
+    },
+  );
+}
+
+Widget noRecordedWidgets(BuildContext context, Function refresh) {
+  return CustomRefreshIndicator(
+    onRefresh: () {
+      return refresh();
+    },
+    child: ListView(
+      children: const [
+        Padding(
+          padding: EdgeInsets.only(top: 100),
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              'No Recorded Workouts',
+              style: TextStyle(
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+    builder: (
+      BuildContext context,
+      Widget child,
+      IndicatorController controller,
+    ) {
+      return customRefreshIndicatorLeading(context, child, controller);
+    },
   );
 }

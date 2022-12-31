@@ -53,19 +53,21 @@ class WorkoutPageState extends State<WorkoutPage>
       ),
     );
 
-    result.then((value) {
-      if (value != null) {
-        NavigatorResponse response = value as NavigatorResponse;
+    result.then(
+      (value) {
+        if (value != null) {
+          NavigatorResponse response = value as NavigatorResponse;
 
-        if (response.success) {
-          if (response.action == finishAction) {
-            finishTracking();
-          } else if (response.action == cancelAction) {
-            cancelTracking();
+          if (response.success) {
+            if (response.action == finishAction) {
+              finishTracking();
+            } else if (response.action == cancelAction) {
+              cancelTracking();
+            }
           }
         }
-      }
-    });
+      },
+    );
   }
 
   void saveCurrentDuration() {

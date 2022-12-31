@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
@@ -61,13 +62,15 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
         confirmFinishDialogMessage,
       );
 
-      result.then((value) {
-        if (value) {
-          Navigator.of(context).pop(
-            NavigatorResponse(true, finishAction, null),
-          );
-        }
-      });
+      result.then(
+        (value) {
+          if (value) {
+            Navigator.of(context).pop(
+              NavigatorResponse(true, finishAction, null),
+            );
+          }
+        },
+      );
     } else {
       Navigator.of(context).pop(
         NavigatorResponse(true, finishAction, null),
@@ -82,13 +85,15 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
       confirmCancelWorkoutDialogMessage,
     );
 
-    result.then((value) {
-      if (value) {
-        Navigator.of(context).pop(
-          NavigatorResponse(true, cancelAction, null),
-        );
-      }
-    });
+    result.then(
+      (value) {
+        if (value) {
+          Navigator.of(context).pop(
+            NavigatorResponse(true, cancelAction, null),
+          );
+        }
+      },
+    );
   }
 
   @override

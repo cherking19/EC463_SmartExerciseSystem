@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
+import 'package:smart_gym/utils/widget_utils.dart';
 // import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import '../../workout_page/workout.dart';
 
@@ -40,6 +43,15 @@ class ViewHistory extends StatefulWidget {
 }
 
 class ViewHistoryState extends State<ViewHistory> {
+  void deleteWorkout(bool result) {
+    if (result) {
+      deleteTrackedWorkout(widget.workout.uuid!);
+      Navigator.of(context).pop(
+        NavigatorResponse(true, deleteAction, null),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -48,7 +60,33 @@ class ViewHistoryState extends State<ViewHistory> {
         WorkoutWidget(
           type: WidgetType.history,
           workout: widget.workout,
-        )
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                // stopWorkout(context);
+              },
+              child: const Text('Edit'),
+            ),
+            // TextButton(
+            //   onPressed: () {
+            //     // cancelWorkout(context);
+            //   },
+            //   child: const Text(
+            //     'Delete',
+            //     style: TextStyle(
+            //       color: Color.fromARGB(255, 255, 0, 0),
+            //     ),
+            //   ),
+            // ),
+            deleteButton(
+              context,
+              deleteWorkout,
+            ),
+          ],
+        ),
       ],
     );
   }
