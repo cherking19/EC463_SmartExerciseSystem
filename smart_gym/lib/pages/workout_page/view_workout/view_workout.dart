@@ -27,8 +27,8 @@ class ViewWorkoutRoute extends StatefulWidget {
 
 class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   bool editable = false;
-  Workout? preSaveWorkout;
-  bool working = false;
+  Workout? preEditWorkout;
+  bool loading = false;
   final SubmitController _submitController = SubmitController();
 
   Future<void> updateWorkout(
@@ -37,7 +37,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
     VoidCallback onFailure,
   ) async {
     setState(() {
-      working = true;
+      loading = true;
     });
 
     Routines routines = await loadRoutines();
@@ -58,8 +58,9 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   }
 
   void openEdit() {
-    String workoutJson = jsonEncode(widget.workout.toJson());
-    preSaveWorkout = Workout.fromJson(jsonDecode(workoutJson));
+    // String workoutJson = jsonEncode(widget.workout.toJson());
+    // preSaveWorkout = Workout.fromJson(jsonDecode(workoutJson));
+    preEditWorkout = widget.workout.copy();
 
     setState(() {
       editable = true;
@@ -78,7 +79,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
       confirmCancelDialogTitle,
       confirmCancelDialogMessage,
     )) {
-      widget.workout = preSaveWorkout!;
+      widget.workout = preEditWorkout!;
 
       setState(() {
         editable = false;
@@ -93,7 +94,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
       confirmDeleteDialogMessage,
     )) {
       setState(() {
-        working = true;
+        loading = true;
       });
 
       Routines routines = await loadRoutines();
@@ -104,8 +105,6 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
           Navigator.of(context).pop(NavigatorResponse(true, 'Delete', null));
         } else {
           Navigator.of(context).pop(NavigatorResponse(false, 'Delete', null));
-          // ScaffoldMessenger.of(context)
-          // .showSnackBar(deleteFailedSnackBar(context));
         }
       });
     }
@@ -120,7 +119,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
         ),
         body: Column(
           children: [
-            if (!working)
+            if (!loading)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -149,7 +148,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                   ),
                 ],
               ),
-            if (working)
+            if (loading)
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: SizedBox(

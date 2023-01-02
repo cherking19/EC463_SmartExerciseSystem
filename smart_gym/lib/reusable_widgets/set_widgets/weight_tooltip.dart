@@ -3,10 +3,12 @@ import '../../utils/widget_utils.dart';
 
 class WeightTooltip extends StatelessWidget {
   final int weight;
+  final bool enabled;
 
   const WeightTooltip({
     Key? key,
     required this.weight,
+    required this.enabled,
   }) : super(key: key);
 
   String trimPlate(double plate) {

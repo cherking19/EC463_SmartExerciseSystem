@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/exercise_widgets/exercise_widget.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
@@ -12,11 +13,13 @@ import '../../services/TimerService.dart';
 class WorkoutWidget extends StatefulWidget {
   final WidgetType type;
   final Workout workout;
+  final bool editable;
 
   const WorkoutWidget({
     Key? key,
     required this.type,
     required this.workout,
+    required this.editable,
   }) : super(key: key);
 
   @override
@@ -42,6 +45,13 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.editable);
+    // print(widget.workout);
+    Text dateTextWidget = Text(
+      DateFormat(DateFormat.ABBR_MONTH_DAY).format(widget.workout.dateStarted!),
+      style: globalTitleTextStyle,
+    );
+
     return AnimatedBuilder(
       animation: TimerService.ofSet(context),
       builder: (context, child) {
@@ -53,26 +63,37 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                 child: Row(
                   children: [
                     Text(
-                      '${widget.workout.name} - ${DateFormat(DateFormat.ABBR_MONTH_DAY).format(widget.workout.dateStarted!)}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      '${widget.workout.name} - ',
+                      style: globalTitleTextStyle,
                     ),
+                    if (!widget.editable) dateTextWidget,
+                    if (widget.editable)
+                      TextButton(
+                        style: minimalButtonStyle(),
+                        onPressed: () {},
+                        child: dateTextWidget,
+                      ),
                     if (widget.type == WidgetType.track ||
                         widget.type == WidgetType.history)
                       Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                            child: AnimatedBuilder(
-                              animation: TimerService.ofWorkout(context),
-                              builder: (context, child) =>
-                                  Text('Duration: ${getDuration()}'),
-                            ),
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Text('Duration - '),
+                            if (!widget.editable)
+                              AnimatedBuilder(
+                                animation: TimerService.ofWorkout(context),
+                                builder: (context, child) =>
+                                    Text(getDuration()),
+                              ),
+                            if (widget.editable)
+                              TextButton(
+                                style: minimalButtonStyle(),
+                                onPressed: () {},
+                                child: Text(getDuration()),
+                              ),
+                          ],
                         ),
                       ),
                   ],
@@ -91,6 +112,7 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                             const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                         child: ExerciseWidget(
                           type: widget.type,
+                          editable: widget.editable,
                           index: index,
                           exercise: widget.workout.exercises[index],
                           startSetTimer: startSetTimer,

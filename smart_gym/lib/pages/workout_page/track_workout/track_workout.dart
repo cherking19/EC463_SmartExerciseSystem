@@ -106,6 +106,7 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
             WorkoutWidget(
               type: WidgetType.track,
               workout: widget.workout,
+              editable: false,
             ),
             if (TimerService.ofSet(context).isRunning)
               const Padding(

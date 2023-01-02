@@ -7,19 +7,19 @@ import '../reusable_widgets.dart';
 
 class ExerciseWidget extends StatefulWidget {
   final WidgetType type;
+  final bool editable;
   final int index;
   final Exercise exercise;
   final Function startSetTimer;
-  // final Function startWorkoutTimer;
   final Function editWorkout;
 
   const ExerciseWidget({
     Key? key,
     required this.type,
+    required this.editable,
     required this.index,
     required this.exercise,
     required this.startSetTimer,
-    // required this.startWorkoutTimer,
     required this.editWorkout,
   }) : super(key: key);
 
@@ -34,17 +34,6 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
 
   void update() {
     setState(() {});
-  }
-
-  Widget setWidget(int index, Set set) {
-    return SetWidget(
-      type: widget.type,
-      index: index,
-      exercise: widget.exercise,
-      set: set,
-      updateParent: update,
-      startSetTimer: widget.startSetTimer,
-    );
   }
 
   @override
@@ -95,9 +84,14 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
                         (index) => Padding(
                           padding:
                               const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 8.0),
-                          child: setWidget(
-                            index,
-                            widget.exercise.sets[index],
+                          child: SetWidget(
+                            type: widget.type,
+                            editable: widget.editable,
+                            index: index,
+                            exercise: widget.exercise,
+                            set: widget.exercise.sets[index],
+                            updateParent: update,
+                            startSetTimer: widget.startSetTimer,
                           ),
                         ),
                       ),

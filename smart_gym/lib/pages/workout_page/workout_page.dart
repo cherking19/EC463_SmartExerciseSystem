@@ -294,7 +294,6 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                       ),
                       duration: globalAnimationSpeed,
                       builder: ((context, value, child) {
-                        // print(value);
                         return LinearProgressIndicator(
                           value: value,
                           backgroundColor: const Color.fromARGB(

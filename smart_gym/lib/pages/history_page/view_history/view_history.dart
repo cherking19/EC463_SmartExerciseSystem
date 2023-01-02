@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
+import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-// import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import '../../workout_page/workout.dart';
 
 class ViewHistoryRoute extends StatelessWidget {
@@ -29,9 +29,9 @@ class ViewHistoryRoute extends StatelessWidget {
 }
 
 class ViewHistory extends StatefulWidget {
-  final Workout workout;
+  Workout workout;
 
-  const ViewHistory({
+  ViewHistory({
     Key? key,
     required this.workout,
   }) : super(key: key);
@@ -43,6 +43,9 @@ class ViewHistory extends StatefulWidget {
 }
 
 class ViewHistoryState extends State<ViewHistory> {
+  bool editable = false;
+  Workout? preEditWorkout;
+
   void deleteWorkout(bool result) {
     if (result) {
       deleteTrackedWorkout(widget.workout.uuid!);
@@ -52,24 +55,67 @@ class ViewHistoryState extends State<ViewHistory> {
     }
   }
 
+  void startEdit() {
+    preEditWorkout = widget.workout.copy();
+
+    setState(() {
+      editable = true;
+    });
+  }
+
+  void cancelEdit() async {
+    if (await showConfirmationDialog(
+      context,
+      confirmCancelDialogTitle,
+      confirmCancelDialogMessage,
+    )) {
+      widget.workout = preEditWorkout!;
+
+      // print(widget.workout);
+
+      setState(() {
+        editable = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // print('view: $editable');
     return Column(
       children: [
         // Text(widget.workout.name),
         WorkoutWidget(
           type: WidgetType.history,
           workout: widget.workout,
+          editable: editable,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextButton(
-              onPressed: () {
-                // stopWorkout(context);
-              },
-              child: const Text('Edit'),
-            ),
+            if (editable)
+              TextButton(
+                onPressed: () {
+                  cancelEdit();
+                },
+                child: const Text('Cancel'),
+              ),
+            if (editable)
+              TextButton(
+                onPressed: () {},
+                child: const Text('Save'),
+              ),
+            if (!editable)
+              TextButton(
+                onPressed: () {
+                  // stopWorkout(context);
+                  // setState(() {
+                  //   editable = true;
+                  // });
+                  startEdit();
+                },
+                child: const Text('Edit'),
+              ),
             // TextButton(
             //   onPressed: () {
             //     // cancelWorkout(context);
@@ -83,6 +129,7 @@ class ViewHistoryState extends State<ViewHistory> {
             // ),
             deleteButton(
               context,
+              true,
               deleteWorkout,
             ),
           ],

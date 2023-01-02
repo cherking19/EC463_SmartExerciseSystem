@@ -1,5 +1,6 @@
 // import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 // import 'dart:convert';
@@ -68,13 +69,10 @@ class Workout {
 
   Map<String, dynamic> toJson() => _$WorkoutToJson(this);
 
-  // factory WorkoutRoutine.fromJson(Map<String, dynamic> parsedJson) {
-  //   return WorkoutRoutine();
-  // }
-
-  // Map<String, dynamic> toJson() {
-  //   return {"name": _name, "exercises": jsonEncode(_exercises)};
-  // }
+  Workout copy() {
+    String json = jsonEncode(toJson());
+    return Workout.fromJson(jsonDecode(json));
+  }
 
   bool validateRoutine() {
     if (_name.isEmpty) {

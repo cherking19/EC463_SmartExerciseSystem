@@ -24,6 +24,11 @@ const BoxDecoration globalBoxDecoration = BoxDecoration(
 const double globalBorderRadius = 10.0;
 const Color globalContainerColor = Color.fromARGB(255, 220, 220, 220);
 
+const TextStyle globalTitleTextStyle = TextStyle(
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+);
+
 const Duration globalAnimationSpeed = Duration(milliseconds: 500);
 
 Image logoWidget(String imageName) {
