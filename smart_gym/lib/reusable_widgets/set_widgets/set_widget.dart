@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/reusable_widgets/buttons.dart';
+import 'package:smart_gym/reusable_widgets/input_validation.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
 import 'weight_tooltip.dart';
 
 class SetWidget extends StatefulWidget {
   final WidgetType type;
+  final bool editable;
   final int index;
   final Exercise exercise;
   final Set set;
@@ -14,6 +18,7 @@ class SetWidget extends StatefulWidget {
   const SetWidget({
     Key? key,
     required this.type,
+    required this.editable,
     required this.index,
     required this.exercise,
     required this.set,
@@ -30,37 +35,55 @@ class SetWidget extends StatefulWidget {
 class SetWidgetState extends State<SetWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController progressController;
-  String repsDisplay = '';
+  bool enterable = false;
+  TextEditingController? weightController;
+  late FocusNode focusNode;
 
   bool isSetIndicatorEnabled() {
-    if (widget.type == WidgetType.track) {
+    if (widget.type == WidgetType.track ||
+        (widget.type == WidgetType.history && widget.editable)) {
       return widget.index != 0
           ? (widget.exercise.sets[widget.index - 1].repsDone != null)
           : true;
     }
+    // else if (widget.type == WidgetType.history && widget.editable) {
+    //   return true;
+    // }
 
     return false;
   }
 
   void clickSet() {
-    if (widget.type == WidgetType.track) {
+    if (widget.type == WidgetType.track || widget.type == WidgetType.history) {
       if (widget.set.repsDone == null) {
         widget.startSetTimer(widget.set.rest);
       }
 
-      // widget.startWorkoutTimer();
-
-      if (progressController.value == 0.0) {
+      if (widget.set.repsDone == null || widget.set.repsDone == 0) {
         widget.set.repsDone = widget.set.reps;
-        progressController.animateTo(1.0);
         widget.updateParent();
       } else {
         widget.set.repsDone = widget.set.repsDone! - 1;
-        progressController.animateBack(widget.set.repsDone! / widget.set.reps);
       }
 
-      repsDisplay = widget.set.repsDone.toString();
+      animateProgress();
     }
+  }
+
+  void animateProgress() {
+    if (widget.set.repsDone != null) {
+      progressController.animateTo(widget.set.repsDone! / widget.set.reps);
+    } else {
+      progressController.animateTo(0.0);
+    }
+  }
+
+  void editWeight() {
+    // print('edit');
+    setState(() {
+      enterable = true;
+      // focusNode = FocusNode();
+    });
   }
 
   @override
@@ -68,29 +91,83 @@ class SetWidgetState extends State<SetWidget>
     progressController = AnimationController(
       vsync: this,
       duration: globalAnimationSpeed,
-    )..addListener(() {
-        setState(() {});
-      });
+    )..addListener(
+        () {
+          setState(() {});
+        },
+      );
 
-    if (widget.set.repsDone != null) {
-      repsDisplay = widget.set.repsDone.toString();
-      progressController.value = widget.set.repsDone! / widget.set.reps;
-    } else {
-      repsDisplay = widget.set.reps.toString();
-    }
+    animateProgress();
+
+    focusNode = FocusNode()
+      ..addListener(
+        () {
+          // print("Has focus: ${focusNode.hasFocus}");
+
+          if (!focusNode.hasFocus) {
+            // print('not enterable');
+            // focusNode.unfocus();
+            if (weightController!.text.isNotEmpty) {
+              widget.set.weight = int.parse(weightController!.text);
+              // print('change');
+            }
+
+            setState(() {
+              enterable = false;
+              // focusNode!.dispose();
+            });
+          }
+        },
+      );
 
     super.initState();
   }
 
   @override
   void dispose() {
+    // print('dispose');
     progressController.dispose();
+    weightController?.dispose();
+    focusNode.dispose();
 
     super.dispose();
   }
 
   @override
+  void didUpdateWidget(SetWidget oldWidget) {
+    animateProgress();
+    // focusNode?.dispose();
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (enterable) {
+      if (weightController == null) {
+        weightController ??= TextEditingController();
+        weightController!.text = widget.set.weight.toString();
+      }
+
+      // if (focusNode == null) {
+
+      // focusNode!.addListener(() {
+      //   print("Has focus: ${focusNode!.hasFocus}");
+
+      //   if (!focusNode!.hasFocus) {
+      //     print('not enterable');
+      //     focusNode!.unfocus();
+      //     setState(() {
+      //       enterable = false;
+      //       // focusNode!.dispose();
+      //     });
+      //   }
+      // });
+
+      FocusScope.of(context).requestFocus(focusNode);
+      // }
+    }
+
     return Column(
       children: [
         Stack(
@@ -112,15 +189,45 @@ class SetWidgetState extends State<SetWidget>
                 fixedSize: const Size(50, 50),
                 shape: const CircleBorder(),
               ),
-              child: Text(repsDisplay),
+              child: Text(
+                widget.set.repsDone != null
+                    ? widget.set.repsDone.toString()
+                    : widget.set.reps.toString(),
+              ),
             ),
           ],
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
-          child: WeightTooltip(
-            weight: widget.set.weight,
-          ),
+          child: !widget.editable
+              ? WeightTooltip(
+                  weight: widget.set.weight,
+                  enabled: widget.editable,
+                )
+              : enterable
+                  ? SizedBox(
+                      width: 40,
+                      child: TextField(
+                        controller: weightController,
+                        focusNode: focusNode,
+                        autofocus: true,
+                        inputFormatters: positiveInteger,
+                        decoration: minimalInputDecoration,
+                        style: const TextStyle(fontSize: 14.0),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : TextButton(
+                      style: minimalButtonStyle(),
+                      onPressed: widget.set.repsDone != null
+                          ? () {
+                              editWeight();
+                            }
+                          : null,
+                      child: Text(
+                        widget.set.weight.toString(),
+                      ),
+                    ),
         ),
       ],
     );

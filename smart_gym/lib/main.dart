@@ -1,4 +1,3 @@
-// import 'package:calendar_view/calendar_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // trackedWorkout: trackedWorkout,
       ),
       const HistoryPage(),
-      const SocialPage(),
+      // const SocialPage(),
       const SettingsPage(),
     ];
   }
@@ -119,13 +118,14 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: PageView(
-          controller: pageController,
-          onPageChanged: (int index) {
-            setState(() {
-              _selectedPage = index;
-            });
-          },
-          children: bodyWidgets),
+        controller: pageController,
+        onPageChanged: (int index) {
+          setState(() {
+            _selectedPage = index;
+          });
+        },
+        children: bodyWidgets,
+      ),
 
       // bodyWidgets[_selectedPage],
       bottomNavigationBar: BottomNavigationBar(
@@ -138,10 +138,10 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.calendar_month),
             label: 'History',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Social',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.chat),
+          //   label: 'Social',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',

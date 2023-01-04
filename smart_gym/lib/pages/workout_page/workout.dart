@@ -1,5 +1,8 @@
 // import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 // import 'dart:convert';
 
 part 'workout.g.dart';
@@ -47,7 +50,8 @@ class Workout {
   String _name = '';
   List<Exercise> _exercises = [];
 
-  int? _duration;
+  String? _uuid;
+  Duration? _duration;
   DateTime? _dateStarted;
 
   Workout(String name, List<Exercise> exercises) {
@@ -65,13 +69,10 @@ class Workout {
 
   Map<String, dynamic> toJson() => _$WorkoutToJson(this);
 
-  // factory WorkoutRoutine.fromJson(Map<String, dynamic> parsedJson) {
-  //   return WorkoutRoutine();
-  // }
-
-  // Map<String, dynamic> toJson() {
-  //   return {"name": _name, "exercises": jsonEncode(_exercises)};
-  // }
+  Workout copy() {
+    String json = jsonEncode(toJson());
+    return Workout.fromJson(jsonDecode(json));
+  }
 
   bool validateRoutine() {
     if (_name.isEmpty) {
@@ -106,18 +107,19 @@ class Workout {
   int addExercise() {
     exercises.add(
       Exercise(
-          exerciseChoices.first,
-          [
-            Set(
-              0,
-              0,
-              0,
-              null,
-            )
-          ],
-          false,
-          false,
-          false),
+        exerciseChoices.first,
+        [
+          Set(
+            0,
+            0,
+            0,
+            null,
+          )
+        ],
+        false,
+        false,
+        false,
+      ),
     );
 
     return exercises.length - 1;
@@ -127,11 +129,23 @@ class Workout {
     exercises.removeAt(index);
   }
 
-  int? get duration {
+  String? get uuid {
+    return _uuid;
+  }
+
+  set uuid(String? value) {
+    _uuid = value;
+  }
+
+  void generateRandomUuid() {
+    uuid = const Uuid().v4();
+  }
+
+  Duration? get duration {
     return _duration;
   }
 
-  set duration(int? value) {
+  set duration(Duration? value) {
     _duration = value;
   }
 

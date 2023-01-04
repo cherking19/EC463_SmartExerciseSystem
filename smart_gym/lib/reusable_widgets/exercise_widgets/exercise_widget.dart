@@ -2,25 +2,26 @@ import 'package:flutter/material.dart';
 // import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
+import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
 
 import '../reusable_widgets.dart';
 
 class ExerciseWidget extends StatefulWidget {
   final WidgetType type;
+  final bool editable;
   final int index;
   final Exercise exercise;
   final Function startSetTimer;
-  // final Function startWorkoutTimer;
-  final Function editWorkout;
+  // final Function editWorkout;
 
   const ExerciseWidget({
     Key? key,
     required this.type,
+    required this.editable,
     required this.index,
     required this.exercise,
     required this.startSetTimer,
-    // required this.startWorkoutTimer,
-    required this.editWorkout,
+    // required this.editWorkout,
   }) : super(key: key);
 
   @override
@@ -34,21 +35,12 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
 
   void update() {
     setState(() {});
-  }
-
-  Widget setWidget(int index, Set set) {
-    return SetWidget(
-      type: widget.type,
-      index: index,
-      exercise: widget.exercise,
-      set: set,
-      updateParent: update,
-      startSetTimer: widget.startSetTimer,
-    );
+    // print('update 2');
   }
 
   @override
   Widget build(BuildContext context) {
+    // print('build exercise widget');
     return Container(
       decoration: globalBoxDecoration,
       child: Padding(
@@ -95,9 +87,14 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
                         (index) => Padding(
                           padding:
                               const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 8.0),
-                          child: setWidget(
-                            index,
-                            widget.exercise.sets[index],
+                          child: SetWidget(
+                            type: widget.type,
+                            editable: widget.editable,
+                            index: index,
+                            exercise: widget.exercise,
+                            set: widget.exercise.sets[index],
+                            updateParent: update,
+                            startSetTimer: widget.startSetTimer,
                           ),
                         ),
                       ),

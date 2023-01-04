@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
+import 'package:smart_gym/reusable_widgets/input_validation.dart';
 import '../workout.dart';
 
 class WorkoutForm extends StatefulWidget {
@@ -25,7 +25,7 @@ class WorkoutForm extends StatefulWidget {
 
   @override
   WorkoutFormState createState() {
-    return WorkoutFormState(submitController);
+    return WorkoutFormState();
   }
 }
 
@@ -34,9 +34,7 @@ class WorkoutFormState extends State<WorkoutForm> {
   final TextEditingController nameController = TextEditingController();
   bool saving = false;
 
-  WorkoutFormState(SubmitController? submitController) {
-    submitController?.saveWorkout = saveWorkout;
-  }
+  // WorkoutFormState(SubmitController? submitController) {}
 
   void showInvalidDialog(BuildContext context) {
     showDialog<String>(
@@ -88,11 +86,18 @@ class WorkoutFormState extends State<WorkoutForm> {
   }
 
   @override
+  void initState() {
+    widget.submitController?.saveWorkout = saveWorkout;
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (() {
+      onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-      }),
+      },
       child: Form(
         key: _formKey,
         child: Column(
@@ -687,12 +692,7 @@ class _SetWidgetState extends State<SetWidget> {
                 ),
                 controller: weightController,
                 keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                  FilteringTextInputFormatter.deny(
-                    RegExp(r'^0+'),
-                  ),
-                ],
+                inputFormatters: positiveInteger,
                 onChanged: (value) {
                   checkWeightInput(context);
                 },
@@ -713,12 +713,7 @@ class _SetWidgetState extends State<SetWidget> {
                 ),
                 controller: repsController,
                 keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                  FilteringTextInputFormatter.deny(
-                    RegExp(r'^0+'),
-                  ),
-                ],
+                inputFormatters: positiveInteger,
                 onChanged: (value) {
                   checkRepsInput(context);
                 },
@@ -739,12 +734,7 @@ class _SetWidgetState extends State<SetWidget> {
                 ),
                 controller: restController,
                 keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                  FilteringTextInputFormatter.deny(
-                    RegExp(r'^0+'),
-                  ),
-                ],
+                inputFormatters: positiveInteger,
                 onChanged: (value) {
                   checkRestInput(context);
                 },

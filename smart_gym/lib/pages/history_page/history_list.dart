@@ -2,16 +2,19 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 
 class HistoryList extends StatefulWidget {
   final List<Workout> workouts;
   final Function refresh;
+  final Function orderedRefresh;
 
   const HistoryList({
     Key? key,
     required this.workouts,
     required this.refresh,
+    required this.orderedRefresh,
   }) : super(key: key);
 
   @override
@@ -54,18 +57,13 @@ class HistoryListState extends State<HistoryList>
   }
 
   Future<void> refreshHistory() async {
-    await Future.delayed(const Duration(seconds: 1));
-    widget.refresh();
+    await Future.delayed(
+      globalPseudoDelay,
+      () {
+        widget.refresh();
+      },
+    );
   }
-
-  // void openWorkout(Workout workout) {
-  //   Future result = Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) {
-  //       return ViewHistoryRoute(workout: workout);
-  //     }),
-  //   );
-  // }
 
   @override
   bool get wantKeepAlive => true;
@@ -73,6 +71,11 @@ class HistoryListState extends State<HistoryList>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    if (widget.workouts.isEmpty) {
+      return noRecordedWidgets(context, refreshHistory);
+    }
+
     return Scrollbar(
       child: CustomRefreshIndicator(
         trigger: IndicatorTrigger.leadingEdge,
@@ -87,7 +90,11 @@ class HistoryListState extends State<HistoryList>
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  openWorkout(context, widget.workouts[index]);
+                  openViewWorkout(
+                    context,
+                    widget.workouts[index],
+                    widget.orderedRefresh,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),
@@ -105,7 +112,11 @@ class HistoryListState extends State<HistoryList>
           Widget child,
           IndicatorController controller,
         ) {
-          return customRefreshIndicatorLeading(context, child, controller);
+          return customRefreshIndicatorLeading(
+            context,
+            child,
+            controller,
+          );
         },
       ),
     );

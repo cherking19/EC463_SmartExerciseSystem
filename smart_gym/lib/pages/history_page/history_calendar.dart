@@ -2,17 +2,22 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/reusable_widgets/dialogs.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
 import 'package:tuple/tuple.dart';
 
 class HistoryCalendar extends StatefulWidget {
   final List<Workout> workouts;
   final Function refresh;
+  final Function orderRefresh;
 
   const HistoryCalendar({
     Key? key,
     required this.workouts,
     required this.refresh,
+    required this.orderRefresh,
   }) : super(key: key);
 
   @override
@@ -70,8 +75,12 @@ class HistoryCalendarState extends State<HistoryCalendar>
   }
 
   Future<void> refreshHistory() async {
-    await Future.delayed(const Duration(seconds: 1));
-    widget.refresh();
+    await Future.delayed(
+      globalPseudoDelay,
+      () {
+        widget.refresh();
+      },
+    );
   }
 
   @override
@@ -79,9 +88,10 @@ class HistoryCalendarState extends State<HistoryCalendar>
 
   @override
   void initState() {
-    scrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      if (widget.workouts.isNotEmpty) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }
     });
 
     super.initState();
@@ -98,8 +108,13 @@ class HistoryCalendarState extends State<HistoryCalendar>
   Widget build(BuildContext context) {
     super.build(context);
 
+    if (widget.workouts.isEmpty) {
+      return noRecordedWidgets(context, refreshHistory);
+    }
+
     months = [];
     calculateMonths();
+    scrollController = ScrollController();
 
     return CustomRefreshIndicator(
       trigger: IndicatorTrigger.trailingEdge,
@@ -125,6 +140,7 @@ class HistoryCalendarState extends State<HistoryCalendar>
                     months[index].item1,
                     months[index].item2,
                   ),
+                  refresh: widget.orderRefresh,
                 ),
               ),
             ),
@@ -136,7 +152,11 @@ class HistoryCalendarState extends State<HistoryCalendar>
         Widget child,
         IndicatorController controller,
       ) {
-        return customRefreshIndicator(context, child, controller);
+        return customRefreshIndicator(
+          context,
+          child,
+          controller,
+        );
       },
     );
   }
@@ -146,6 +166,7 @@ class CalendarMonth extends StatelessWidget {
   final int month;
   final int year;
   final List<Workout> workouts;
+  final Function refresh;
   List<int> days = [];
 
   CalendarMonth({
@@ -153,6 +174,7 @@ class CalendarMonth extends StatelessWidget {
     required this.month,
     required this.year,
     required this.workouts,
+    required this.refresh,
   }) : super(key: key);
 
   void calculateDays() {
@@ -224,27 +246,17 @@ class CalendarMonth extends StatelessWidget {
             onPressed: daysWorkouts != null
                 ? () {
                     if (daysWorkouts.length > 1) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return SimpleDialog(
-                            title: const Text('Multiple Workouts'),
-                            children: List.generate(
-                              daysWorkouts.length,
-                              (index) => SimpleDialogOption(
-                                onPressed: () {
-                                  openWorkout(context, daysWorkouts[index]);
-                                },
-                                child: Text(
-                                  '${daysWorkouts[index].name} - ${DateFormat('hh:mm a').format(daysWorkouts[index].dateStarted!)}',
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                      showMultipleWorkoutsDialog(
+                        context,
+                        daysWorkouts,
+                        refresh,
                       );
                     } else {
-                      openWorkout(context, daysWorkouts[0]);
+                      openViewWorkout(
+                        context,
+                        daysWorkouts[0],
+                        refresh,
+                      );
                     }
                   }
                 : null,

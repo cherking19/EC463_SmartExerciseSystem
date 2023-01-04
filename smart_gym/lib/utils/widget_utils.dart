@@ -1,14 +1,24 @@
-const List<String> sundayWeekAbbr = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
+import 'package:duration/duration.dart';
 
-const String cancelAction = 'Cancel';
-const String editAction = 'Edit';
-const String deleteAction = 'Delete';
-const String finishAction = 'Finish';
-const String trackAction = 'Track';
+const List<String> sundayWeekAbbr = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+// const String NavigatorAction.cancel = 'Cancel';
+// const String editAction = 'Edit';
+// const String NavigatorAction.delete = 'Delete';
+// const String NavigatorAction.finish = 'Finish';
+// const String NavigatorAction.track = 'Track';
+
+enum NavigatorAction {
+  cancel,
+  edit,
+  delete,
+  finish,
+  track,
+}
 
 class NavigatorResponse {
   bool success;
-  String action;
+  NavigatorAction action;
   Object? data;
 
   NavigatorResponse(
@@ -18,19 +28,64 @@ class NavigatorResponse {
   );
 }
 
-String getFormattedDuration(Duration duration) {
-  String twoDigits(int n) => n.toString().padLeft(2, "0");
-  String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-  String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-
-  return "$twoDigitMinutes:$twoDigitSeconds";
+enum TimeFormat {
+  digital, // like a digital clock 12:59:59
+  word // in the format '5d 23h 16m 50s'
 }
 
-const List<double> availablePlates = [45, 25, 10, 5, 2.5];
+class DigitalTimeFormat {
+  final bool showHours;
+  final bool showMinutes;
+  final bool showSeconds;
+
+  DigitalTimeFormat(
+    this.showHours,
+    this.showMinutes,
+    this.showSeconds,
+  );
+}
+
+class DurationFormat {
+  final TimeFormat formatType;
+  final Object format;
+
+  DurationFormat(
+    this.formatType,
+    this.format,
+  );
+}
+
+String getFormattedDuration(
+  Duration duration,
+  DurationFormat durationFormat,
+) {
+  // return prettyDuration(duration)
+  if (durationFormat.formatType == TimeFormat.digital) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+
+    String twoDigitHours = twoDigits(duration.inHours);
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+
+    DigitalTimeFormat format = durationFormat.format as DigitalTimeFormat;
+
+    return "${format.showHours ? '$twoDigitHours:' : ''}${format.showMinutes ? '$twoDigitMinutes:' : ''}${format.showSeconds ? twoDigitSeconds : ''}";
+  } else if (durationFormat.formatType == TimeFormat.word) {
+    DurationTersity tersity = durationFormat.format as DurationTersity;
+
+    return prettyDuration(
+      duration,
+      abbreviated: true,
+      tersity: tersity,
+    );
+  }
+
+  return '';
+}
+
+const List<double> availablePlates = [45, 25, 10, 5, 2.5, 1, 0.5];
 
 List<double> calculatePlates(double weight) {
-  // print(weight);
-  // print('hi');
   List<double> plates = [];
 
   weight -= 45;

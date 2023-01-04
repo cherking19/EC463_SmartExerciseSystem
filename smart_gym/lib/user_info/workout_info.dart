@@ -39,7 +39,31 @@ Future<List<Workout>> loadFinishedWorkouts() async {
 
 Future<bool> saveTrackedWorkout(Workout workout) async {
   List<Workout> finishedWorkouts = await loadFinishedWorkouts();
+  workout.generateRandomUuid();
   finishedWorkouts.add(workout);
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String finishedWorkoutsJson = jsonEncode(finishedWorkouts);
+
+  return await prefs.setString(finishedWorkoutsKey, finishedWorkoutsJson);
+}
+
+Future<bool> updateTrackedWorkout(Workout workout) async {
+  List<Workout> finishedWorkouts = await loadFinishedWorkouts();
+  finishedWorkouts[finishedWorkouts.indexWhere(
+      (finishedWorkout) => finishedWorkout.uuid == workout.uuid)] = workout;
+  String finishedWorkoutsJson = jsonEncode(finishedWorkouts);
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  return await prefs.setString(finishedWorkoutsKey, finishedWorkoutsJson);
+}
+
+Future<bool> deleteTrackedWorkout(String uuid) async {
+  List<Workout> finishedWorkouts = await loadFinishedWorkouts();
+  finishedWorkouts.removeAt(
+    finishedWorkouts.indexWhere(
+      (workout) => workout.uuid == uuid,
+    ),
+  );
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String finishedWorkoutsJson = jsonEncode(finishedWorkouts);
 

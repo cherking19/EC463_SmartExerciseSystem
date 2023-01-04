@@ -22,7 +22,10 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
           .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
           .toList(),
     )
-      ..duration = json['duration'] as int?
+      ..uuid = json['uuid'] as String?
+      ..duration = json['duration'] == null
+          ? null
+          : Duration(microseconds: json['duration'] as int)
       ..dateStarted = json['dateStarted'] == null
           ? null
           : DateTime.parse(json['dateStarted'] as String);
@@ -30,7 +33,8 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'name': instance.name,
       'exercises': instance.exercises.map((e) => e.toJson()).toList(),
-      'duration': instance.duration,
+      'uuid': instance.uuid,
+      'duration': instance.duration?.inMicroseconds,
       'dateStarted': instance.dateStarted?.toIso8601String(),
     };
 
