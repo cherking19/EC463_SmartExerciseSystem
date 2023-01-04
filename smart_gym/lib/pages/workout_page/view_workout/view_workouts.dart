@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 //import 'package:smart_gym/api.dart';
-import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+// import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
 import '../../../utils/widget_utils.dart';
@@ -54,26 +55,31 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
       ),
     );
 
-    result.then((value) {
-      if (value != null) {
-        NavigatorResponse response = value as NavigatorResponse;
+    result.then(
+      (value) {
+        if (value != null) {
+          NavigatorResponse response = value as NavigatorResponse;
 
-        if (response.action == editAction) {
-          if (response.success) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(editSuccessSnackBar(context));
+          if (response.action == NavigatorAction.edit) {
+            if (response.success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                editSuccessSnackBar(context),
+              );
+            }
+          } else if (response.action == NavigatorAction.delete) {
+            response.success
+                ? ScaffoldMessenger.of(context).showSnackBar(
+                    deleteSuccessSnackBar(context),
+                  )
+                : ScaffoldMessenger.of(context).showSnackBar(
+                    deleteFailedSnackBar(context),
+                  );
+          } else if (response.action == NavigatorAction.track) {
+            Navigator.of(context).pop(response);
           }
-        } else if (response.action == deleteAction) {
-          response.success
-              ? ScaffoldMessenger.of(context)
-                  .showSnackBar(deleteSuccessSnackBar(context))
-              : ScaffoldMessenger.of(context)
-                  .showSnackBar(deleteFailedSnackBar(context));
-        } else if (response.action == trackAction) {
-          Navigator.of(context).pop(response);
         }
-      }
-    });
+      },
+    );
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
@@ -51,7 +52,7 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
       result.then((value) {
         if (value) {
           Navigator.of(context).pop(
-            NavigatorResponse(true, cancelAction, null),
+            NavigatorResponse(true, NavigatorAction.cancel, null),
           );
         }
       });
@@ -66,14 +67,22 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
         (value) {
           if (value) {
             Navigator.of(context).pop(
-              NavigatorResponse(true, finishAction, null),
+              NavigatorResponse(
+                true,
+                NavigatorAction.finish,
+                null,
+              ),
             );
           }
         },
       );
     } else {
       Navigator.of(context).pop(
-        NavigatorResponse(true, finishAction, null),
+        NavigatorResponse(
+          true,
+          NavigatorAction.finish,
+          null,
+        ),
       );
     }
   }
@@ -89,7 +98,7 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
       (value) {
         if (value) {
           Navigator.of(context).pop(
-            NavigatorResponse(true, cancelAction, null),
+            NavigatorResponse(true, NavigatorAction.cancel, null),
           );
         }
       },
@@ -173,6 +182,14 @@ class RestTimerState extends State<RestTimer> {
                       Duration(
                         seconds:
                             TimerService.ofSet(context).elapsedMilli ~/ 1000,
+                      ),
+                      DurationFormat(
+                        TimeFormat.digital,
+                        DigitalTimeFormat(
+                          false,
+                          true,
+                          true,
+                        ),
                       ),
                     ),
                     style: const TextStyle(

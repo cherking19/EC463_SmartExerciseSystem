@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/history_page/history_calendar.dart';
 import 'package:smart_gym/pages/history_page/history_list.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../workout_page/workout.dart';
+
+enum HistoryPageTabType {
+  list,
+  calendar,
+}
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({
@@ -79,18 +86,88 @@ class HistoryPageState extends State<HistoryPage>
           child: TabBarView(
             controller: _tabController,
             children: [
-              HistoryList(
+              HistoryPageTab(
+                type: HistoryPageTabType.list,
                 workouts: finishedWorkouts,
-                refresh: loadHistory,
+                refresh: () async {
+                  loadHistory();
+                },
               ),
-              HistoryCalendar(
+              // HistoryList(
+              //   workouts: finishedWorkouts,
+              //   refresh: () async {
+              //     loadHistory();
+              //   },
+              // ),
+              HistoryPageTab(
+                type: HistoryPageTabType.calendar,
                 workouts: finishedWorkouts,
-                refresh: loadHistory,
+                refresh: () async {
+                  loadHistory();
+                },
               ),
             ],
           ),
         ),
       ],
     );
+  }
+}
+
+class HistoryPageTab extends StatefulWidget {
+  final HistoryPageTabType type;
+  final List<Workout> workouts;
+  final Function refresh;
+
+  const HistoryPageTab({
+    Key? key,
+    required this.type,
+    required this.workouts,
+    required this.refresh,
+  }) : super(key: key);
+
+  @override
+  HistoryPageTabState createState() {
+    return HistoryPageTabState();
+  }
+}
+
+class HistoryPageTabState extends State<HistoryPageTab> {
+  bool orderedRefresh = false;
+
+  void orderRefresh() {
+    setState(() {
+      orderedRefresh = true;
+    });
+
+    Future.delayed(
+      globalPseudoDelay,
+      () async {
+        await widget.refresh();
+
+        setState(() {
+          orderedRefresh = false;
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return orderedRefresh
+        ? const Center(
+            child: loadingSpinner,
+          )
+        : widget.type == HistoryPageTabType.list
+            ? HistoryList(
+                workouts: widget.workouts,
+                refresh: widget.refresh,
+                orderedRefresh: orderRefresh,
+              )
+            : HistoryCalendar(
+                workouts: widget.workouts,
+                refresh: widget.refresh,
+                orderRefresh: orderRefresh,
+              );
   }
 }

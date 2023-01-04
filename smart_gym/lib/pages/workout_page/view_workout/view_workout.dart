@@ -1,7 +1,9 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
-import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
+// import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
@@ -45,7 +47,13 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
 
     Future.delayed(const Duration(seconds: 1), () async {
       if (await saveRoutines(routines)) {
-        Navigator.of(context).pop(NavigatorResponse(true, 'Edit', null));
+        Navigator.of(context).pop(
+          NavigatorResponse(
+            true,
+            NavigatorAction.edit,
+            null,
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(editFailedSnackBar(context));
       }
@@ -53,8 +61,13 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   }
 
   void trackWorkout() {
-    Navigator.of(context)
-        .pop(NavigatorResponse(true, trackAction, widget.workout));
+    Navigator.of(context).pop(
+      NavigatorResponse(
+        true,
+        NavigatorAction.track,
+        widget.workout,
+      ),
+    );
   }
 
   void openEdit() {
@@ -100,13 +113,28 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
       Routines routines = await loadRoutines();
       routines.deleteWorkout(widget.index);
 
-      Future.delayed(const Duration(seconds: 1), () async {
-        if (await saveRoutines(routines)) {
-          Navigator.of(context).pop(NavigatorResponse(true, 'Delete', null));
-        } else {
-          Navigator.of(context).pop(NavigatorResponse(false, 'Delete', null));
-        }
-      });
+      Future.delayed(
+        const Duration(seconds: 1),
+        () async {
+          if (await saveRoutines(routines)) {
+            Navigator.of(context).pop(
+              NavigatorResponse(
+                true,
+                NavigatorAction.delete,
+                null,
+              ),
+            );
+          } else {
+            Navigator.of(context).pop(
+              NavigatorResponse(
+                false,
+                NavigatorAction.delete,
+                null,
+              ),
+            );
+          }
+        },
+      );
     }
   }
 
@@ -148,17 +176,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                   ),
                 ],
               ),
-            if (loading)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: SizedBox(
-                  height: 20.0,
-                  width: 20.0,
-                  child: CircularProgressIndicator(
-                    value: null,
-                  ),
-                ),
-              ),
+            if (loading) loadingSpinner,
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),

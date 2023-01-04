@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
@@ -44,19 +46,37 @@ class ViewHistory extends StatefulWidget {
 
 class ViewHistoryState extends State<ViewHistory> {
   bool editable = false;
-  Workout? preEditWorkout;
+  Workout? editWorkout;
+  bool loading = false;
 
-  void deleteWorkout(bool result) {
+  void deleteWorkout(bool result) async {
     if (result) {
-      deleteTrackedWorkout(widget.workout.uuid!);
-      Navigator.of(context).pop(
-        NavigatorResponse(true, deleteAction, null),
-      );
+      setState(() {
+        loading = true;
+      });
+
+      if (await deleteTrackedWorkout(widget.workout.uuid!)) {
+        Navigator.of(context).pop(
+          NavigatorResponse(
+            true,
+            NavigatorAction.delete,
+            null,
+          ),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          deleteSuccessSnackBar(context),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          deleteFailedSnackBar(context),
+        );
+      }
     }
   }
 
   void startEdit() {
-    preEditWorkout = widget.workout.copy();
+    editWorkout = widget.workout.copy();
 
     setState(() {
       editable = true;
@@ -69,72 +89,123 @@ class ViewHistoryState extends State<ViewHistory> {
       confirmCancelDialogTitle,
       confirmCancelDialogMessage,
     )) {
-      widget.workout = preEditWorkout!;
-
       // print(widget.workout);
-
       setState(() {
         editable = false;
       });
     }
   }
 
+  void saveEdit() async {
+    setState(() {
+      loading = true;
+    });
+
+    Future.delayed(
+      globalPseudoDelay,
+      () async {
+        if (await updateTrackedWorkout(editWorkout!)) {
+          Navigator.of(context).pop(
+            NavigatorResponse(
+              true,
+              NavigatorAction.edit,
+              null,
+            ),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            editSuccessSnackBar(context),
+          );
+
+          setState(() {
+            widget.workout = editWorkout!.copy();
+            editable = false;
+            loading = false;
+          });
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // print('view: $editable');
-    return Column(
-      children: [
-        // Text(widget.workout.name),
-        WorkoutWidget(
-          type: WidgetType.history,
-          workout: widget.workout,
-          editable: editable,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (editable)
-              TextButton(
-                onPressed: () {
-                  cancelEdit();
-                },
-                child: const Text('Cancel'),
-              ),
-            if (editable)
-              TextButton(
-                onPressed: () {},
-                child: const Text('Save'),
-              ),
-            if (!editable)
-              TextButton(
-                onPressed: () {
-                  // stopWorkout(context);
-                  // setState(() {
-                  //   editable = true;
-                  // });
-                  startEdit();
-                },
-                child: const Text('Edit'),
-              ),
-            // TextButton(
-            //   onPressed: () {
-            //     // cancelWorkout(context);
-            //   },
-            //   child: const Text(
-            //     'Delete',
-            //     style: TextStyle(
-            //       color: Color.fromARGB(255, 255, 0, 0),
-            //     ),
-            //   ),
-            // ),
-            deleteButton(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+        // print('request focus');
+      },
+      child: WillPopScope(
+        onWillPop: () async {
+          if (editable) {
+            return await showConfirmationDialog(
               context,
-              true,
-              deleteWorkout,
+              confirmCancelDialogTitle,
+              confirmCancelDialogMessage,
+            );
+          }
+
+          return true;
+        },
+        child: Column(
+          children: [
+            // Text(widget.workout.name),
+            WorkoutWidget(
+              type: WidgetType.history,
+              workout: editable ? editWorkout! : widget.workout,
+              editable: editable,
             ),
+            if (!loading)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (editable)
+                    TextButton(
+                      onPressed: () {
+                        cancelEdit();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                  if (editable)
+                    TextButton(
+                      onPressed: () {
+                        saveEdit();
+                      },
+                      child: const Text('Save'),
+                    ),
+                  if (!loading)
+                    TextButton(
+                      onPressed: () {
+                        // stopWorkout(context);
+                        // setState(() {
+                        //   editable = true;
+                        // });
+                        startEdit();
+                      },
+                      child: const Text('Edit'),
+                    ),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     // cancelWorkout(context);
+                  //   },
+                  //   child: const Text(
+                  //     'Delete',
+                  //     style: TextStyle(
+                  //       color: Color.fromARGB(255, 255, 0, 0),
+                  //     ),
+                  //   ),
+                  // ),
+                  deleteButton(
+                    context,
+                    true,
+                    deleteWorkout,
+                  ),
+                ],
+              ),
+            if (loading) loadingSpinner
           ],
         ),
-      ],
+      ),
     );
   }
 }

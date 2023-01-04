@@ -26,11 +26,15 @@ class WeightTooltip extends StatelessWidget {
   String printPlates(List<double> plates) {
     String config = '';
 
-    for (double plate in plates) {
-      config += '${trimPlate(plate)}, ';
+    if (plates.isNotEmpty) {
+      for (double plate in plates) {
+        config += '${trimPlate(plate)}, ';
+      }
+
+      return config.substring(0, config.length - 2);
     }
 
-    return config.substring(0, config.length - 2);
+    return 'No plates needed';
   }
 
   @override

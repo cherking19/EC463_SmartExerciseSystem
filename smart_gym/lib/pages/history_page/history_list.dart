@@ -2,16 +2,19 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 
 class HistoryList extends StatefulWidget {
   final List<Workout> workouts;
   final Function refresh;
+  final Function orderedRefresh;
 
   const HistoryList({
     Key? key,
     required this.workouts,
     required this.refresh,
+    required this.orderedRefresh,
   }) : super(key: key);
 
   @override
@@ -54,8 +57,12 @@ class HistoryListState extends State<HistoryList>
   }
 
   Future<void> refreshHistory() async {
-    await Future.delayed(const Duration(seconds: 1));
-    widget.refresh();
+    await Future.delayed(
+      globalPseudoDelay,
+      () {
+        widget.refresh();
+      },
+    );
   }
 
   @override
@@ -86,7 +93,7 @@ class HistoryListState extends State<HistoryList>
                   openViewWorkout(
                     context,
                     widget.workouts[index],
-                    refreshHistory,
+                    widget.orderedRefresh,
                   );
                 },
                 child: Padding(
@@ -105,7 +112,11 @@ class HistoryListState extends State<HistoryList>
           Widget child,
           IndicatorController controller,
         ) {
-          return customRefreshIndicatorLeading(context, child, controller);
+          return customRefreshIndicatorLeading(
+            context,
+            child,
+            controller,
+          );
         },
       ),
     );

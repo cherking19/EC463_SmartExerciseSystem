@@ -3,6 +3,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/history_page/view_history/view_history.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 // import 'package:smart_gym/utils/function_utils.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 
@@ -14,22 +15,8 @@ enum WidgetType {
   history,
 }
 
-const BoxDecoration globalBoxDecoration = BoxDecoration(
-  color: globalContainerColor,
-  borderRadius: BorderRadius.all(
-    Radius.circular(globalBorderRadius),
-  ),
-);
-
-const double globalBorderRadius = 10.0;
-const Color globalContainerColor = Color.fromARGB(255, 220, 220, 220);
-
-const TextStyle globalTitleTextStyle = TextStyle(
-  fontSize: 18,
-  fontWeight: FontWeight.bold,
-);
-
 const Duration globalAnimationSpeed = Duration(milliseconds: 500);
+const Duration globalPseudoDelay = Duration(seconds: 1);
 
 Image logoWidget(String imageName) {
   return Image.asset(
@@ -106,216 +93,11 @@ Container signInSignUpButton(
   );
 }
 
-SnackBar createSuccessSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('Create Success'),
-    backgroundColor: Colors.green,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-SnackBar createFailedSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('Create Failed'),
-    backgroundColor: Colors.red,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-SnackBar editSuccessSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('Edit Success'),
-    backgroundColor: Colors.green,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-SnackBar editFailedSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('Edit Failed'),
-    backgroundColor: Colors.red,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-SnackBar deleteSuccessSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('Delete Success'),
-    backgroundColor: Colors.green,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-SnackBar deleteFailedSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('Delete Failed'),
-    backgroundColor: Colors.red,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-SnackBar workoutInProgressSnackBar(BuildContext context) {
-  return SnackBar(
-    content: const Text('There is already a workout in progress'),
-    backgroundColor: Colors.red,
-    action: SnackBarAction(
-      label: 'OK',
-      onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
-      },
-    ),
-  );
-}
-
-// using CustomRefreshIndicator example
-AnimatedBuilder customRefreshIndicator(
-    BuildContext context, Widget child, IndicatorController controller) {
-  const double height = 150.0;
-  return AnimatedBuilder(
-    animation: controller,
-    builder: (context, _) {
-      final dy =
-          controller.value.clamp(0.0, 1.25) * -(height - (height * 0.25));
-      return Stack(
-        children: [
-          Transform.translate(
-            offset: Offset(0.0, dy),
-            child: child,
-          ),
-          Positioned(
-            bottom: -height,
-            left: 0,
-            right: 0,
-            height: height,
-            child: Container(
-              transform: Matrix4.translationValues(0.0, dy, 0.0),
-              padding: const EdgeInsets.only(top: 30.0),
-              constraints: const BoxConstraints.expand(),
-              child: Column(
-                children: [
-                  if (controller.isLoading)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).primaryColor,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  else
-                    Icon(
-                      Icons.keyboard_arrow_up,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  Text(
-                    controller.isLoading
-                        ? "Refreshing..."
-                        : "Pull to refresh workouts",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-// using CustomRefreshIndicator example
-AnimatedBuilder customRefreshIndicatorLeading(
-    BuildContext context, Widget child, IndicatorController controller) {
-  const double height = 125.0;
-  return AnimatedBuilder(
-    animation: controller,
-    builder: (context, _) {
-      final dy = controller.value.clamp(0.0, 1.25) * (height - (height * 0.25));
-      return Stack(
-        children: [
-          Transform.translate(
-            offset: Offset(0.0, dy),
-            child: child,
-          ),
-          Positioned(
-            // bottom: height,
-            top: -height,
-            left: 0,
-            right: 0,
-            height: height,
-            child: Container(
-              transform: Matrix4.translationValues(0.0, dy, 0.0),
-              padding: const EdgeInsets.only(top: 60.0),
-              constraints: const BoxConstraints.expand(),
-              child: Column(
-                children: [
-                  if (controller.isLoading)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).primaryColor,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  else
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  Text(
-                    controller.isLoading
-                        ? "Refreshing.."
-                        : "Pull to refresh workouts",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-void openViewWorkout(BuildContext context, Workout workout, Function refresh) {
+void openViewWorkout(
+  BuildContext context,
+  Workout workout,
+  Function refresh,
+) {
   Future result = Navigator.push(
     context,
     MaterialPageRoute(
@@ -331,7 +113,8 @@ void openViewWorkout(BuildContext context, Workout workout, Function refresh) {
         NavigatorResponse response = value as NavigatorResponse;
 
         if (response.success) {
-          if (response.action == deleteAction) {
+          if (response.action == NavigatorAction.delete ||
+              response.action == NavigatorAction.edit) {
             refresh();
           }
         }

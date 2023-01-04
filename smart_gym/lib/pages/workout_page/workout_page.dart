@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
@@ -59,9 +60,9 @@ class WorkoutPageState extends State<WorkoutPage>
           NavigatorResponse response = value as NavigatorResponse;
 
           if (response.success) {
-            if (response.action == finishAction) {
+            if (response.action == NavigatorAction.finish) {
               finishTracking();
-            } else if (response.action == cancelAction) {
+            } else if (response.action == NavigatorAction.cancel) {
               cancelTracking();
             }
           }
@@ -71,8 +72,9 @@ class WorkoutPageState extends State<WorkoutPage>
   }
 
   void saveCurrentDuration() {
-    widget.workout!.duration =
-        TimerService.ofWorkout(context).elapsedMilli ~/ 1000;
+    widget.workout!.duration = Duration(
+      seconds: TimerService.ofWorkout(context).elapsedMilli ~/ 1000,
+    );
   }
 
   void stopTimers() {
@@ -163,7 +165,7 @@ class WorkoutPageState extends State<WorkoutPage>
                     if (value != null) {
                       NavigatorResponse response = value as NavigatorResponse;
 
-                      if (response.action == trackAction) {
+                      if (response.action == NavigatorAction.track) {
                         startTracking(response.data as Workout);
                       }
                     }
@@ -213,6 +215,15 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
 
   @override
   Widget build(BuildContext context) {
+    DurationFormat restTimerFormat = DurationFormat(
+      TimeFormat.digital,
+      DigitalTimeFormat(
+        false,
+        true,
+        true,
+      ),
+    );
+
     return AnimatedBuilder(
       animation: TimerService.ofSet(context),
       builder: (context, child) {
@@ -258,9 +269,11 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                                 Text(
                                   getFormattedDuration(
                                     Duration(
-                                        seconds: TimerService.ofSet(context)
-                                                .elapsedMilli ~/
-                                            1000),
+                                      seconds: TimerService.ofSet(context)
+                                              .elapsedMilli ~/
+                                          1000,
+                                    ),
+                                    restTimerFormat,
                                   ),
                                   style: const TextStyle(
                                     fontSize: 16,
@@ -269,8 +282,10 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                                 Text(
                                   getFormattedDuration(
                                     Duration(
-                                        seconds: TimerService.ofSet(context)
-                                            .duration!),
+                                      seconds:
+                                          TimerService.ofSet(context).duration!,
+                                    ),
+                                    restTimerFormat,
                                   ),
                                   style: const TextStyle(
                                     fontSize: 16,

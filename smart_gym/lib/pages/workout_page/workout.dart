@@ -51,7 +51,7 @@ class Workout {
   List<Exercise> _exercises = [];
 
   String? _uuid;
-  int? _duration;
+  Duration? _duration;
   DateTime? _dateStarted;
 
   Workout(String name, List<Exercise> exercises) {
@@ -141,11 +141,11 @@ class Workout {
     uuid = const Uuid().v4();
   }
 
-  int? get duration {
+  Duration? get duration {
     return _duration;
   }
 
-  set duration(int? value) {
+  set duration(Duration? value) {
     _duration = value;
   }
 

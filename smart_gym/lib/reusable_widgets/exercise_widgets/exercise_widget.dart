@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
+import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
 
 import '../reusable_widgets.dart';
 
@@ -11,7 +12,7 @@ class ExerciseWidget extends StatefulWidget {
   final int index;
   final Exercise exercise;
   final Function startSetTimer;
-  final Function editWorkout;
+  // final Function editWorkout;
 
   const ExerciseWidget({
     Key? key,
@@ -20,7 +21,7 @@ class ExerciseWidget extends StatefulWidget {
     required this.index,
     required this.exercise,
     required this.startSetTimer,
-    required this.editWorkout,
+    // required this.editWorkout,
   }) : super(key: key);
 
   @override
@@ -34,10 +35,12 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
 
   void update() {
     setState(() {});
+    // print('update 2');
   }
 
   @override
   Widget build(BuildContext context) {
+    // print('build exercise widget');
     return Container(
       decoration: globalBoxDecoration,
       child: Padding(
