@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/services/TimerService.dart';
+import 'package:smart_gym/utils/widget_utils.dart';
 import 'pages/history_page/history_page.dart';
 import 'pages/workout_page/workout.dart';
 import 'pages/workout_page/workout_page.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smart Gym',
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       theme: ThemeData(
         // This is the theme of your application.
         //

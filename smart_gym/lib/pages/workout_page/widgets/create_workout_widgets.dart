@@ -34,8 +34,6 @@ class WorkoutFormState extends State<WorkoutForm> {
   final TextEditingController nameController = TextEditingController();
   bool saving = false;
 
-  // WorkoutFormState(SubmitController? submitController) {}
-
   void showInvalidDialog(BuildContext context) {
     showDialog<String>(
       context: context,
