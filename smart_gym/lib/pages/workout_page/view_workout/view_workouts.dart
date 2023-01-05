@@ -10,7 +10,9 @@ import '../../../utils/widget_utils.dart';
 import '../workout.dart';
 
 class ViewWorkoutsRoute extends StatelessWidget {
-  const ViewWorkoutsRoute({super.key});
+  const ViewWorkoutsRoute({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +44,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
     });
     Future.delayed(globalPseudoDelay, () async {
       workouts = await loadRoutines();
-      // await clearFinishedWorkouts();
-      // await clearSharedPreferences();
+
       setState(() {
         refreshing = false;
       });
@@ -112,17 +113,26 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
               child: loadingSpinner,
             ),
           if (!refreshing)
+            if (workouts.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 100),
+                  child: Text('No Routines'),
+                ),
+              ),
+          if (workouts.isNotEmpty)
             Expanded(
               child: Scrollbar(
                 child: ListView.builder(
-                    padding: const EdgeInsets.all(8.0),
-                    itemCount: workouts.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return TextButton(
-                        onPressed: () => openWorkout(index),
-                        child: Text(workouts[index].name),
-                      );
-                    }),
+                  padding: const EdgeInsets.all(8.0),
+                  itemCount: workouts.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return TextButton(
+                      onPressed: () => openWorkout(index),
+                      child: Text(workouts[index].name),
+                    );
+                  },
+                ),
               ),
             ),
         ],
