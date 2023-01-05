@@ -1,8 +1,7 @@
-// import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
-// import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
@@ -31,7 +30,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   bool editable = false;
   Workout? preEditWorkout;
   bool loading = false;
-  final SubmitController _submitController = SubmitController();
+  final SubmitController submitController = SubmitController();
 
   Future<void> updateWorkout(
     BuildContext context,
@@ -45,19 +44,23 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
     Routines routines = await loadRoutines();
     routines.replaceWorkout(widget.workout, widget.index);
 
-    Future.delayed(const Duration(seconds: 1), () async {
-      if (await saveRoutines(routines)) {
-        Navigator.of(context).pop(
-          NavigatorResponse(
-            true,
-            NavigatorAction.edit,
-            null,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(editFailedSnackBar(context));
-      }
-    });
+    Future.delayed(
+      globalPseudoDelay,
+      () async {
+        if (await saveRoutines(routines)) {
+          Navigator.of(context).pop(
+            NavigatorResponse(
+              true,
+              NavigatorAction.edit,
+              null,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(editFailedSnackBar(context));
+        }
+      },
+    );
   }
 
   void trackWorkout() {
@@ -83,7 +86,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   void saveEdit() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    _submitController.saveWorkout!();
+    submitController.saveWorkout!();
   }
 
   void cancelEdit() async {
@@ -142,6 +145,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
+        // key: globalScaffoldKey,
         appBar: AppBar(
           title: const Text('Viewing Workout'),
         ),
@@ -185,7 +189,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                   viewing: true,
                   workout: widget.workout,
                   saveWorkout: updateWorkout,
-                  submitController: _submitController,
+                  submitController: submitController,
                 ),
               ),
             )

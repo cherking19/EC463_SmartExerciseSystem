@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/utils/widget_utils.dart';
 
 SnackBar createSuccessSnackBar(BuildContext context) {
   return SnackBar(
@@ -7,7 +8,7 @@ SnackBar createSuccessSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );
@@ -20,7 +21,7 @@ SnackBar createFailedSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );
@@ -33,7 +34,7 @@ SnackBar editSuccessSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );
@@ -46,7 +47,7 @@ SnackBar editFailedSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );
@@ -59,7 +60,7 @@ SnackBar deleteSuccessSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );
@@ -72,7 +73,7 @@ SnackBar deleteFailedSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );
@@ -85,7 +86,7 @@ SnackBar workoutInProgressSnackBar(BuildContext context) {
     action: SnackBarAction(
       label: 'OK',
       onPressed: () {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar;
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
       },
     ),
   );

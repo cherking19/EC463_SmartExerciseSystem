@@ -1,12 +1,11 @@
 import 'package:duration/duration.dart';
+import 'package:flutter/material.dart';
 
 const List<String> sundayWeekAbbr = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-// const String NavigatorAction.cancel = 'Cancel';
-// const String editAction = 'Edit';
-// const String NavigatorAction.delete = 'Delete';
-// const String NavigatorAction.finish = 'Finish';
-// const String NavigatorAction.track = 'Track';
+// final GlobalKey<ScaffoldState> globalScaffoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 enum NavigatorAction {
   cancel,
