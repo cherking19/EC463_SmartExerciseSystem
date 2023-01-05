@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_gym/api.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
@@ -68,19 +68,22 @@ class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
     Workout workout,
     VoidCallback onFailure,
   ) async {
-    Routines routines = await loadRoutines();
-    routines.addWorkout(workout);
-    addWorkout(workout);
+    // Routines routines = await loadRoutines();
+    // routines.addWorkout(workout);
+    // addWorkout(workout);
 
-    Future.delayed(const Duration(seconds: 2), () async {
-      if (await saveRoutines(routines)) {
-        Navigator.of(context).pop(true);
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(createFailedSnackBar(context));
-        onFailure.call();
-      }
-    });
+    Future.delayed(
+      globalPseudoDelay,
+      () async {
+        if (await saveRoutine(workout)) {
+          Navigator.of(context).pop(true);
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(createFailedSnackBar(context));
+          onFailure.call();
+        }
+      },
+    );
   }
 
   @override

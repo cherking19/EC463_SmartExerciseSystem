@@ -6,16 +6,6 @@ part of 'workout.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Routines _$RoutinesFromJson(Map<String, dynamic> json) => Routines(
-      (json['workouts'] as List<dynamic>)
-          .map((e) => Workout.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$RoutinesToJson(Routines instance) => <String, dynamic>{
-      'workouts': instance.workouts.map((e) => e.toJson()).toList(),
-    };
-
 Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
       json['name'] as String,
       (json['exercises'] as List<dynamic>)

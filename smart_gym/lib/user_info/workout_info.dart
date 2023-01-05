@@ -5,20 +5,57 @@ import '../pages/workout_page/workout.dart';
 const String routinesJsonKey = 'routines';
 const String finishedWorkoutsKey = 'finishedWorkouts';
 
-Future<Routines> loadRoutines() async {
+Future<List<Workout>> loadRoutines() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String routinesJson = prefs.getString(routinesJsonKey) ?? "";
-  Routines routines = Routines([]);
+  List<Workout> routines = [];
+
   if (routinesJson.isNotEmpty) {
-    routines = Routines.fromJson(jsonDecode(routinesJson));
+    routines = (jsonDecode(routinesJson) as List)
+        .map((i) => Workout.fromJson(i))
+        .toList();
   }
 
   return routines;
 }
 
-Future<bool> saveRoutines(Routines routines) async {
+Future<bool> saveRoutine(Workout routine) async {
+  List<Workout> routines = await loadRoutines();
+  routine.generateRandomUuid();
+  routines.add(routine);
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String routinesJson = jsonEncode(routines.toJson());
+  String routinesJson = jsonEncode(routines);
+
+  return await prefs.setString(routinesJsonKey, routinesJson);
+}
+
+Future<bool> updateRoutine(Workout workout) async {
+  List<Workout> routines = await loadRoutines();
+  routines[routines.indexWhere(
+    (routine) => routine.uuid == workout.uuid,
+  )] = workout;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String routinesJson = jsonEncode(routines);
+
+  return await prefs.setString(routinesJsonKey, routinesJson);
+}
+
+Future<bool> deleteRoutine(String uuid) async {
+  List<Workout> routines = await loadRoutines();
+  routines.removeAt(
+    routines.indexWhere(
+      (routine) => routine.uuid == uuid,
+    ),
+  );
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String routinesJson = jsonEncode(routines);
+
+  return prefs.setString(routinesJsonKey, routinesJson);
+}
+
+Future<bool> clearRoutines() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String routinesJson = jsonEncode([]);
 
   return await prefs.setString(routinesJsonKey, routinesJson);
 }
@@ -50,7 +87,8 @@ Future<bool> saveTrackedWorkout(Workout workout) async {
 Future<bool> updateTrackedWorkout(Workout workout) async {
   List<Workout> finishedWorkouts = await loadFinishedWorkouts();
   finishedWorkouts[finishedWorkouts.indexWhere(
-      (finishedWorkout) => finishedWorkout.uuid == workout.uuid)] = workout;
+    (finishedWorkout) => finishedWorkout.uuid == workout.uuid,
+  )] = workout;
   String finishedWorkoutsJson = jsonEncode(finishedWorkouts);
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -75,4 +113,9 @@ Future<bool> clearFinishedWorkouts() async {
   String finishedWorkoutsJson = jsonEncode([]);
 
   return await prefs.setString(finishedWorkoutsKey, finishedWorkoutsJson);
+}
+
+Future<bool> clearSharedPreferences() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return await prefs.clear();
 }

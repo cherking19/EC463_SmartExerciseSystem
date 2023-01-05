@@ -15,35 +15,35 @@ const List<String> exerciseChoices = <String>[
   'Barbell Row'
 ];
 
-@JsonSerializable(explicitToJson: true)
-class Routines {
-  List<Workout> _workouts = [];
+// @JsonSerializable(explicitToJson: true)
+// class Routines {
+//   List<Workout> _workouts = [];
 
-  Routines(List<Workout> workouts) {
-    _workouts = workouts;
-  }
+//   Routines(List<Workout> workouts) {
+//     _workouts = workouts;
+//   }
 
-  factory Routines.fromJson(Map<String, dynamic> json) =>
-      _$RoutinesFromJson(json);
+//   factory Routines.fromJson(Map<String, dynamic> json) =>
+//       _$RoutinesFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RoutinesToJson(this);
+//   Map<String, dynamic> toJson() => _$RoutinesToJson(this);
 
-  List<Workout> get workouts {
-    return _workouts;
-  }
+//   List<Workout> get workouts {
+//     return _workouts;
+//   }
 
-  void addWorkout(Workout workout) {
-    workouts.add(workout);
-  }
+//   void addWorkout(Workout workout) {
+//     workouts.add(workout);
+//   }
 
-  void replaceWorkout(Workout workout, int index) {
-    workouts[index] = workout;
-  }
+//   void replaceWorkout(Workout workout, int index) {
+//     workouts[index] = workout;
+//   }
 
-  void deleteWorkout(int index) {
-    workouts.removeAt(index);
-  }
-}
+//   void deleteWorkout(int index) {
+//     workouts.removeAt(index);
+//   }
+// }
 
 @JsonSerializable(explicitToJson: true)
 class Workout {
