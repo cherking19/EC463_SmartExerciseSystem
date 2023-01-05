@@ -15,8 +15,12 @@ enum WidgetType {
   history,
 }
 
-const Duration globalAnimationSpeed = Duration(milliseconds: 500);
-const Duration globalPseudoDelay = Duration(seconds: 1);
+const Duration globalAnimationSpeed = Duration(
+  milliseconds: 500,
+);
+const Duration globalPseudoDelay = Duration(
+  milliseconds: 500,
+);
 
 Image logoWidget(String imageName) {
   return Image.asset(

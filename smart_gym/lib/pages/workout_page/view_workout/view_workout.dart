@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
-import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
@@ -32,35 +30,14 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   bool loading = false;
   final SubmitController submitController = SubmitController();
 
-  Future<void> updateWorkout(
+  void updateWorkout(
     BuildContext context,
     Workout workout,
-    VoidCallback onFailure,
+    VoidCallback onComplete,
   ) async {
     setState(() {
       loading = true;
     });
-
-    Routines routines = await loadRoutines();
-    routines.replaceWorkout(widget.workout, widget.index);
-
-    Future.delayed(
-      globalPseudoDelay,
-      () async {
-        if (await saveRoutines(routines)) {
-          Navigator.of(context).pop(
-            NavigatorResponse(
-              true,
-              NavigatorAction.edit,
-              null,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(editFailedSnackBar(context));
-        }
-      },
-    );
   }
 
   void trackWorkout() {
@@ -103,7 +80,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
     }
   }
 
-  void deleteWorkout() async {
+  void deleteWorkout(Function onComplete) async {
     if (await showConfirmationDialog(
       context,
       confirmDeleteDialogTitle,
@@ -113,30 +90,8 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
         loading = true;
       });
 
-      Routines routines = await loadRoutines();
-      routines.deleteWorkout(widget.index);
-
-      Future.delayed(
-        const Duration(seconds: 1),
-        () async {
-          if (await saveRoutines(routines)) {
-            Navigator.of(context).pop(
-              NavigatorResponse(
-                true,
-                NavigatorAction.delete,
-                null,
-              ),
-            );
-          } else {
-            Navigator.of(context).pop(
-              NavigatorResponse(
-                false,
-                NavigatorAction.delete,
-                null,
-              ),
-            );
-          }
-        },
+      onComplete(
+        await deleteRoutine(widget.workout.uuid!),
       );
     }
   }
@@ -172,7 +127,19 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                     child: const Text('Cancel'),
                   ),
                   TextButton(
-                    onPressed: deleteWorkout,
+                    onPressed: () {
+                      deleteWorkout(
+                        (bool result) {
+                          Navigator.of(context).pop(
+                            NavigatorResponse(
+                              result,
+                              NavigatorAction.delete,
+                              null,
+                            ),
+                          );
+                        },
+                      );
+                    },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),

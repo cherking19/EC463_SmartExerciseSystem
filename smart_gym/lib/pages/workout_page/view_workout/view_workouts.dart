@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 //import 'package:smart_gym/api.dart';
 // import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
@@ -32,17 +34,27 @@ class ViewWorkouts extends StatefulWidget {
 
 class ViewWorkoutsState extends State<ViewWorkouts> {
   List<Workout> workouts = [];
+  bool refreshing = false;
 
-  void initialLoadWorkouts() async {
-    workouts = (await loadRoutines()).workouts;
-    setState(() {});
-  }
-
-  void deleteWorkout(int index) async {
+  void loadWorkouts() async {
     setState(() {
-      workouts.removeAt(index);
+      refreshing = true;
+    });
+    Future.delayed(globalPseudoDelay, () async {
+      workouts = await loadRoutines();
+      // await clearFinishedWorkouts();
+      // await clearSharedPreferences();
+      setState(() {
+        refreshing = false;
+      });
     });
   }
+
+  // void deleteWorkout(int index) async {
+  //   setState(() {
+  //     workouts.removeAt(index);
+  //   });
+  // }
 
   void openWorkout(int index) {
     Future result = Navigator.push(
@@ -67,6 +79,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
               );
             }
           } else if (response.action == NavigatorAction.delete) {
+            loadWorkouts();
             response.success
                 ? ScaffoldMessenger.of(context).showSnackBar(
                     deleteSuccessSnackBar(context),
@@ -84,7 +97,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
 
   @override
   void initState() {
-    initialLoadWorkouts();
+    loadWorkouts();
     super.initState();
   }
 
@@ -94,19 +107,24 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
-          Expanded(
-            child: Scrollbar(
-              child: ListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: workouts.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return TextButton(
-                      onPressed: () => openWorkout(index),
-                      child: Text(workouts[index].name),
-                    );
-                  }),
+          if (refreshing)
+            const Center(
+              child: loadingSpinner,
             ),
-          ),
+          if (!refreshing)
+            Expanded(
+              child: Scrollbar(
+                child: ListView.builder(
+                    padding: const EdgeInsets.all(8.0),
+                    itemCount: workouts.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return TextButton(
+                        onPressed: () => openWorkout(index),
+                        child: Text(workouts[index].name),
+                      );
+                    }),
+              ),
+            ),
         ],
       ),
     );
