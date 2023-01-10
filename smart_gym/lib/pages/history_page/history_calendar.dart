@@ -50,23 +50,21 @@ class HistoryCalendarState extends State<HistoryCalendar>
       month = 1;
       year++;
     }
-
-    // for (int i = 0; i < months.length; i++) {
-    //   print(months[i]);
-    // }
   }
 
   List<Workout> getMonthsWorkouts(int month, int year) {
     List<Workout> workouts = [];
 
-    for (int i = 0; i < widget.workouts.length; i++) {
-      if (widget.workouts[i].dateStarted!.year < year) {
-        continue;
-      } else if (widget.workouts[i].dateStarted!.year > year) {
-        break;
-      }
+    int startIndex = widget.workouts.indexWhere((workout) =>
+        workout.dateStarted!.year == year &&
+        workout.dateStarted!.month == month);
 
-      if (widget.workouts[i].dateStarted!.month == month) {
+    if (startIndex >= 0) {
+      for (int i = startIndex; i < widget.workouts.length; i++) {
+        if (widget.workouts[i].dateStarted!.month != month) {
+          break;
+        }
+
         workouts.add(widget.workouts[i]);
       }
     }
@@ -124,7 +122,6 @@ class HistoryCalendarState extends State<HistoryCalendar>
       child: ListView.builder(
         controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        // padding: const EdgeInsets.all(16.0),
         itemCount: months.length,
         itemBuilder: (context, index) {
           return Padding(
@@ -292,7 +289,6 @@ class CalendarMonth extends StatelessWidget {
             DateTime(year, month),
           ),
           style: const TextStyle(
-            // fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -316,7 +312,7 @@ class CalendarMonth extends StatelessWidget {
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }

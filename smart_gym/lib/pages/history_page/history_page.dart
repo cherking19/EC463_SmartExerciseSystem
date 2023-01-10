@@ -37,9 +37,6 @@ class HistoryPageState extends State<HistoryPage>
 
     // clearFinishedWorkouts();
 
-    // for (int i = 0; i < finishedWorkouts.length; i++) {
-    //   print(finishedWorkouts[i].uuid);
-    // }
     setState(() {});
   }
 
@@ -93,12 +90,6 @@ class HistoryPageState extends State<HistoryPage>
                   loadHistory();
                 },
               ),
-              // HistoryList(
-              //   workouts: finishedWorkouts,
-              //   refresh: () async {
-              //     loadHistory();
-              //   },
-              // ),
               HistoryPageTab(
                 type: HistoryPageTabType.calendar,
                 workouts: finishedWorkouts,
