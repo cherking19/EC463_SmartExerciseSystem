@@ -31,9 +31,9 @@ class HistoryPageState extends State<HistoryPage>
   void loadHistory() async {
     finishedWorkouts = await loadFinishedWorkouts();
 
-    if (recentFirst) {
-      finishedWorkouts = finishedWorkouts.reversed.toList();
-    }
+    // if (recentFirst) {
+    //   finishedWorkouts = finishedWorkouts.reversed.toList();
+    // }
 
     // clearFinishedWorkouts();
 
