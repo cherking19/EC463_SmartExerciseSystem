@@ -219,6 +219,9 @@ class CalendarMonth extends StatelessWidget {
       index++;
     }
 
+    daysWorkouts
+        ?.sort((a, b) => a.dateStarted!.isAfter(b.dateStarted!) ? 1 : -1);
+
     return daysWorkouts;
   }
 

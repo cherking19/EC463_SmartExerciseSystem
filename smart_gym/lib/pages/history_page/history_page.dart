@@ -30,6 +30,8 @@ class HistoryPageState extends State<HistoryPage>
 
   void loadHistory() async {
     finishedWorkouts = await loadFinishedWorkouts();
+    finishedWorkouts
+        .sort((a, b) => a.dateStarted!.isBefore(b.dateStarted!) ? 1 : -1);
 
     // if (recentFirst) {
     //   finishedWorkouts = finishedWorkouts.reversed.toList();
