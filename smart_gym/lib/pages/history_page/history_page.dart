@@ -148,8 +148,11 @@ class HistoryPageTabState extends State<HistoryPageTab> {
   @override
   Widget build(BuildContext context) {
     return orderedRefresh
-        ? const Center(
-            child: loadingSpinner,
+        ? Center(
+            child: loadingSpinner(
+              size: defaultLoadingSpinnerSize,
+              padding: EdgeInsets.zero,
+            ),
           )
         : widget.type == HistoryPageTabType.list
             ? HistoryList(

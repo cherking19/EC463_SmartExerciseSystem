@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';

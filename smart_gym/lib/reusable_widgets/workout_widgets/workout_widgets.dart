@@ -6,7 +6,7 @@ import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/exercise_widgets/exercise_widget.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 
 import '../../services/TimerService.dart';
