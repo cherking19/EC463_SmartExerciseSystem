@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
-<<<<<<< Updated upstream
-import 'package:smart_gym/reusable_widgets/input.dart';
-=======
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
->>>>>>> Stashed changes
 import '../workout.dart';
 
 class WorkoutForm extends StatefulWidget {

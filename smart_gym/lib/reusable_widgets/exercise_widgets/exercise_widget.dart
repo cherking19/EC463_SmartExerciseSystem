@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-<<<<<<< Updated upstream
-import 'package:smart_gym/pages/workout_page/workout.dart';
-import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
-import 'package:smart_gym/reusable_widgets/decoration.dart';
-
-=======
 import 'package:flutter/scheduler.dart';
 import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
->>>>>>> Stashed changes
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 import '../reusable_widgets.dart';
 
 class ExerciseWidget extends StatefulWidget {

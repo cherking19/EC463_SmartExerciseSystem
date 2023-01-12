@@ -50,21 +50,7 @@ class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
     '',
     [
       Exercise(
-<<<<<<< Updated upstream
-          defaultExercises.first,
-          [
-            Set(
-              0,
-              0,
-              0,
-              null,
-            )
-          ],
-          false,
-          false,
-          false),
-=======
-        exerciseChoices.first,
+        defaultExercises.first,
         [
           Set(
             0,
@@ -77,7 +63,6 @@ class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
         false,
         false,
       ),
->>>>>>> Stashed changes
     ],
   );
 

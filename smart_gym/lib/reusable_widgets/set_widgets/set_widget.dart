@@ -4,13 +4,9 @@ import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/input.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-<<<<<<< Updated upstream
 import 'package:smart_gym/reusable_widgets/decoration.dart';
-=======
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
->>>>>>> Stashed changes
 import 'weight_tooltip.dart';
 
 const double setCircleDiameter = 50;
