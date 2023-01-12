@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 
+SnackBar createSnackBar({
+  required String title,
+  required Color color,
+}) {
+  return SnackBar(
+    content: Text(title),
+    backgroundColor: color,
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
+      },
+    ),
+  );
+}
+
 SnackBar createSuccessSnackBar(BuildContext context) {
   return SnackBar(
     content: const Text('Create Success'),

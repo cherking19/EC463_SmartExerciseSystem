@@ -202,7 +202,6 @@ class ViewHistoryState extends State<ViewHistory> {
                   ),
                 ],
               ),
-            if (loading) loadingSpinner
           ],
         ),
       ),

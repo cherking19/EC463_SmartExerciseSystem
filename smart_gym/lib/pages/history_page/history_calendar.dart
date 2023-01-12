@@ -5,7 +5,7 @@ import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:tuple/tuple.dart';
 
 class HistoryCalendar extends StatefulWidget {

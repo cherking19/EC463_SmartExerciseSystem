@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
-import 'package:smart_gym/reusable_widgets/input_validation.dart';
+import 'package:smart_gym/reusable_widgets/input.dart';
 import '../workout.dart';
 
 class WorkoutForm extends StatefulWidget {
@@ -367,7 +367,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
                 widget.exercise.name = value!;
               });
             },
-      items: exerciseChoices.map<DropdownMenuItem<String>>((String value) {
+      items: defaultExercises.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
