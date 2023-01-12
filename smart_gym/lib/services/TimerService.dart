@@ -1,33 +1,32 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/workout.dart';
 
 class TimerService extends ChangeNotifier {
   Timer? _timer;
   // duration in seconds
-  int? _duration = 0;
+  Duration? endDuration = const Duration(seconds: 0);
 
-  int _elapsedMilli = 0;
-  int _deltaMilli = 50;
+  Duration elapsed = defaultRestDuration;
+  static const Duration _delta = Duration(milliseconds: 50);
   // int _elapsed = 0;
 
-  int? get duration => _duration;
-  int get elapsedMilli => _elapsedMilli;
+  // Duration? get duration => _duration;
+  // Duration get elapsedMilli => elapsed;
 
   bool get isRunning => _timer != null;
 
   TimerService();
 
-  void restart(int? duration) {
+  void restart(
+    Duration? duration,
+  ) {
     stop();
-    _duration = duration;
+    endDuration = duration;
     // _elapsedMilli = duration * 1000;
-    _elapsedMilli = 0;
-    _deltaMilli = 50;
-    _timer = Timer.periodic(
-        Duration(
-          // seconds: 1,
-          milliseconds: _deltaMilli,
-        ), (timer) {
+    elapsed = const Duration(seconds: 0);
+    // _deltaMilli = 50;
+    _timer = Timer.periodic(_delta, (timer) {
       countUp();
     });
 
@@ -35,7 +34,7 @@ class TimerService extends ChangeNotifier {
   }
 
   void countUp() {
-    _elapsedMilli += _deltaMilli;
+    elapsed += _delta;
 
     // if (elapsedMilli == _duration * 1000) {
     //   // stop();

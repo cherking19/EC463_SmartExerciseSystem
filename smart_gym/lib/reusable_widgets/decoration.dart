@@ -15,7 +15,17 @@ const TextStyle globalTitleTextStyle = TextStyle(
   fontWeight: FontWeight.bold,
 );
 
-const InputDecoration minimalInputDecoration = InputDecoration(
-  contentPadding: EdgeInsets.all(0.0),
-  isDense: true,
+InputDecoration minimalInputDecoration({
+  String? hint,
+  TextStyle? errorStyle,
+}) =>
+    InputDecoration(
+      contentPadding: const EdgeInsets.all(0.0),
+      isDense: true,
+      hintText: hint,
+      errorStyle: errorStyle,
+    );
+
+const TextStyle minimalTextStyling = TextStyle(
+  height: 0,
 );

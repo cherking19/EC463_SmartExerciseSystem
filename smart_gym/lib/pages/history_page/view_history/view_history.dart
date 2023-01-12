@@ -129,11 +129,9 @@ class ViewHistoryState extends State<ViewHistory> {
 
   @override
   Widget build(BuildContext context) {
-    // print('view: $editable');
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
-        // print('request focus');
       },
       child: WillPopScope(
         onWillPop: () async {

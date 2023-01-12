@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/utils/function_utils.dart';
 
-ButtonStyle minimalButtonStyle() {
+ButtonStyle minimalButtonStyle({
+  EdgeInsets? padding,
+}) {
   return TextButton.styleFrom(
     minimumSize: Size.zero,
-    padding: EdgeInsets.zero,
+    padding: padding ?? EdgeInsets.zero,
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
   );
 }
