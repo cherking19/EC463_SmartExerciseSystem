@@ -5033,87 +5033,6 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="transistor" urn="urn:adsk.eagle:library:402">
-<description>&lt;b&gt;Transistors&lt;/b&gt;&lt;p&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
-<packages>
-<package name="TO92-ECB" urn="urn:adsk.eagle:footprint:29865/1" library_version="7">
-<description>&lt;b&gt;TO-92&lt;/b&gt; Pads In Line E C B from top&lt;p&gt;</description>
-<wire x1="-2.095" y1="-1.651" x2="2.095" y2="-1.651" width="0.127" layer="21"/>
-<wire x1="-2.413" y1="1.1359" x2="2.413" y2="1.1359" width="0.127" layer="21" curve="-129.583"/>
-<wire x1="1.136" y1="-0.127" x2="-1.136" y2="-0.127" width="0.127" layer="51"/>
-<wire x1="-2.413" y1="1.1359" x2="-2.664" y2="-0.127" width="0.127" layer="51" curve="27.9407"/>
-<wire x1="-2.664" y1="-0.127" x2="-2.413" y2="-1.1359" width="0.127" layer="51" curve="22.4788"/>
-<wire x1="-1.404" y1="-0.127" x2="-2.664" y2="-0.127" width="0.127" layer="51"/>
-<wire x1="-2.4135" y1="-1.1359" x2="-2.095" y2="-1.651" width="0.127" layer="21" curve="13.0385"/>
-<wire x1="-1.136" y1="-0.127" x2="-1.404" y2="-0.127" width="0.127" layer="21"/>
-<wire x1="2.413" y1="-1.1359" x2="2.664" y2="-0.127" width="0.127" layer="51" curve="22.4788"/>
-<wire x1="2.664" y1="-0.127" x2="2.413" y2="1.1359" width="0.127" layer="51" curve="27.9333"/>
-<wire x1="2.664" y1="-0.127" x2="1.404" y2="-0.127" width="0.127" layer="51"/>
-<wire x1="1.404" y1="-0.127" x2="1.136" y2="-0.127" width="0.127" layer="21"/>
-<wire x1="2.095" y1="-1.651" x2="2.4247" y2="-1.1118" width="0.127" layer="21" curve="13.6094"/>
-<pad name="C" x="0" y="0" drill="0.8128" shape="long" rot="R90"/>
-<pad name="E" x="-2.54" y="0" drill="0.8128" shape="long" rot="R90"/>
-<pad name="B" x="2.54" y="0" drill="0.8128" shape="long" rot="R90"/>
-<text x="-2.54" y="3.048" size="1.27" layer="25" ratio="10">&gt;NAME</text>
-<text x="-2.54" y="-3.302" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
-</package>
-</packages>
-<packages3d>
-<package3d name="TO92-ECB" urn="urn:adsk.eagle:package:29929/2" type="model" library_version="7">
-<description>TO-92 Pads In Line E C B from top</description>
-<packageinstances>
-<packageinstance name="TO92-ECB"/>
-</packageinstances>
-</package3d>
-</packages3d>
-<symbols>
-<symbol name="NPN" urn="urn:adsk.eagle:symbol:26256/2" library_version="7">
-<wire x1="2.54" y1="2.54" x2="0.508" y2="1.524" width="0.1524" layer="94"/>
-<wire x1="1.778" y1="-1.524" x2="2.54" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="2.54" y1="-2.54" x2="1.27" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="-2.54" x2="1.778" y2="-1.524" width="0.1524" layer="94"/>
-<wire x1="1.54" y1="-2.04" x2="0.308" y2="-1.424" width="0.1524" layer="94"/>
-<wire x1="1.524" y1="-2.413" x2="2.286" y2="-2.413" width="0.254" layer="94"/>
-<wire x1="2.286" y1="-2.413" x2="1.778" y2="-1.778" width="0.254" layer="94"/>
-<wire x1="1.778" y1="-1.778" x2="1.524" y2="-2.286" width="0.254" layer="94"/>
-<wire x1="1.524" y1="-2.286" x2="1.905" y2="-2.286" width="0.254" layer="94"/>
-<wire x1="1.905" y1="-2.286" x2="1.778" y2="-2.032" width="0.254" layer="94"/>
-<text x="-10.16" y="7.62" size="1.778" layer="95">&gt;NAME</text>
-<text x="-10.16" y="5.08" size="1.778" layer="96">&gt;VALUE</text>
-<rectangle x1="-0.254" y1="-2.54" x2="0.508" y2="2.54" layer="94"/>
-<pin name="B" x="-2.54" y="0" visible="off" length="short" direction="pas" swaplevel="1"/>
-<pin name="E" x="2.54" y="-5.08" visible="off" length="short" direction="pas" swaplevel="3" rot="R90"/>
-<pin name="C" x="2.54" y="5.08" visible="off" length="short" direction="pas" swaplevel="2" rot="R270"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="2SC945" urn="urn:adsk.eagle:component:30070/4" prefix="T" library_version="7">
-<description>&lt;b&gt;NPN Silicon Epitaxial Planar Transistor&lt;/b&gt;&lt;p&gt;
-Source: SEMTECH ELECTRONICS LTD. ... 2SC945  2.pdf</description>
-<gates>
-<gate name="G$1" symbol="NPN" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="TO92-ECB">
-<connects>
-<connect gate="G$1" pin="B" pad="B"/>
-<connect gate="G$1" pin="C" pad="C"/>
-<connect gate="G$1" pin="E" pad="E"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:29929/2"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="POPULARITY" value="0" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 </libraries>
 <attributes>
 </attributes>
@@ -5129,9 +5048,7 @@ Source: SEMTECH ELECTRONICS LTD. ... 2SC945  2.pdf</description>
 <part name="BUTTON" library="switch-coto" library_urn="urn:adsk.eagle:library:374" deviceset="CT10-XXXX-" device="A2" package3d_urn="urn:adsk.eagle:package:27090/1"/>
 <part name="G1" library="battery" library_urn="urn:adsk.eagle:library:109" deviceset="AB9V" device="" package3d_urn="urn:adsk.eagle:package:4600/1"/>
 <part name="D1" library="diode" library_urn="urn:adsk.eagle:library:210" deviceset="1N4148" device="DO35-10" package3d_urn="urn:adsk.eagle:package:43344/2"/>
-<part name="T2" library="transistor" library_urn="urn:adsk.eagle:library:402" deviceset="2SC945" device="" package3d_urn="urn:adsk.eagle:package:29929/2"/>
-<part name="R3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="1K"/>
-<part name="R4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="1K"/>
+<part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/5" package3d_urn="urn:adsk.eagle:package:23488/1" value="1K"/>
 </parts>
 <sheets>
 <sheet>
@@ -5158,17 +5075,9 @@ Source: SEMTECH ELECTRONICS LTD. ... 2SC945  2.pdf</description>
 <attribute name="NAME" x="19.05" y="57.9374" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="15.24" y="58.6486" size="1.778" layer="96"/>
 </instance>
-<instance part="T2" gate="G$1" x="105.41" y="55.88" smashed="yes">
-<attribute name="NAME" x="109.22" y="54.61" size="1.778" layer="95"/>
-<attribute name="VALUE" x="109.22" y="57.15" size="1.778" layer="96"/>
-</instance>
-<instance part="R3" gate="G$1" x="26.67" y="53.34" smashed="yes">
+<instance part="R1" gate="G$1" x="26.67" y="53.34" smashed="yes">
 <attribute name="NAME" x="22.86" y="54.8386" size="1.778" layer="95"/>
-<attribute name="VALUE" x="27.94" y="55.118" size="1.778" layer="96"/>
-</instance>
-<instance part="R4" gate="G$1" x="97.79" y="55.88" smashed="yes">
-<attribute name="NAME" x="93.98" y="57.3786" size="1.778" layer="95"/>
-<attribute name="VALUE" x="97.79" y="57.658" size="1.778" layer="96"/>
+<attribute name="VALUE" x="26.67" y="55.118" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -5204,10 +5113,6 @@ Source: SEMTECH ELECTRONICS LTD. ... 2SC945  2.pdf</description>
 <wire x1="-13.97" y1="73.66" x2="-13.97" y2="80.01" width="0.1524" layer="91"/>
 <wire x1="-13.97" y1="80.01" x2="21.59" y2="80.01" width="0.1524" layer="91"/>
 <label x="-1.27" y="81.28" size="1.778" layer="95"/>
-<pinref part="T2" gate="G$1" pin="C"/>
-<wire x1="21.59" y1="80.01" x2="107.95" y2="80.01" width="0.1524" layer="91"/>
-<wire x1="107.95" y1="80.01" x2="107.95" y2="60.96" width="0.1524" layer="91"/>
-<junction x="21.59" y="80.01"/>
 </segment>
 </net>
 <net name="N$4" class="0">
@@ -5217,11 +5122,11 @@ Source: SEMTECH ELECTRONICS LTD. ... 2SC945  2.pdf</description>
 <wire x1="13.97" y1="53.34" x2="21.59" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="Q3" gate="G$1" pin="D"/>
 <wire x1="21.59" y1="53.34" x2="21.59" y2="52.07" width="0.1524" layer="91"/>
-<pinref part="R3" gate="G$1" pin="1"/>
+<pinref part="R1" gate="G$1" pin="1"/>
 <junction x="21.59" y="53.34"/>
 </segment>
 </net>
-<net name="D12" class="0">
+<net name="N$5" class="0">
 <segment>
 <pinref part="Q3" gate="G$1" pin="G"/>
 <wire x1="26.67" y1="44.45" x2="45.72" y2="44.45" width="0.1524" layer="91"/>
@@ -5235,33 +5140,16 @@ Source: SEMTECH ELECTRONICS LTD. ... 2SC945  2.pdf</description>
 <pinref part="G1" gate="G$1" pin="-"/>
 <wire x1="21.59" y1="39.37" x2="-13.97" y2="39.37" width="0.1524" layer="91"/>
 <wire x1="-13.97" y1="39.37" x2="-13.97" y2="48.26" width="0.1524" layer="91"/>
-<wire x1="21.59" y1="39.37" x2="44.45" y2="39.37" width="0.1524" layer="91"/>
+<wire x1="21.59" y1="39.37" x2="45.72" y2="39.37" width="0.1524" layer="91"/>
 <junction x="21.59" y="39.37"/>
 <label x="34.29" y="39.37" size="1.778" layer="95"/>
-<pinref part="T2" gate="G$1" pin="E"/>
-<wire x1="44.45" y1="39.37" x2="45.72" y2="39.37" width="0.1524" layer="91"/>
-<wire x1="107.95" y1="50.8" x2="107.95" y2="39.37" width="0.1524" layer="91"/>
-<wire x1="107.95" y1="39.37" x2="45.72" y2="39.37" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="5V" class="0">
 <segment>
+<pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="31.75" y1="53.34" x2="44.45" y2="53.34" width="0.1524" layer="91"/>
 <label x="35.56" y="53.34" size="1.778" layer="95"/>
-<pinref part="R3" gate="G$1" pin="2"/>
-</segment>
-</net>
-<net name="D13" class="0">
-<segment>
-<wire x1="92.71" y1="55.88" x2="82.55" y2="55.88" width="0.1524" layer="91"/>
-<label x="83.82" y="57.15" size="1.778" layer="95"/>
-<pinref part="R4" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="N$1" class="0">
-<segment>
-<pinref part="T2" gate="G$1" pin="B"/>
-<pinref part="R4" gate="G$1" pin="2"/>
 </segment>
 </net>
 </nets>
