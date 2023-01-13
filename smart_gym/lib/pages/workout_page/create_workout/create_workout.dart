@@ -48,7 +48,7 @@ class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
     '',
     [
       Exercise(
-          exerciseChoices.first,
+          defaultExercises.first,
           [
             Set(
               0,

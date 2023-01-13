@@ -30,16 +30,15 @@ class HistoryPageState extends State<HistoryPage>
 
   void loadHistory() async {
     finishedWorkouts = await loadFinishedWorkouts();
+    finishedWorkouts
+        .sort((a, b) => a.dateStarted!.isBefore(b.dateStarted!) ? 1 : -1);
 
-    if (recentFirst) {
-      finishedWorkouts = finishedWorkouts.reversed.toList();
-    }
+    // if (recentFirst) {
+    //   finishedWorkouts = finishedWorkouts.reversed.toList();
+    // }
 
     // clearFinishedWorkouts();
 
-    // for (int i = 0; i < finishedWorkouts.length; i++) {
-    //   print(finishedWorkouts[i].uuid);
-    // }
     setState(() {});
   }
 
@@ -93,12 +92,6 @@ class HistoryPageState extends State<HistoryPage>
                   loadHistory();
                 },
               ),
-              // HistoryList(
-              //   workouts: finishedWorkouts,
-              //   refresh: () async {
-              //     loadHistory();
-              //   },
-              // ),
               HistoryPageTab(
                 type: HistoryPageTabType.calendar,
                 workouts: finishedWorkouts,
@@ -155,8 +148,11 @@ class HistoryPageTabState extends State<HistoryPageTab> {
   @override
   Widget build(BuildContext context) {
     return orderedRefresh
-        ? const Center(
-            child: loadingSpinner,
+        ? Center(
+            child: loadingSpinner(
+              size: defaultLoadingSpinnerSize,
+              padding: EdgeInsets.zero,
+            ),
           )
         : widget.type == HistoryPageTabType.list
             ? HistoryList(

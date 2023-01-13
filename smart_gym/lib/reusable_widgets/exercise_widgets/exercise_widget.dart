@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 
 import '../reusable_widgets.dart';
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-//import 'package:smart_gym/api.dart';
-// import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
@@ -99,24 +97,33 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
   @override
   void initState() {
     loadWorkouts();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    const double topPadding = 100;
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
           if (refreshing)
-            const Center(
-              child: loadingSpinner,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: topPadding),
+                child: loadingSpinner(
+                  size: defaultLoadingSpinnerSize,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
             ),
           if (!refreshing)
             if (workouts.isEmpty)
               const Center(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 100),
+                  padding: EdgeInsets.only(top: topPadding),
                   child: Text('No Routines'),
                 ),
               ),

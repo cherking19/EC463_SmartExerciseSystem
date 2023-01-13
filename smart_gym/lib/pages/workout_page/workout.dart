@@ -7,13 +7,37 @@ import 'package:uuid/uuid.dart';
 
 part 'workout.g.dart';
 
-const List<String> exerciseChoices = <String>[
+const List<String> defaultExercises = <String>[
   'Squat',
   'Bench Press',
   'Deadlift',
   'Overhead Press',
   'Barbell Row'
 ];
+
+// @JsonSerializable(explicitToJson: true)
+// class CustomExercises {
+//   List<String> _exercises = [];
+
+//   CustomExercises({
+//     required exercises,
+//   });
+
+//   factory CustomExercises.fromJson(Map<String, dynamic> json) =>
+//       _$CustomExercisesFromJson(json);
+
+//   Map<String, dynamic> toJson() => _$CustomExercisesToJson(this);
+
+//   List<String> get exercises {
+//     return _exercises;
+//   }
+
+//   set exercises(List<String> value) {
+//     _exercises = value;
+//   }
+
+//   // void addExercise()
+// }
 
 // @JsonSerializable(explicitToJson: true)
 // class Routines {
@@ -107,7 +131,7 @@ class Workout {
   int addExercise() {
     exercises.add(
       Exercise(
-        exerciseChoices.first,
+        defaultExercises.first,
         [
           Set(
             0,

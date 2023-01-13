@@ -147,7 +147,11 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                   ),
                 ],
               ),
-            if (loading) loadingSpinner,
+            if (loading)
+              loadingSpinner(
+                size: defaultLoadingSpinnerSize,
+                padding: EdgeInsets.zero,
+              ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),

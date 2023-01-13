@@ -2,16 +2,23 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 
-const Widget loadingSpinner = Padding(
-  padding: EdgeInsets.all(16.0),
-  child: SizedBox(
-    height: 20.0,
-    width: 20.0,
-    child: CircularProgressIndicator(
-      value: null,
+const double defaultLoadingSpinnerSize = 20;
+
+Widget loadingSpinner({
+  required EdgeInsets padding,
+  double? size,
+}) {
+  return Padding(
+    padding: padding,
+    child: SizedBox(
+      height: size,
+      width: size,
+      child: const CircularProgressIndicator(
+        value: null,
+      ),
     ),
-  ),
-);
+  );
+}
 
 AnimatedBuilder customRefreshIndicator(
     BuildContext context, Widget child, IndicatorController controller) {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/exercises/exercises.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/services/TimerService.dart';
@@ -104,10 +105,74 @@ class WorkoutPageState extends State<WorkoutPage>
 
   @override
   Widget build(BuildContext context) {
+    void clickCreate() {
+      Future result = Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateWorkoutRoute(),
+        ),
+      );
+
+      result.then((value) {
+        if (value != null) {
+          if (value) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(createSuccessSnackBar(context));
+          } else {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(createFailedSnackBar(context));
+          }
+        }
+      });
+    }
+
+    void clickViewWorkouts() {
+      Future result = Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ViewWorkoutsRoute(),
+        ),
+      );
+
+      result.then((value) {
+        if (value != null) {
+          NavigatorResponse response = value as NavigatorResponse;
+
+          if (response.action == NavigatorAction.track) {
+            startTracking(response.data as Workout);
+          }
+        }
+      });
+    }
+
+    void clickExercises() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ViewExercisesRoute(),
+        ),
+      );
+    }
+
+    Widget workoutPageButton({
+      required String text,
+      required onPressed,
+    }) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(10),
+            padding: const EdgeInsets.all(24.0),
+          ),
+          onPressed: onPressed,
+          child: Text(text),
+        ),
+      );
+    }
+
     super.build(context);
     return Center(
-      // Center is a layout widget. It takes a single child and positions it
-      // in the middle of the parent.
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
@@ -116,61 +181,17 @@ class WorkoutPageState extends State<WorkoutPage>
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(10),
-                    padding: const EdgeInsets.all(24.0),
-                    // backgroundColor: Colors.lightBlue,
-                  ),
-                  child: const Text('Create Workout'),
-                  onPressed: () {
-                    Future result = Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateWorkoutRoute(),
-                      ),
-                    );
-
-                    result.then((value) {
-                      if (value != null) {
-                        if (value) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(createSuccessSnackBar(context));
-                        } else {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(createFailedSnackBar(context));
-                        }
-                      }
-                    });
-                  },
-                ),
+              workoutPageButton(
+                text: 'Create Workout',
+                onPressed: clickCreate,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(10),
-                  padding: const EdgeInsets.all(24.0),
-                ),
-                child: const Text('View Workouts'),
-                onPressed: () {
-                  Future result = Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ViewWorkoutsRoute(),
-                    ),
-                  );
-
-                  result.then((value) {
-                    if (value != null) {
-                      NavigatorResponse response = value as NavigatorResponse;
-
-                      if (response.action == NavigatorAction.track) {
-                        startTracking(response.data as Workout);
-                      }
-                    }
-                  });
-                },
+              workoutPageButton(
+                text: 'View Workouts',
+                onPressed: clickViewWorkouts,
+              ),
+              workoutPageButton(
+                text: 'Exercises',
+                onPressed: clickExercises,
               ),
               if (widget.workout != null)
                 Expanded(

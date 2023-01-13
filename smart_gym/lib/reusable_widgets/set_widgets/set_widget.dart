@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
-import 'package:smart_gym/reusable_widgets/input_validation.dart';
+import 'package:smart_gym/reusable_widgets/input.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/decoration.dart';
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'weight_tooltip.dart';
 
 class SetWidget extends StatefulWidget {
