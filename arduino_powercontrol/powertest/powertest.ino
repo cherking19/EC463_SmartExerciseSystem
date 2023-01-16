@@ -1,5 +1,5 @@
 #define powerdrain 12
-#define haptic 13
+#define haptic 11
 unsigned long start_time;
 void setup() {
   // put your setup code here, to run once:
@@ -9,7 +9,7 @@ void setup() {
   digitalWrite(powerdrain, LOW);
   digitalWrite(haptic, LOW);
 //  digitalWrite(LED_BUILTIN, LOW);
-  Serial.begin(9600);
+  // Serial.begin(9600);
   start_time = millis();
   
 
@@ -20,15 +20,15 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  if (millis() - start_time >= 3000){
+  unsigned long nowtime=millis();
+  if ( nowtime - start_time >= 3000)
     digitalWrite(powerdrain, HIGH);
-//    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  if(millis()%1000 < 400)
+  
+  if(nowtime%1000 < 400)
     digitalWrite(haptic,HIGH);
   else
     digitalWrite(haptic,LOW);
-  Serial.print(String(millis()));
-  Serial.print("\n");
+  
+  // Serial.print(String(nowtime));
+  // Serial.print("\n");
 }
