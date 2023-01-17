@@ -1,20 +1,7 @@
 #include <Arduino_LSM9DS1.h>
 #include <Adafruit_AHRS.h>
-#include <Adafruit_Sensor_Calibration.h>
 #define sensorRate 104.00
 Adafruit_Mahony filter;
-#if defined(ADAFRUIT_SENSOR_CALIBRATION_USE_EEPROM)
-  Adafruit_Sensor_Calibration_EEPROM cal;
-#else
-  Adafruit_Sensor_Calibration_SDFat cal;
-#endif
-
-template <typename T>
-Print& operator<<(Print& printer, T value)
-{
-    printer.print(value);
-    return printer;
-}
 
 void setup() {
   Serial.begin(9600);
@@ -24,9 +11,24 @@ void setup() {
     // stop here if you can't access the IMU:
     while (true);
   }
+  // Calibration:
+  // Gyroscope code
+   IMU.setGyroFS(2);
+   IMU.setGyroODR(5);
+   IMU.setGyroOffset (1.370026, -0.591858, 0.469818);
+   IMU.setGyroSlope (1.205162, 1.202537, 1.155080);
+  // Magnetometer code
+   IMU.setMagnetFS(0);
+   IMU.setMagnetODR(8);
+   IMU.setMagnetOffset(5.055542, 24.595947, 13.364258);
+   IMU.setMagnetSlope (1.345936, 1.178488, 1.197922);
+  // Accelerometer code
+   IMU.setAccelFS(3);
+   IMU.setAccelODR(5);
+   
   // start the filter to run at the sample rate:
   filter.begin(sensorRate);
-  
+  Serial.print("Orientation:\n");
 }
 
 void loop() {
@@ -37,8 +39,9 @@ void loop() {
         xGyro,yGyro,zGyro,
         xMag, yMag, zMag;
   if(IMU.accelerationAvailable() && 
-      IMU.gyroscopeAvailable() &&
-      IMU.magneticFieldAvailable()) {
+     IMU.gyroscopeAvailable() &&
+     IMU.magneticFieldAvailable()
+     ){
     IMU.readAcceleration(xAcc, yAcc, zAcc);
     IMU.readGyroscope(xGyro, yGyro, zGyro);
     IMU.readMagneticField(xMag, yMag, zMag);
@@ -50,16 +53,11 @@ void loop() {
   pitch = filter.getPitch();
   heading = filter.getYaw();
   //print values
-  // Serial << "xa:\t"<<xAcc<<"ya:\t"<<yAcc<<"za:\t"<<zAcc<<'\n';
-  // Serial << "xg:\t"<<xGyro<<"yg:\t"<<yGyro<<"zg:\t"<<zGyro<<'\n';
-  // Serial << "xm:\t"<<xMag<<"ym:\t"<<yMag<<"zm:\t"<<zMag<<'\n';
+  Serial.print("heading: ");
+  Serial.print(heading);
+  Serial.print("\tpitch: ");
+  Serial.print(pitch);
+  Serial.print("\troll: ");
+  Serial.println(roll);
 
-  // Serial.print("Orientation: ");
-  // Serial.print(heading);
-  // Serial.print(", ");
-  // Serial.print(pitch);
-  // Serial.print(", ");
-  // Serial.println(roll);
-  Serial << "heading: "<<heading<<", pitch: "<<pitch<<", roll: "<<roll<<"\n";
-  // delay(500);
 }
