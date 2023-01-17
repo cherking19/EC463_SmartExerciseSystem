@@ -1,10 +1,26 @@
 #include <Arduino_LSM9DS1.h>
 #include <Adafruit_AHRS.h>
+#include <ArduinoBLE.h>
 #define sensorRate 104.00
 Adafruit_Mahony filter;
 
+BLEService AHRSfilter("A123"); // create service
+BLEFloatCharacteristic RollCharacteristic("2A19", BLERead | BLENotify); //create Characteristic
+BLEFloatCharacteristic PitchCharacteristic("2A20", BLERead | BLENotify); //create Characteristic
+BLEFloatCharacteristic HeadingCharacteristic("2A21", BLERead | BLENotify); //create Characteristic
+
+//PINS
+#define powerdrain 12
+#define haptic 11
+
+unsigned long start_time;
+
 void setup() {
-  Serial.begin(9600);
+  pinMode(powerdrain, OUTPUT);
+  pinMode(haptic, OUTPUT);
+  digitalWrite(powerdrain, LOW);
+  digitalWrite(haptic, LOW);
+
   // attempt to start the IMU:
   if (!IMU.begin()) {
     Serial.println("Failed to initialize IMU");
@@ -29,9 +45,38 @@ void setup() {
   // start the filter to run at the sample rate:
   filter.begin(sensorRate);
   Serial.print("Orientation:\n");
+
+  // BLE Setup  
+  BLE.begin();
+  BLE.setLocalName("Node1");
+  BLE.setAdvertisedService(AHRSfilter);
+  AHRSfilter.addCharacteristic(RollCharacteristic);
+  AHRSfilter.addCharacteristic(PitchCharacteristic);
+  AHRSfilter.addCharacteristic(HeadingCharacteristic);
+  BLE.addService(AHRSfilter);
+  BLE.advertise();
+
+  // Serial
+  Serial.begin(9600);
+  //temporary counter
+  start_time = millis();
 }
 
 void loop() {
+  //power control---------------
+  unsigned long nowtime=millis();
+  
+  if ( nowtime - start_time >= 10000)
+    digitalWrite(powerdrain, HIGH);
+ 
+  if(nowtime%1000 < 400)
+    digitalWrite(haptic,HIGH);
+  else
+    digitalWrite(haptic,LOW);
+  //----------------------------
+  
+  BLEDevice central = BLE.central();
+  
   //Output Values
   float roll, pitch, heading;
   //IMU values
@@ -59,5 +104,9 @@ void loop() {
   Serial.print(pitch);
   Serial.print("\troll: ");
   Serial.println(roll);
+
+  RollCharacteristic.writeValue(roll);
+  PitchCharacteristic.writeValue(pitch);
+  HeadingCharacteristic.writeValue(heading);
 
 }
