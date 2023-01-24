@@ -63,14 +63,16 @@ class CreateWorkoutWidgetState extends State<CreateWorkoutWidget> {
     ],
   );
 
-  Future<void> submitWorkout(
+  void submitWorkout(
     BuildContext context,
     Workout workout,
     VoidCallback onFailure,
-  ) async {
+  ) {
     // Routines routines = await loadRoutines();
     // routines.addWorkout(workout);
     // addWorkout(workout);
+
+    print('hello');
 
     Future.delayed(
       globalPseudoDelay,

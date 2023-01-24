@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/workout_page/view_workout/view_workout.dart';
 import 'package:smart_gym/reusable_widgets/input.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/snackbars.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
 import '../workout.dart';
 
 class WorkoutForm extends StatefulWidget {
@@ -63,15 +66,31 @@ class WorkoutFormState extends State<WorkoutForm> {
   }
 
   void saveWorkout() {
+    print('save');
     if (_formKey.currentState!.validate() & validateRoutine()) {
       setState(() {
         saving = true;
       });
-      widget.saveWorkout(
-        context,
-        widget.workout,
-        onCreateFailure,
+      print('true');
+
+      Future.delayed(
+        globalPseudoDelay,
+        () async {
+          if (await saveRoutine(widget.workout)) {
+            Navigator.of(context).pop(true);
+          } else {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(createFailedSnackBar(context));
+            // onFailure.call();
+            onCreateFailure();
+          }
+        },
       );
+      // widget.saveWorkout(
+      //   context,
+      //   widget.workout,
+      //   onCreateFailure,
+      // );
     } else {
       showInvalidDialog(context);
     }
