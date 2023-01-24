@@ -213,13 +213,57 @@ class SettingsPage extends StatelessWidget {
         child: Container(
           alignment: Alignment.topLeft,
           // color: Colors.blue,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: ListView(
             children: <Widget>[
               Text(
-                'Hello ${FirebaseAuth.instance.currentUser!.displayName.toString()}',
+                'Hello! \n${FirebaseAuth.instance.currentUser!.displayName.toString()}',
                 style: const TextStyle(fontSize: 18.0),
+              ),
+               Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 130,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 4,
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                          boxShadow: [
+                            BoxShadow(
+                                spreadRadius: 2,
+                                blurRadius: 10,
+                                color: Colors.black.withOpacity(0.1),
+                                offset: Offset(0, 10))
+                          ],
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(
+                                "https://drive.google.com/file/d/1Syikj67REBlumyyahMKBX9iSYauMNwEh/view",
+                              ))),
+                    ),
+                    Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              width: 4,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: Theme.of(context).secondaryHeaderColor,
+                          ),
+                        )),
+                  ],
+                ),
               ),
               ElevatedButton(
                 child: const Text("Logout"),
