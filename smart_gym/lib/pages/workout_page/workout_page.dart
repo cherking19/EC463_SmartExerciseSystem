@@ -8,7 +8,7 @@ import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../../utils/widget_utils.dart';
-import 'create_workout/create_workout.dart';
+import 'create_routine/create_routine.dart';
 import 'view_workout/view_workouts.dart';
 
 class WorkoutPage extends StatefulWidget {
@@ -107,7 +107,7 @@ class WorkoutPageState extends State<WorkoutPage>
       Future result = Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const CreateWorkoutRoute(),
+          builder: (context) => const CreateRoutineRoute(),
         ),
       );
 
