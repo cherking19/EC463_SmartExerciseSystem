@@ -9,24 +9,6 @@ import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'weight_tooltip.dart';
 
-const double setCircleDiameter = 50;
-
-ButtonStyle setButtonStyle() {
-  return TextButton.styleFrom(
-    backgroundColor: const Color.fromARGB(
-      255,
-      190,
-      190,
-      190,
-    ),
-    fixedSize: const Size(
-      setCircleDiameter,
-      setCircleDiameter,
-    ),
-    shape: const CircleBorder(),
-  );
-}
-
 class SetWidget extends StatefulWidget {
   final WidgetType type;
   final bool editable;
@@ -140,7 +122,6 @@ class SetWidgetState extends State<SetWidget>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Text('hello'),
         Stack(
           children: [
             Positioned(

@@ -29,3 +29,21 @@ InputDecoration minimalInputDecoration({
 const TextStyle minimalTextStyling = TextStyle(
   height: 0,
 );
+
+const double setCircleDiameter = 50;
+
+ButtonStyle setButtonStyle() {
+  return TextButton.styleFrom(
+    backgroundColor: const Color.fromARGB(
+      255,
+      190,
+      190,
+      190,
+    ),
+    fixedSize: const Size(
+      setCircleDiameter,
+      setCircleDiameter,
+    ),
+    shape: const CircleBorder(),
+  );
+}

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
+import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
+import 'package:smart_gym/reusable_widgets/input.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
@@ -110,15 +113,17 @@ class CreateRoutineState extends State<CreateRoutine> {
               child: ListView.builder(
                 itemCount: workout.exercises.length,
                 itemBuilder: (context, index) {
-                  return CreateRoutineExercise(
-                    workout: workout,
-                    index: index,
-                    deleteExercise: () {
-                      setState(() {
-                        workout.deleteExercise(index);
-                      });
-                    },
-                    // exercise: workout.exercises[index],
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: CreateRoutineExercise(
+                      workout: workout,
+                      index: index,
+                      deleteExercise: () {
+                        setState(() {
+                          workout.deleteExercise(index);
+                        });
+                      },
+                    ),
                   );
                 },
               ),
@@ -127,9 +132,6 @@ class CreateRoutineState extends State<CreateRoutine> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Align(
-              //   alignment: Alignment.bottomCenter,
-              //   child:
               IconButton(
                 onPressed: () {
                   setState(() {
@@ -144,55 +146,11 @@ class CreateRoutineState extends State<CreateRoutine> {
                 },
                 child: const Text('Create'),
               ),
-              // ),
             ],
           ),
-
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     TextButton(
-          //       onPressed: () {
-          //         tryCreate();
-          //       },
-          //       child: const Text('Create'),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
     );
-    // Column(
-    //   children: [
-    //     Form(
-    //       key: formKey,
-    //       child: WorkoutWidget(
-    //         // key: formKey,
-    //         type: WidgetType.create,
-    //         workout: workout,
-    //         editable: false,
-    //         // formKey: formKey,
-    //       ),
-    //     ),
-    //     Row(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: [
-    //         TextButton(
-    //           onPressed: () {
-    //             tryCreate();
-    //           },
-    //           child: const Text('Create'),
-    //         ),
-    //       ],
-    //     ),
-    //   ],
-    // );
-    // WorkoutForm(
-    //   editable: true,
-    //   viewing: false,
-    //   workout: workout,
-    //   saveWorkout: submitWorkout,
-    // );
   }
 }
 
@@ -215,77 +173,192 @@ class CreateRoutineExercise extends StatefulWidget {
 }
 
 class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
+  ScrollController scrollController = ScrollController();
+
   Exercise getExercise() {
     return widget.workout.exercises[widget.index];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    const EdgeInsets setWidgetPadding = EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 8.0);
+
+    List<Widget> setWidgets = List.generate(
+      getExercise().sets.length,
+      (index) => CreateRoutineSet(),
+    );
+
+    setWidgets.add(
+      Padding(
+        padding: EdgeInsets.zero, //setWidgetPadding,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                getExercise().addSet();
+              });
+              SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                scrollController
+                    .jumpTo(scrollController.position.maxScrollExtent);
+              });
+            },
+            style: setButtonStyle(),
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ),
+    );
+
+    return Container(
+      decoration: globalBoxDecoration,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12.0, 4.0, 12.0, 12.0),
+        child: Column(
           children: [
-            Expanded(
-              child: ExerciseNameDropdown(
-                readOnly: false,
-                exercise: getExercise(),
+            Row(
+              children: [
+                Expanded(
+                  child: ExerciseNameDropdown(
+                    readOnly: false,
+                    exercise: getExercise(),
+                  ),
+                ),
+                if (widget.workout.exercises.length > 1)
+                  IconButton(
+                    onPressed: () {
+                      widget.deleteExercise();
+                    },
+                    icon: const Icon(Icons.close),
+                  ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Checkbox(
+                    value: getExercise().sameWeight,
+                    onChanged: (bool? value) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      setState(() {
+                        getExercise().sameWeight = value!;
+                      });
+                    },
+                  ),
+                ),
+                const Expanded(
+                  child: Text('Same Weight'),
+                ),
+                Expanded(
+                  child: Checkbox(
+                    value: getExercise().sameReps,
+                    onChanged: (bool? value) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      setState(() {
+                        getExercise().sameReps = value!;
+                      });
+                    },
+                  ),
+                ),
+                const Expanded(
+                  child: Text('Same Reps'),
+                ),
+                Expanded(
+                  child: Checkbox(
+                    value: getExercise().sameRest,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        getExercise().sameRest = value!;
+                      });
+                    },
+                  ),
+                ),
+                const Expanded(
+                  child: Text('Same Rest'),
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: scrollController,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      children: setWidgets,
+                    ),
+                  ),
+                ),
               ),
             ),
-            if (widget.workout.exercises.length > 1)
-              IconButton(
-                onPressed: () {
-                  widget.deleteExercise();
-                },
-                icon: const Icon(Icons.close),
-              ),
           ],
         ),
-        Row(
-          children: [
-            Expanded(
-              child: Checkbox(
-                value: getExercise().sameWeight,
-                onChanged: (bool? value) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  setState(() {
-                    getExercise().sameWeight = value!;
-                  });
-                },
+      ),
+    );
+  }
+}
+
+class CreateRoutineSet extends StatefulWidget {
+  const CreateRoutineSet({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  CreateRoutineSetState createState() => CreateRoutineSetState();
+}
+
+class CreateRoutineSetState extends State<CreateRoutineSet> {
+  late TextEditingController repsController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    repsController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    repsController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextButton(
+          onPressed: null,
+          style: setButtonStyle(),
+          child: SizedBox(
+            width: 30,
+            child: TextFormField(
+              controller: repsController,
+              // focusNode: repsFocusNode,
+              // autofocus: widget.type != WidgetType.create,
+              inputFormatters: positiveInteger,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null ||
+                    value.isEmpty ||
+                    int.parse(repsController.text) <= 0) {
+                  return '';
+                }
+
+                return null;
+              },
+              decoration: minimalInputDecoration(
+                hint: 'reps',
+                errorStyle: minimalTextStyling,
               ),
+              style: const TextStyle(fontSize: 14.0),
+              textAlign: TextAlign.center,
             ),
-            const Expanded(
-              child: Text('Same Weight'),
-            ),
-            Expanded(
-              child: Checkbox(
-                value: getExercise().sameReps,
-                onChanged: (bool? value) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  setState(() {
-                    getExercise().sameReps = value!;
-                  });
-                },
-              ),
-            ),
-            const Expanded(
-              child: Text('Same Reps'),
-            ),
-            Expanded(
-              child: Checkbox(
-                value: getExercise().sameRest,
-                onChanged: (bool? value) {
-                  setState(() {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    getExercise().sameRest = value!;
-                  });
-                },
-              ),
-            ),
-            const Expanded(
-              child: Text('Same Rest'),
-            ),
-          ],
-        )
+          ),
+        ),
       ],
     );
   }

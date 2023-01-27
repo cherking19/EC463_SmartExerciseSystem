@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
+import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
 import 'package:smart_gym/utils/function_utils.dart';
 
 ButtonStyle minimalButtonStyle({
