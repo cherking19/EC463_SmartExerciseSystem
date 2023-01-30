@@ -5,6 +5,7 @@ import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/input.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../workout.dart';
@@ -53,7 +54,7 @@ class CreateRoutine extends StatefulWidget {
 }
 
 class CreateRoutineState extends State<CreateRoutine> {
-  final formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Workout workout = Workout(
     '',
@@ -103,6 +104,7 @@ class CreateRoutineState extends State<CreateRoutine> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: formKey,
       child: Column(
         children: [
           WorkoutName(
@@ -174,6 +176,7 @@ class CreateRoutineExercise extends StatefulWidget {
 
 class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
   ScrollController scrollController = ScrollController();
+  List<ChildUpdateController> updateSetsControllers = [];
 
   Exercise getExercise() {
     return widget.workout.exercises[widget.index];
@@ -183,16 +186,34 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
   Widget build(BuildContext context) {
     const EdgeInsets setWidgetPadding = EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 8.0);
 
-    List<Widget> setWidgets = List.generate(
-      getExercise().sets.length,
-      (index) => CreateRoutineSet(
+    updateSetsControllers.clear();
+
+    void updateSets({
+      int? indexToIgnore,
+    }) {
+      for (int i = 0; i < updateSetsControllers.length; i++) {
+        if (indexToIgnore == null || i != indexToIgnore) {
+          if (updateSetsControllers[i].update != null) {
+            updateSetsControllers[i].update!();
+          }
+        }
+      }
+    }
+
+    List<Widget> setWidgets = List.generate(getExercise().sets.length, (index) {
+      ChildUpdateController refreshController = ChildUpdateController();
+      updateSetsControllers.add(refreshController);
+      return CreateRoutineSet(
         exercise: getExercise(),
         index: index,
-        updateExercise: () {
-          setState(() {});
+        updateExercise: (int index) {
+          updateSets(
+            indexToIgnore: index,
+          );
         },
-      ),
-    );
+        refreshController: refreshController,
+      );
+    });
 
     setWidgets.add(
       Padding(
@@ -250,6 +271,7 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
                       setState(() {
                         getExercise().sameWeight = value!;
                       });
+                      updateSets();
                     },
                   ),
                 ),
@@ -264,6 +286,7 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
                       setState(() {
                         getExercise().sameReps = value!;
                       });
+                      updateSets();
                     },
                   ),
                 ),
@@ -307,16 +330,22 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
   }
 }
 
+class ChildUpdateController {
+  void Function()? update;
+}
+
 class CreateRoutineSet extends StatefulWidget {
   final Exercise exercise;
   final int index;
-  final Function updateExercise;
+  final Function(int) updateExercise;
+  final ChildUpdateController refreshController;
 
   const CreateRoutineSet({
     Key? key,
     required this.exercise,
     required this.index,
     required this.updateExercise,
+    required this.refreshController,
   }) : super(key: key);
 
   @override
@@ -324,153 +353,93 @@ class CreateRoutineSet extends StatefulWidget {
 }
 
 class CreateRoutineSetState extends State<CreateRoutineSet> {
-  // final TextEditingController repsController = TextEditingController();
-
-  // Set getSet() {
-  //   return widget.exercise.sets[widget.index];
-  // }
-
-  // String getInitialRepsValue() {
-  //   return getSet().reps > 0 ? getSet().reps.toString() : '';
-  // }
-
-  // // void onRepsChange() {
-  // //   var reps = int.tryParse(repsController.text);
-
-  // //   if (reps != null) {
-  // //     print(reps);
-  // //     widget.exercise.setReps(widget.index, reps);
-  // //     widget.updateExercise();
-  // //   }
-  // // }
-
-  // // void initRepsController() {
-  // //   // repsController.removeListener(onRepsChange);
-  // //   if (getSet().reps > 0) {
-  // //     repsController.text = getSet().reps.toString();
-  // //   } else {
-  // //     repsController.text = '';
-  // //   }
-  // //   // repsController.addListener(onRepsChange);
-  // // }
-
-  // // @override
-  // // void initState() {
-  // //   super.initState();
-
-  // //   repsController = TextEditingController();
-  // //   // // initRepsController();
-  // //   repsController.addListener(onRepsChange);
-  // // }
-
-  // // @override
-  // // void didUpdateWidget(CreateRoutineSet oldWidget) {
-  // //   super.didUpdateWidget(oldWidget);
-
-  // //   // initRepsController();
-  // // }
-
-  // // @override
-  // // void dispose() {
-  // //   repsController.dispose();
-
-  // //   super.dispose();
-  // // }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-  //   //   // initRepsController();
-  //   //   repsController.value = TextEditingValue(
-  //   //     text: getInitialRepsValue(),
-  //   //     selection: TextSelection.collapsed(
-  //   //       offset: repsController.text.length,
-  //   //     ),
-  //   //   );
-  //   // });
-
-  //   // print('Set ${widget.index}: ${getInitialRepsValue()}');
-
-  //   // repsController.value = TextEditingValue(
-  //   //   text: getInitialRepsValue(),
-  //   //   selection: TextSelection.collapsed(
-  //   //     offset: repsController.text.length,
-  //   //   ),
-  //   // );
-
-  //   repsController.text = getInitialRepsValue();
-  //   repsController.selection = TextSelection.collapsed(
-  //     offset: repsController.text.length,
-  //   );
-
-  //   return Column(
-  //     children: [
-  //       TextButton(
-  //         onPressed: null,
-  //         style: setButtonStyle(),
-  //         child: SizedBox(
-  //           width: 30,
-  //           child: TextFormField(
-  //             // key: UniqueKey,
-  //             controller: repsController,
-  //             // initialValue: getInitialRepsValue(),
-  //             onChanged: (value) {
-  //               int reps = 0;
-
-  //               if (repsController.text.isNotEmpty) {
-  //                 reps = int.parse(repsController.text);
-  //               }
-
-  //               widget.exercise.setReps(widget.index, reps);
-
-  //               if (widget.exercise.sameReps) {
-  //                 widget.updateExercise();
-  //               }
-  //             },
-  //             // focusNode: repsFocusNode,
-  //             // autofocus: widget.type != WidgetType.create,
-  //             inputFormatters: positiveInteger,
-  //             keyboardType: TextInputType.number,
-  //             validator: (value) {
-  //               if (value == null ||
-  //                   value.isEmpty ||
-  //                   int.parse(repsController.text) <= 0) {
-  //                 return '';
-  //               }
-
-  //               return null;
-  //             },
-  //             decoration: minimalInputDecoration(
-  //               hint: 'reps',
-  //               errorStyle: minimalTextStyling,
-  //             ),
-  //             style: const TextStyle(fontSize: 14.0),
-  //             textAlign: TextAlign.center,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   final TextEditingController repsController = TextEditingController();
   final TextEditingController restController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
+
+  void update() {
+    widget.refreshController.update = null;
+
+    repsController.value = TextEditingValue(
+      text: getInitialRepsValue(),
+      selection: TextSelection.collapsed(
+        offset: repsController.text.length,
+      ),
+    );
+
+    weightController.value = TextEditingValue(
+      text: getWeightString(),
+      selection: TextSelection.collapsed(
+        offset: weightController.text.length,
+      ),
+    );
+    print('Set ${widget.index + 1}: ${getSet().weight}');
+
+    widget.refreshController.update = update;
+  }
+
+  Set getSet() {
+    return widget.exercise.sets[widget.index];
+  }
+
+  String getInitialRepsValue() {
+    return getSet().reps > 0 ? getSet().reps.toString() : '';
+  }
+
+  String getWeightString() {
+    return getSet().weight > 0 ? getSet().weight.toString() : '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.refreshController.update = update;
+
+    repsController.addListener(() {
+      var reps = int.tryParse(repsController.text);
+      reps ??= 0;
+      widget.exercise.setReps(widget.index, reps);
+      widget.updateExercise(widget.index);
+    });
+
+    weightController.addListener(() {
+      var weight = int.tryParse(weightController.text);
+      weight ??= 0;
+      widget.exercise.setWeight(widget.index, weight);
+      widget.updateExercise(widget.index);
+    });
+  }
+
+  @override
+  void didUpdateWidget(CreateRoutineSet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    widget.refreshController.update = update;
+  }
+
+  @override
+  void dispose() {
+    repsController.dispose();
+
+    super.dispose();
+  }
+
   bool onlySet = false;
 
-  void checkRepsInput(BuildContext context) {
-    int reps = 0;
+  // void checkRepsInput(BuildContext context) {
+  //   int reps = 0;
 
-    if (repsController.text.isNotEmpty) {
-      reps = int.parse(repsController.text);
-    }
+  //   if (repsController.text.isNotEmpty) {
+  //     reps = int.parse(repsController.text);
+  //   }
 
-    widget.exercise.setReps(widget.index, reps);
+  //   widget.exercise.setReps(widget.index, reps);
 
-    if (widget.exercise.sameReps) {
-      widget.updateExercise();
-    }
-  }
+  //   if (widget.exercise.sameReps) {
+  //     widget.updateExercise(widget.index);
+  //   }
+  // }
 
   // void checkRestInput(BuildContext context) {
   //   int rest = 0;
@@ -502,18 +471,18 @@ class CreateRoutineSetState extends State<CreateRoutineSet> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.exercise.sets[widget.index].weight > 0) {
-      weightController.text =
-          widget.exercise.sets[widget.index].weight.toString();
-    } else {
-      weightController.text = '';
-    }
+    // if (widget.exercise.sets[widget.index].weight > 0) {
+    //   weightController.text =
+    //       widget.exercise.sets[widget.index].weight.toString();
+    // } else {
+    //   weightController.text = '';
+    // }
 
-    if (widget.exercise.sets[widget.index].reps > 0) {
-      repsController.text = widget.exercise.sets[widget.index].reps.toString();
-    } else {
-      repsController.text = '';
-    }
+    // if (widget.exercise.sets[widget.index].reps > 0) {
+    //   repsController.text = widget.exercise.sets[widget.index].reps.toString();
+    // } else {
+    //   repsController.text = '';
+    // }
 
     // if (widget.exercise.sets[widget.index].rest > 0) {
     //   restController.text = widget.exercise.sets[widget.index].rest.toString();
@@ -521,126 +490,240 @@ class CreateRoutineSetState extends State<CreateRoutineSet> {
     //   restController.text = '';
     // }
 
-    weightController.selection = TextSelection.collapsed(
-      offset: weightController.text.length,
-    );
-    repsController.selection = TextSelection.collapsed(
-      offset: repsController.text.length,
-    );
-    restController.selection = TextSelection.collapsed(
-      offset: restController.text.length,
-    );
+    // weightController.selection = TextSelection.collapsed(
+    //   offset: weightController.text.length,
+    // );
+    // repsController.selection = TextSelection.collapsed(
+    //   offset: repsController.text.length,
+    // );
+    // restController.selection = TextSelection.collapsed(
+    //   offset: restController.text.length,
+    // );
 
-    onlySet = widget.exercise.sets.length == 1;
+    // onlySet = widget.exercise.sets.length == 1;
+
+    // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    //   repsController.addListener(update);
+    // });
 
     // print(!onlySet && widget.editable);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Text(
-                  'Set ${widget.index + 1}',
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                // if (!onlySet && widget.editable)
-                //   Padding(
-                //     padding: const EdgeInsets.fromLTRB(6.0, 0.0, 0.0, 0.0),
-                //     child: Align(
-                //       alignment: Alignment.center,
-                //       child: SizedBox(
-                //         height: 16.0,
-                //         width: 16.0,
-                //         child: IconButton(
-                //           icon: const Icon(Icons.close),
-                //           padding: const EdgeInsets.all(0.0),
-                //           iconSize: 16.0,
-                //           splashRadius: 16.0,
-                //           onPressed: () {
-                //             FocusManager.instance.primaryFocus?.unfocus();
-                //             widget.exercise.deleteSet(widget.index);
-                //             widget.updateParent();
-                //           },
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-              ],
-            ),
-          ),
-          // SizedBox(
-          //   width: 90,
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(4.0),
-          //     child: TextField(
-          //       enabled: widget.editable,
-          //       decoration: const InputDecoration(
-          //         border: OutlineInputBorder(),
-          //         labelText: 'Weight (lb)',
-          //         isDense: true,
-          //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          //       ),
-          //       controller: weightController,
-          //       keyboardType: TextInputType.number,
-          //       inputFormatters: positiveInteger,
-          //       onChanged: (value) {
-          //         checkWeightInput(context);
-          //       },
-          //     ),
-          //   ),
-          // ),
-          SizedBox(
-            width: 90,
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: TextField(
-                // enabled: widget.editable,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Reps',
-                  isDense: true,
-                  contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                ),
-                controller: repsController,
-                keyboardType: TextInputType.number,
-                inputFormatters: positiveInteger,
-                onChanged: (value) {
-                  checkRepsInput(context);
-                },
+    // TextButton(
+    //         onPressed: null,
+    //         style: setButtonStyle(),
+    //         child: SizedBox(
+    //           width: 30,
+    //           child: TextFormField(
+    //             // key: UniqueKey,
+    //             controller: repsController,
+    //             // initialValue: getInitialRepsValue(),
+    //             onChanged: (value) {
+    //               int reps = 0;
+
+    //               if (repsController.text.isNotEmpty) {
+    //                 reps = int.parse(repsController.text);
+    //               }
+
+    //               widget.exercise.setReps(widget.index, reps);
+
+    //               if (widget.exercise.sameReps) {
+    //                 widget.updateExercise();
+    //               }
+    //             },
+    //             // focusNode: repsFocusNode,
+    //             // autofocus: widget.type != WidgetType.create,
+    //             inputFormatters: positiveInteger,
+    //             keyboardType: TextInputType.number,
+    //             validator: (value) {
+    //               if (value == null ||
+    //                   value.isEmpty ||
+    //                   int.parse(repsController.text) <= 0) {
+    //                 return '';
+    //               }
+
+    //               return null;
+    //             },
+    //             decoration: minimalInputDecoration(
+    //               hint: 'reps',
+    //               errorStyle: minimalTextStyling,
+    //             ),
+    //             style: const TextStyle(fontSize: 14.0),
+    //             textAlign: TextAlign.center,
+    //           ),
+    //         ),
+    //       ),
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(
+          onPressed: null,
+          style: setButtonStyle(),
+          child: SizedBox(
+            width: 30,
+            child: TextFormField(
+              controller: repsController,
+              keyboardType: TextInputType.number,
+              inputFormatters: positiveInteger,
+              // onChanged: (value) {
+              //   checkRepsInput(context);
+              // },
+              validator: (value) {
+                if (value == null ||
+                    value.isEmpty ||
+                    int.parse(repsController.text) <= 0) {
+                  return '';
+                }
+
+                return null;
+              },
+              decoration: minimalInputDecoration(
+                hint: 'reps',
+                errorStyle: minimalTextStyling,
               ),
+              style: const TextStyle(
+                fontSize: 14.0,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
-          // SizedBox(
-          //   width: 90,
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(4.0),
-          //     child: TextField(
-          //       enabled: widget.editable,
-          //       decoration: const InputDecoration(
-          //         border: OutlineInputBorder(),
-          //         labelText: 'Rest (s)',
-          //         isDense: true,
-          //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          //       ),
-          //       controller: restController,
-          //       keyboardType: TextInputType.number,
-          //       inputFormatters: positiveInteger,
-          //       onChanged: (value) {
-          //         checkRestInput(context);
-          //       },
-          //     ),
-          //   ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 8.0,
+          ),
+          child: SizedBox(
+            width: 45,
+            child: TextFormField(
+              controller: weightController,
+              keyboardType: TextInputType.number,
+              inputFormatters: positiveInteger,
+              validator: (value) {
+                if (value == null ||
+                    value.isEmpty ||
+                    int.parse(weightController.text) <= 0) {
+                  return '';
+                }
+              },
+              decoration: minimalInputDecoration(
+                hint: 'lbs',
+                errorStyle: minimalTextStyling,
+              ),
+              style: const TextStyle(
+                fontSize: 14.0,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          // SetWeight(
+          //   type: WidgetType.create,
+          //   set: getSet(),
+          //   editable: true,
           // ),
-        ],
-      ),
+        ),
+      ],
     );
+    // Padding(
+    //   padding: const EdgeInsets.all(8.0),
+    //   child: Row(
+    //     children: [
+    //       Text(
+    //         'Set ${widget.index + 1}',
+    //         style: const TextStyle(
+    //           fontSize: 16.0,
+    //         ),
+    //       ),
+    //       // if (!onlySet && widget.editable)
+    //       //   Padding(
+    //       //     padding: const EdgeInsets.fromLTRB(6.0, 0.0, 0.0, 0.0),
+    //       //     child: Align(
+    //       //       alignment: Alignment.center,
+    //       //       child: SizedBox(
+    //       //         height: 16.0,
+    //       //         width: 16.0,
+    //       //         child: IconButton(
+    //       //           icon: const Icon(Icons.close),
+    //       //           padding: const EdgeInsets.all(0.0),
+    //       //           iconSize: 16.0,
+    //       //           splashRadius: 16.0,
+    //       //           onPressed: () {
+    //       //             FocusManager.instance.primaryFocus?.unfocus();
+    //       //             widget.exercise.deleteSet(widget.index);
+    //       //             widget.updateParent();
+    //       //           },
+    //       //         ),
+    //       //       ),
+    //       //     ),
+    //       //   ),
+    //     ],
+    //   ),
+    // ),
+    // SizedBox(
+    //   width: 90,
+    //   child: Padding(
+    //     padding: const EdgeInsets.all(4.0),
+    //     child: TextField(
+    //       enabled: widget.editable,
+    //       decoration: const InputDecoration(
+    //         border: OutlineInputBorder(),
+    //         labelText: 'Weight (lb)',
+    //         isDense: true,
+    //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+    //       ),
+    //       controller: weightController,
+    //       keyboardType: TextInputType.number,
+    //       inputFormatters: positiveInteger,
+    //       onChanged: (value) {
+    //         checkWeightInput(context);
+    //       },
+    //     ),
+    //   ),
+    // ),
+    // SizedBox(
+    //   width: 90,
+    //   child: Padding(
+    //     padding: const EdgeInsets.all(4.0),
+    //     child: TextField(
+    //       // enabled: widget.editable,
+    //       decoration: const InputDecoration(
+    //         border: OutlineInputBorder(),
+    //         labelText: 'Reps',
+    //         isDense: true,
+    //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+    //       ),
+    //       controller: repsController,
+    //       keyboardType: TextInputType.number,
+    //       inputFormatters: positiveInteger,
+    //       onChanged: (value) {
+    //         checkRepsInput(context);
+    //       },
+    //     ),
+    //   ),
+    // ),
+    // SizedBox(
+    //   width: 90,
+    //   child: Padding(
+    //     padding: const EdgeInsets.all(4.0),
+    //     child: TextField(
+    //       enabled: widget.editable,
+    //       decoration: const InputDecoration(
+    //         border: OutlineInputBorder(),
+    //         labelText: 'Rest (s)',
+    //         isDense: true,
+    //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+    //       ),
+    //       controller: restController,
+    //       keyboardType: TextInputType.number,
+    //       inputFormatters: positiveInteger,
+    //       onChanged: (value) {
+    //         checkRestInput(context);
+    //       },
+    //     ),
+    //   ),
+    // ),
+    //     ],
+    //   ),
+    // );
   }
 }
 
