@@ -185,7 +185,13 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
 
     List<Widget> setWidgets = List.generate(
       getExercise().sets.length,
-      (index) => CreateRoutineSet(),
+      (index) => CreateRoutineSet(
+        exercise: getExercise(),
+        index: index,
+        updateExercise: () {
+          setState(() {});
+        },
+      ),
     );
 
     setWidgets.add(
@@ -195,6 +201,7 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
           alignment: Alignment.topCenter,
           child: TextButton(
             onPressed: () {
+              FocusScope.of(context).requestFocus(FocusNode());
               setState(() {
                 getExercise().addSet();
               });
@@ -301,8 +308,15 @@ class CreateRoutineExerciseState extends State<CreateRoutineExercise> {
 }
 
 class CreateRoutineSet extends StatefulWidget {
+  final Exercise exercise;
+  final int index;
+  final Function updateExercise;
+
   const CreateRoutineSet({
     Key? key,
+    required this.exercise,
+    required this.index,
+    required this.updateExercise,
   }) : super(key: key);
 
   @override
@@ -310,56 +324,516 @@ class CreateRoutineSet extends StatefulWidget {
 }
 
 class CreateRoutineSetState extends State<CreateRoutineSet> {
-  late TextEditingController repsController;
+  // final TextEditingController repsController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
+  // Set getSet() {
+  //   return widget.exercise.sets[widget.index];
+  // }
 
-    repsController = TextEditingController();
+  // String getInitialRepsValue() {
+  //   return getSet().reps > 0 ? getSet().reps.toString() : '';
+  // }
+
+  // // void onRepsChange() {
+  // //   var reps = int.tryParse(repsController.text);
+
+  // //   if (reps != null) {
+  // //     print(reps);
+  // //     widget.exercise.setReps(widget.index, reps);
+  // //     widget.updateExercise();
+  // //   }
+  // // }
+
+  // // void initRepsController() {
+  // //   // repsController.removeListener(onRepsChange);
+  // //   if (getSet().reps > 0) {
+  // //     repsController.text = getSet().reps.toString();
+  // //   } else {
+  // //     repsController.text = '';
+  // //   }
+  // //   // repsController.addListener(onRepsChange);
+  // // }
+
+  // // @override
+  // // void initState() {
+  // //   super.initState();
+
+  // //   repsController = TextEditingController();
+  // //   // // initRepsController();
+  // //   repsController.addListener(onRepsChange);
+  // // }
+
+  // // @override
+  // // void didUpdateWidget(CreateRoutineSet oldWidget) {
+  // //   super.didUpdateWidget(oldWidget);
+
+  // //   // initRepsController();
+  // // }
+
+  // // @override
+  // // void dispose() {
+  // //   repsController.dispose();
+
+  // //   super.dispose();
+  // // }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+  //   //   // initRepsController();
+  //   //   repsController.value = TextEditingValue(
+  //   //     text: getInitialRepsValue(),
+  //   //     selection: TextSelection.collapsed(
+  //   //       offset: repsController.text.length,
+  //   //     ),
+  //   //   );
+  //   // });
+
+  //   // print('Set ${widget.index}: ${getInitialRepsValue()}');
+
+  //   // repsController.value = TextEditingValue(
+  //   //   text: getInitialRepsValue(),
+  //   //   selection: TextSelection.collapsed(
+  //   //     offset: repsController.text.length,
+  //   //   ),
+  //   // );
+
+  //   repsController.text = getInitialRepsValue();
+  //   repsController.selection = TextSelection.collapsed(
+  //     offset: repsController.text.length,
+  //   );
+
+  //   return Column(
+  //     children: [
+  //       TextButton(
+  //         onPressed: null,
+  //         style: setButtonStyle(),
+  //         child: SizedBox(
+  //           width: 30,
+  //           child: TextFormField(
+  //             // key: UniqueKey,
+  //             controller: repsController,
+  //             // initialValue: getInitialRepsValue(),
+  //             onChanged: (value) {
+  //               int reps = 0;
+
+  //               if (repsController.text.isNotEmpty) {
+  //                 reps = int.parse(repsController.text);
+  //               }
+
+  //               widget.exercise.setReps(widget.index, reps);
+
+  //               if (widget.exercise.sameReps) {
+  //                 widget.updateExercise();
+  //               }
+  //             },
+  //             // focusNode: repsFocusNode,
+  //             // autofocus: widget.type != WidgetType.create,
+  //             inputFormatters: positiveInteger,
+  //             keyboardType: TextInputType.number,
+  //             validator: (value) {
+  //               if (value == null ||
+  //                   value.isEmpty ||
+  //                   int.parse(repsController.text) <= 0) {
+  //                 return '';
+  //               }
+
+  //               return null;
+  //             },
+  //             decoration: minimalInputDecoration(
+  //               hint: 'reps',
+  //               errorStyle: minimalTextStyling,
+  //             ),
+  //             style: const TextStyle(fontSize: 14.0),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  final TextEditingController repsController = TextEditingController();
+  final TextEditingController restController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
+  bool onlySet = false;
+
+  void checkRepsInput(BuildContext context) {
+    int reps = 0;
+
+    if (repsController.text.isNotEmpty) {
+      reps = int.parse(repsController.text);
+    }
+
+    widget.exercise.setReps(widget.index, reps);
+
+    if (widget.exercise.sameReps) {
+      widget.updateExercise();
+    }
   }
 
-  @override
-  void dispose() {
-    repsController.dispose();
+  // void checkRestInput(BuildContext context) {
+  //   int rest = 0;
 
-    super.dispose();
-  }
+  //   if (restController.text.isNotEmpty) {
+  //     rest = int.parse(restController.text);
+  //   }
+
+  //   widget.exercise.setRest(widget.index, rest);
+
+  //   if (widget.exercise.sameRest) {
+  //     widget.updateParent();
+  //   }
+  // }
+
+  // void checkWeightInput(BuildContext context) {
+  //   int weight = 0;
+
+  //   if (weightController.text.isNotEmpty) {
+  //     weight = int.parse(weightController.text);
+  //   }
+
+  //   widget.exercise.setWeight(widget.index, weight);
+
+  //   if (widget.exercise.sameWeight) {
+  //     widget.updateParent();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextButton(
-          onPressed: null,
-          style: setButtonStyle(),
-          child: SizedBox(
-            width: 30,
-            child: TextFormField(
-              controller: repsController,
-              // focusNode: repsFocusNode,
-              // autofocus: widget.type != WidgetType.create,
-              inputFormatters: positiveInteger,
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null ||
-                    value.isEmpty ||
-                    int.parse(repsController.text) <= 0) {
-                  return '';
-                }
+    if (widget.exercise.sets[widget.index].weight > 0) {
+      weightController.text =
+          widget.exercise.sets[widget.index].weight.toString();
+    } else {
+      weightController.text = '';
+    }
 
-                return null;
-              },
-              decoration: minimalInputDecoration(
-                hint: 'reps',
-                errorStyle: minimalTextStyling,
-              ),
-              style: const TextStyle(fontSize: 14.0),
-              textAlign: TextAlign.center,
+    if (widget.exercise.sets[widget.index].reps > 0) {
+      repsController.text = widget.exercise.sets[widget.index].reps.toString();
+    } else {
+      repsController.text = '';
+    }
+
+    // if (widget.exercise.sets[widget.index].rest > 0) {
+    //   restController.text = widget.exercise.sets[widget.index].rest.toString();
+    // } else {
+    //   restController.text = '';
+    // }
+
+    weightController.selection = TextSelection.collapsed(
+      offset: weightController.text.length,
+    );
+    repsController.selection = TextSelection.collapsed(
+      offset: repsController.text.length,
+    );
+    restController.selection = TextSelection.collapsed(
+      offset: restController.text.length,
+    );
+
+    onlySet = widget.exercise.sets.length == 1;
+
+    // print(!onlySet && widget.editable);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Text(
+                  'Set ${widget.index + 1}',
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+                // if (!onlySet && widget.editable)
+                //   Padding(
+                //     padding: const EdgeInsets.fromLTRB(6.0, 0.0, 0.0, 0.0),
+                //     child: Align(
+                //       alignment: Alignment.center,
+                //       child: SizedBox(
+                //         height: 16.0,
+                //         width: 16.0,
+                //         child: IconButton(
+                //           icon: const Icon(Icons.close),
+                //           padding: const EdgeInsets.all(0.0),
+                //           iconSize: 16.0,
+                //           splashRadius: 16.0,
+                //           onPressed: () {
+                //             FocusManager.instance.primaryFocus?.unfocus();
+                //             widget.exercise.deleteSet(widget.index);
+                //             widget.updateParent();
+                //           },
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+              ],
             ),
           ),
-        ),
-      ],
+          // SizedBox(
+          //   width: 90,
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(4.0),
+          //     child: TextField(
+          //       enabled: widget.editable,
+          //       decoration: const InputDecoration(
+          //         border: OutlineInputBorder(),
+          //         labelText: 'Weight (lb)',
+          //         isDense: true,
+          //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+          //       ),
+          //       controller: weightController,
+          //       keyboardType: TextInputType.number,
+          //       inputFormatters: positiveInteger,
+          //       onChanged: (value) {
+          //         checkWeightInput(context);
+          //       },
+          //     ),
+          //   ),
+          // ),
+          SizedBox(
+            width: 90,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: TextField(
+                // enabled: widget.editable,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Reps',
+                  isDense: true,
+                  contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                ),
+                controller: repsController,
+                keyboardType: TextInputType.number,
+                inputFormatters: positiveInteger,
+                onChanged: (value) {
+                  checkRepsInput(context);
+                },
+              ),
+            ),
+          ),
+          // SizedBox(
+          //   width: 90,
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(4.0),
+          //     child: TextField(
+          //       enabled: widget.editable,
+          //       decoration: const InputDecoration(
+          //         border: OutlineInputBorder(),
+          //         labelText: 'Rest (s)',
+          //         isDense: true,
+          //         contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+          //       ),
+          //       controller: restController,
+          //       keyboardType: TextInputType.number,
+          //       inputFormatters: positiveInteger,
+          //       onChanged: (value) {
+          //         checkRestInput(context);
+          //       },
+          //     ),
+          //   ),
+          // ),
+        ],
+      ),
     );
   }
 }
+
+// class _SetWidgetState extends State<SetWidget> {
+//   // double deleteSize = 100;
+
+//   final TextEditingController repsController = TextEditingController();
+//   final TextEditingController restController = TextEditingController();
+//   final TextEditingController weightController = TextEditingController();
+//   bool onlySet = false;
+
+//   void checkRepsInput(BuildContext context) {
+//     int reps = 0;
+
+//     if (repsController.text.isNotEmpty) {
+//       reps = int.parse(repsController.text);
+//     }
+
+//     widget.exercise.setReps(widget.index, reps);
+
+//     if (widget.exercise.sameReps) {
+//       widget.updateParent();
+//     }
+//   }
+
+//   // void checkRestInput(BuildContext context) {
+//   //   int rest = 0;
+
+//   //   if (restController.text.isNotEmpty) {
+//   //     rest = int.parse(restController.text);
+//   //   }
+
+//   //   widget.exercise.setRest(widget.index, rest);
+
+//   //   if (widget.exercise.sameRest) {
+//   //     widget.updateParent();
+//   //   }
+//   // }
+
+//   // void checkWeightInput(BuildContext context) {
+//   //   int weight = 0;
+
+//   //   if (weightController.text.isNotEmpty) {
+//   //     weight = int.parse(weightController.text);
+//   //   }
+
+//   //   widget.exercise.setWeight(widget.index, weight);
+
+//   //   if (widget.exercise.sameWeight) {
+//   //     widget.updateParent();
+//   //   }
+//   // }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     if (widget.exercise.sets[widget.index].weight > 0) {
+//       weightController.text =
+//           widget.exercise.sets[widget.index].weight.toString();
+//     } else {
+//       weightController.text = '';
+//     }
+
+//     if (widget.exercise.sets[widget.index].reps > 0) {
+//       repsController.text = widget.exercise.sets[widget.index].reps.toString();
+//     } else {
+//       repsController.text = '';
+//     }
+
+//     if (widget.exercise.sets[widget.index].rest > 0) {
+//       restController.text = widget.exercise.sets[widget.index].rest.toString();
+//     } else {
+//       restController.text = '';
+//     }
+
+//     weightController.selection = TextSelection.collapsed(
+//       offset: weightController.text.length,
+//     );
+//     repsController.selection = TextSelection.collapsed(
+//       offset: repsController.text.length,
+//     );
+//     restController.selection = TextSelection.collapsed(
+//       offset: restController.text.length,
+//     );
+
+//     onlySet = widget.exercise.sets.length == 1;
+
+//     // print(!onlySet && widget.editable);
+
+//     return Padding(
+//       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: Row(
+//               children: [
+//                 Text(
+//                   'Set ${widget.index + 1}',
+//                   style: const TextStyle(
+//                     fontSize: 16.0,
+//                   ),
+//                 ),
+//                 if (!onlySet && widget.editable)
+//                   Padding(
+//                     padding: const EdgeInsets.fromLTRB(6.0, 0.0, 0.0, 0.0),
+//                     child: Align(
+//                       alignment: Alignment.center,
+//                       child: SizedBox(
+//                         height: 16.0,
+//                         width: 16.0,
+//                         child: IconButton(
+//                           icon: const Icon(Icons.close),
+//                           padding: const EdgeInsets.all(0.0),
+//                           iconSize: 16.0,
+//                           splashRadius: 16.0,
+//                           onPressed: () {
+//                             FocusManager.instance.primaryFocus?.unfocus();
+//                             widget.exercise.deleteSet(widget.index);
+//                             widget.updateParent();
+//                           },
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//               ],
+//             ),
+//           ),
+//           SizedBox(
+//             width: 90,
+//             child: Padding(
+//               padding: const EdgeInsets.all(4.0),
+//               child: TextField(
+//                 enabled: widget.editable,
+//                 decoration: const InputDecoration(
+//                   border: OutlineInputBorder(),
+//                   labelText: 'Weight (lb)',
+//                   isDense: true,
+//                   contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+//                 ),
+//                 controller: weightController,
+//                 keyboardType: TextInputType.number,
+//                 inputFormatters: positiveInteger,
+//                 onChanged: (value) {
+//                   checkWeightInput(context);
+//                 },
+//               ),
+//             ),
+//           ),
+//           SizedBox(
+//             width: 90,
+//             child: Padding(
+//               padding: const EdgeInsets.all(4.0),
+//               child: TextField(
+//                 enabled: widget.editable,
+//                 decoration: const InputDecoration(
+//                   border: OutlineInputBorder(),
+//                   labelText: 'Reps',
+//                   isDense: true,
+//                   contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+//                 ),
+//                 controller: repsController,
+//                 keyboardType: TextInputType.number,
+//                 inputFormatters: positiveInteger,
+//                 onChanged: (value) {
+//                   checkRepsInput(context);
+//                 },
+//               ),
+//             ),
+//           ),
+//           SizedBox(
+//             width: 90,
+//             child: Padding(
+//               padding: const EdgeInsets.all(4.0),
+//               child: TextField(
+//                 enabled: widget.editable,
+//                 decoration: const InputDecoration(
+//                   border: OutlineInputBorder(),
+//                   labelText: 'Rest (s)',
+//                   isDense: true,
+//                   contentPadding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+//                 ),
+//                 controller: restController,
+//                 keyboardType: TextInputType.number,
+//                 inputFormatters: positiveInteger,
+//                 onChanged: (value) {
+//                   checkRestInput(context);
+//                 },
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
