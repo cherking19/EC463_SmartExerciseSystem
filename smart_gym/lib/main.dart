@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 import 'package:smart_gym/utils/user_auth_provider.dart';
-import 'workout_page/workout_page.dart';
+import 'pages/workout_page/workout_page.dart';
 import 'Screens/ble_settings.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_gym/services/TimerService.dart';
