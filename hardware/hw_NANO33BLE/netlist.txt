@@ -1,0 +1,18 @@
+* Netlist created with www.circuit-diagram.org
+* seniordesignpower
+D1 0 1
+V2 2 0
+'motor b:2 a:3 t=Generic
+V3 4 9
+'transnpn emit:1 base:3 col:4 t=NPN
+R4 5 0 1000
+V5 6 0
+'toggleswitch a:7 t=Toggle closed=False
+'Arduino Nano 28:5 18:6 14:8 29:9 11:10
+'Arduino Nano
+D6 10 11
+V7 12 0
+V8 7 9
+R9 7 11 1000
+'mosfetn gate:8 drn:7 t=NChannelMosfet
+'mosfetn drn:7 gate:12 t=NChannelMosfet
