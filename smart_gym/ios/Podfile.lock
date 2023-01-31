@@ -44,6 +44,12 @@ PODS:
   - FirebaseMessagingInterop (10.2.0)
   - FirebaseSharedSwift (10.2.0)
   - Flutter (1.0.0)
+  - flutter_blue (0.0.1):
+    - Flutter
+    - flutter_blue/Protos (= 0.0.1)
+  - flutter_blue/Protos (0.0.1):
+    - Flutter
+    - Protobuf (~> 3.11.4)
   - GoogleUtilities/AppDelegateSwizzler (7.10.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -61,6 +67,7 @@ PODS:
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (3.0.0)
   - PromisesObjC (2.1.1)
+  - Protobuf (3.11.4)
   - shared_preferences_ios (0.0.1):
     - Flutter
 
@@ -69,6 +76,7 @@ DEPENDENCIES:
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
+  - flutter_blue (from `.symlinks/plugins/flutter_blue/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
 
 SPEC REPOS:
@@ -86,6 +94,7 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMSessionFetcher
     - PromisesObjC
+    - Protobuf
 
 EXTERNAL SOURCES:
   cloud_functions:
@@ -96,6 +105,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
     :path: Flutter
+  flutter_blue:
+    :path: ".symlinks/plugins/flutter_blue/ios"
   shared_preferences_ios:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
 
@@ -114,9 +125,11 @@ SPEC CHECKSUMS:
   FirebaseMessagingInterop: b46e7fcf39c0e9b16841e258645a320a154af240
   FirebaseSharedSwift: a160b39d4ce77be922b3d6ff009099c7294e36e5
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_blue: eeb381dc4727a0954dede73515f683865494b370
   GoogleUtilities: bad72cb363809015b1f7f19beb1f1cd23c589f95
   GTMSessionFetcher: c1edebe64e9fb4e8f6415d018edf1fd3eac074a1
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
+  Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
 
 PODFILE CHECKSUM: 5766ae72531cacd93a14a532b1c806a8a60d15bf
