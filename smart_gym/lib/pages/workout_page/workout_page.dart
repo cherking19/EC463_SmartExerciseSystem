@@ -107,7 +107,7 @@ class WorkoutPageState extends State<WorkoutPage>
       Future result = Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const CreateRoutineRoute(),
+          builder: (context) => CreateRoutineRoute(),
         ),
       );
 

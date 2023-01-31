@@ -295,7 +295,9 @@ class SetWeightState extends State<SetWeight> {
               ),
             )
           : TextButton(
-              style: minimalButtonStyle(),
+              style: minimalButtonStyle(
+                context: context,
+              ),
               onPressed: widget.set.repsDone != null
                   ? () {
                       setState(() {
@@ -350,6 +352,7 @@ class SetRestState extends State<SetRest> {
         inputDuration();
       },
       style: minimalButtonStyle(
+        context: context,
         padding: const EdgeInsets.all(4.0),
       ),
       child: Text(widget.set.rest.inSeconds > 0

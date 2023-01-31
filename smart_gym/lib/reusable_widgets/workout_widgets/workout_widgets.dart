@@ -138,6 +138,7 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                               // key: widget.key,
                               // formKey: widget.formKey!,
                               workout: widget.workout,
+                              editable: true,
                             ),
                           ),
 
@@ -153,7 +154,9 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                           if (!widget.editable) dateTextWidget,
                           if (widget.editable)
                             TextButton(
-                              style: minimalButtonStyle(),
+                              style: minimalButtonStyle(
+                                context: context,
+                              ),
                               onPressed: () async {
                                 changeDateStarted();
                               },
@@ -176,7 +179,9 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                                     ),
                                   if (widget.editable)
                                     TextButton(
-                                      style: minimalButtonStyle(),
+                                      style: minimalButtonStyle(
+                                        context: context,
+                                      ),
                                       onPressed: () {
                                         changeDuration();
                                       },

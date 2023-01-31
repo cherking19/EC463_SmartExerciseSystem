@@ -60,7 +60,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
       context,
       MaterialPageRoute(
         builder: (context) => ViewWorkoutRoute(
-          workout: workouts[index],
+          routine: workouts[index],
           index: index,
         ),
       ),
@@ -90,6 +90,8 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
             Navigator.of(context).pop(response);
           }
         }
+
+        print('AFTER____________: ${workouts[index]}');
       },
     );
   }
@@ -106,7 +108,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
     const double topPadding = 100;
 
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(0.0),
       child: Column(
         children: [
           if (refreshing)

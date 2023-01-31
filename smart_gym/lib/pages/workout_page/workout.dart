@@ -352,7 +352,6 @@ class Exercise {
   }
 
   void setReps(int index, int reps) {
-    print(sameReps);
     if (sameReps) {
       for (Set set in sets) {
         set.reps = reps;

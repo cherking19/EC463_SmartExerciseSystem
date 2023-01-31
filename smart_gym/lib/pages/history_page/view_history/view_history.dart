@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
-import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';

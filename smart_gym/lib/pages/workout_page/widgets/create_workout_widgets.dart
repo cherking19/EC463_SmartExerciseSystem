@@ -169,13 +169,13 @@ class WorkoutWidgetController {
 class WorkoutName extends StatelessWidget {
   // final GlobalKey formKey;
   final TextEditingController nameController = TextEditingController();
-  // final bool editable;
+  final bool editable;
   final Workout workout;
 
   WorkoutName({
     Key? key,
     // required this.formKey,
-    // required this.editable,
+    required this.editable,
     required this.workout,
   }) : super(key: key);
 
@@ -184,7 +184,7 @@ class WorkoutName extends StatelessWidget {
     nameController.text = workout.name;
     return TextFormField(
       controller: nameController,
-      // enabled: editable,
+      enabled: editable,
       decoration: const InputDecoration(
         labelText: 'Workout Name',
       ),
@@ -351,12 +351,12 @@ class WorkoutName extends StatelessWidget {
 // }
 
 class ExerciseNameDropdown extends StatefulWidget {
-  final bool readOnly;
+  final bool editable;
   final Exercise exercise;
 
   const ExerciseNameDropdown({
     Key? key,
-    required this.readOnly,
+    required this.editable,
     required this.exercise,
   }) : super(key: key);
 
@@ -377,13 +377,13 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
         height: 2,
         color: Colors.blue,
       ),
-      onChanged: widget.readOnly
-          ? null
-          : (String? value) {
+      onChanged: widget.editable
+          ? (String? value) {
               setState(() {
                 widget.exercise.name = value!;
               });
-            },
+            }
+          : null,
       items: defaultExercises.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,

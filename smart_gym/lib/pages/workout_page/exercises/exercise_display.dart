@@ -169,6 +169,7 @@ class ExerciseInputState extends State<ExerciseInput> {
             Row(
               children: [
                 iconButton(
+                  context: context,
                   icon: const Icon(Icons.close),
                   padding: buttonPadding,
                   onPressed: widget.cancelPressed,
@@ -176,6 +177,7 @@ class ExerciseInputState extends State<ExerciseInput> {
                   splashRadius: buttonSplashRadius,
                 ),
                 iconButton(
+                  context: context,
                   icon: const Icon(Icons.check),
                   padding: buttonPadding,
                   onPressed: () {

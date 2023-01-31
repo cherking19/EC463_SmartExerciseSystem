@@ -121,7 +121,7 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
                 if (widget.type == WidgetType.create)
                   Expanded(
                     child: ExerciseNameDropdown(
-                      readOnly: false,
+                      editable: false,
                       exercise: widget.exercise,
                     ),
                   ),
