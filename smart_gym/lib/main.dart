@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
+import 'package:smart_gym/utils/color_utils.dart';
 import 'package:smart_gym/utils/user_auth_provider.dart';
 // import 'workout_page/workout.dart';
 import 'workout_page/workout_page.dart';
@@ -225,6 +226,7 @@ class SettingsPage extends StatelessWidget {
                     Container(
                       width: 130,
                       height: 130,
+                      child:makeProfilePic(FirebaseAuth.instance.currentUser!.displayName.toString(), 10) ,
                       decoration: BoxDecoration(
                           border: Border.all(
                               width: 4,
@@ -234,14 +236,10 @@ class SettingsPage extends StatelessWidget {
                                 spreadRadius: 2,
                                 blurRadius: 10,
                                 color: Colors.black.withOpacity(0.1),
-                                offset: Offset(0, 10))
+                                offset: const Offset(0, 10))
                           ],
                           shape: BoxShape.circle,
-                          image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(
-                                "https://drive.google.com/file/d/1Syikj67REBlumyyahMKBX9iSYauMNwEh/view",
-                              ))),
+                        ),
                     ),
                     Positioned(
                         bottom: 0,
@@ -265,6 +263,14 @@ class SettingsPage extends StatelessWidget {
                   ],
                 ),
               ),
+                            ElevatedButton(
+                child: const Text("Bluetooth Settings"),
+                onPressed: () {
+                  Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FlutterBlueApp()));
+
+                },
+              ),
               ElevatedButton(
                 child: const Text("Logout"),
                 onPressed: () {
@@ -276,14 +282,7 @@ class SettingsPage extends StatelessWidget {
                   });
                 },
               ),
-              ElevatedButton(
-                child: const Text("Bluetooth Settings"),
-                onPressed: () {
-                  Navigator.push(context,
-                MaterialPageRoute(builder: (context) => FlutterBlueApp()));
 
-                },
-              ),
             ],
           ),
         ),
