@@ -1,0 +1,6 @@
+{
+    "cmake.configureOnOpen": false,
+    "[markdown]": {
+        "editor.wordWrap": "on"
+    }
+}
