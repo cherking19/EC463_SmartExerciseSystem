@@ -2,11 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
+import 'package:smart_gym/utils/color_utils.dart';
+import 'package:smart_gym/utils/user_auth_provider.dart';
+import 'pages/workout_page/workout_page.dart';
+import 'Screens/ble_settings.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'pages/history_page/history_page.dart';
 import 'pages/workout_page/workout.dart';
-import 'pages/workout_page/workout_page.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +33,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+      providers: [
+        Provider<AuthenticationProvider>(
+          create: (_) => AuthenticationProvider(FirebaseAuth.instance),
+        ),
+        StreamProvider(
+          create: (context) => context.read<AuthenticationProvider>().authState,
+          initialData: null,
+        )
+      ],
+    child: MaterialApp(
       title: 'Smart Gym',
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       theme: ThemeData(
@@ -44,10 +59,25 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         tabBarTheme: const TabBarTheme(),
       ),
-      home: const SignInScreen(),
+      home: Authenticate(),
+    )
     );
   }
 }
+class Authenticate extends StatelessWidget {
+  const Authenticate ({super.key});
+  @override
+  Widget build(BuildContext context) {
+    //Instance to know the authentication state.
+    final firebaseUser = context.watch<User?>();
+    
+    if (firebaseUser != null) {
+      return const MyHomePage(title: 'Smart Gym');
+    }
+    return const SignInScreen();
+  }
+}
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -204,13 +234,62 @@ class SettingsPage extends StatelessWidget {
         child: Container(
           alignment: Alignment.topLeft,
           // color: Colors.blue,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: ListView(
             children: <Widget>[
               Text(
-                'Hello ${FirebaseAuth.instance.currentUser!.displayName.toString()}',
+                'Hello! \n${FirebaseAuth.instance.currentUser!.displayName.toString()}',
                 style: const TextStyle(fontSize: 18.0),
+              ),
+               Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 130,
+                      child:makeProfilePic(FirebaseAuth.instance.currentUser!.displayName.toString(), 10) ,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 4,
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                          boxShadow: [
+                            BoxShadow(
+                                spreadRadius: 2,
+                                blurRadius: 10,
+                                color: Colors.black.withOpacity(0.1),
+                                offset: const Offset(0, 10))
+                          ],
+                          shape: BoxShape.circle,
+                        ),
+                    ),
+                    Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              width: 4,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: Theme.of(context).secondaryHeaderColor,
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+                            ElevatedButton(
+                child: const Text("Bluetooth Settings"),
+                onPressed: () {
+                  Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FlutterBlueApp()));
+
+                },
               ),
               ElevatedButton(
                 child: const Text("Logout"),
@@ -223,10 +302,13 @@ class SettingsPage extends StatelessWidget {
                   });
                 },
               ),
+
             ],
           ),
         ),
       ),
     );
+    
   }
+  
 }

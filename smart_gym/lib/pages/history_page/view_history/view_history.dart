@@ -152,6 +152,11 @@ class ViewHistoryState extends State<ViewHistory> {
               workout: editable ? editWorkout! : widget.workout,
               editable: editable,
             ),
+            if (loading)
+              loadingSpinner(
+                padding: const EdgeInsets.all(16.0),
+                size: 20,
+              ),
             if (!loading)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
