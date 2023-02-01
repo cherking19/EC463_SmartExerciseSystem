@@ -49,13 +49,13 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
 Set _$SetFromJson(Map<String, dynamic> json) => Set(
       json['weight'] as int,
       json['reps'] as int,
-      json['rest'] as int,
+      Duration(microseconds: json['rest'] as int),
       json['repsDone'] as int?,
     );
 
 Map<String, dynamic> _$SetToJson(Set instance) => <String, dynamic>{
       'reps': instance.reps,
-      'rest': instance.rest,
+      'rest': instance.rest.inMicroseconds,
       'weight': instance.weight,
       'repsDone': instance.repsDone,
     };

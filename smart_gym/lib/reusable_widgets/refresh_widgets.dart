@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 const double defaultLoadingSpinnerSize = 20;
 
 Widget loadingSpinner({
-  required EdgeInsets padding,
+  EdgeInsets? padding,
   double? size,
 }) {
   return Padding(
-    padding: padding,
+    padding: padding ?? EdgeInsets.zero,
     child: SizedBox(
       height: size,
       width: size,

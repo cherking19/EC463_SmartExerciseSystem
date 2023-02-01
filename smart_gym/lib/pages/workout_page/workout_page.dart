@@ -8,7 +8,7 @@ import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../../utils/widget_utils.dart';
-import 'create_workout/create_workout.dart';
+import 'create_routine/create_routine.dart';
 import 'view_workout/view_workouts.dart';
 
 class WorkoutPage extends StatefulWidget {
@@ -73,9 +73,7 @@ class WorkoutPageState extends State<WorkoutPage>
   }
 
   void saveCurrentDuration() {
-    widget.workout!.duration = Duration(
-      seconds: TimerService.ofWorkout(context).elapsedMilli ~/ 1000,
-    );
+    widget.workout!.duration = TimerService.ofWorkout(context).elapsed;
   }
 
   void stopTimers() {
@@ -109,7 +107,7 @@ class WorkoutPageState extends State<WorkoutPage>
       Future result = Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const CreateWorkoutRoute(),
+          builder: (context) => CreateRoutineRoute(),
         ),
       );
 
@@ -239,9 +237,10 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
     DurationFormat restTimerFormat = DurationFormat(
       TimeFormat.digital,
       DigitalTimeFormat(
-        false,
-        true,
-        true,
+        hours: false,
+        minutes: true,
+        seconds: true,
+        twoDigit: false,
       ),
     );
 
@@ -289,11 +288,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                               children: [
                                 Text(
                                   getFormattedDuration(
-                                    Duration(
-                                      seconds: TimerService.ofSet(context)
-                                              .elapsedMilli ~/
-                                          1000,
-                                    ),
+                                    TimerService.ofSet(context).elapsed,
                                     restTimerFormat,
                                   ),
                                   style: const TextStyle(
@@ -302,10 +297,7 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                                 ),
                                 Text(
                                   getFormattedDuration(
-                                    Duration(
-                                      seconds:
-                                          TimerService.ofSet(context).duration!,
-                                    ),
+                                    TimerService.ofSet(context).endDuration!,
                                     restTimerFormat,
                                   ),
                                   style: const TextStyle(
@@ -325,8 +317,11 @@ class WorkoutInProgressBarState extends State<WorkoutInProgressBar> {
                     child: TweenAnimationBuilder(
                       tween: Tween<double>(
                         begin: 0,
-                        end: TimerService.ofSet(context).elapsedMilli /
-                            (TimerService.ofSet(context).duration! * 1000),
+                        end:
+                            TimerService.ofSet(context).elapsed.inMilliseconds /
+                                TimerService.ofSet(context)
+                                    .endDuration!
+                                    .inMilliseconds,
                       ),
                       duration: globalAnimationSpeed,
                       builder: ((context, value, child) {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/create_routine/create_routine.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
 import '../workout.dart';
 
 class SubmitController {
@@ -11,12 +13,12 @@ class SubmitController {
 }
 
 class ViewWorkoutRoute extends StatefulWidget {
-  Workout workout;
+  Workout routine;
   final int index;
 
   ViewWorkoutRoute({
     Key? key,
-    required this.workout,
+    required this.routine,
     required this.index,
   }) : super(key: key);
 
@@ -26,8 +28,9 @@ class ViewWorkoutRoute extends StatefulWidget {
 
 class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   bool editable = false;
-  Workout? preEditWorkout;
+  Workout? editRoutine;
   bool loading = false;
+  bool edited = false;
   final SubmitController submitController = SubmitController();
 
   void updateWorkout(
@@ -45,7 +48,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
       NavigatorResponse(
         true,
         NavigatorAction.track,
-        widget.workout,
+        widget.routine,
       ),
     );
   }
@@ -53,9 +56,9 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   void openEdit() {
     // String workoutJson = jsonEncode(widget.workout.toJson());
     // preSaveWorkout = Workout.fromJson(jsonDecode(workoutJson));
-    preEditWorkout = widget.workout.copy();
 
     setState(() {
+      editRoutine = widget.routine.copy();
       editable = true;
     });
   }
@@ -74,7 +77,9 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
       confirmCancelDialogTitle,
       confirmCancelDialogMessage,
     )) {
-      widget.workout = preEditWorkout!;
+      // print('pre: $preEditWorkout');
+      // widget.workout = preEditWorkout!;
+      // print(widget.workout);
 
       setState(() {
         editable = false;
@@ -93,7 +98,7 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
       });
 
       onComplete(
-        await deleteRoutine(widget.workout.uuid!),
+        await deleteRoutine(widget.routine.uuid!),
       );
     }
   }
@@ -101,47 +106,57 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child: Scaffold(
-        // key: globalScaffoldKey,
-        appBar: AppBar(
-          title: const Text('Viewing Workout'),
-        ),
-        body: Column(
-          children: [
-            if (!loading)
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Scaffold(
+          // key: globalScaffoldKey,
+          appBar: AppBar(
+            title: const Text('Viewing Workout'),
+          ),
+          body: Column(
+            children: [
+              // if (!loading)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: trackWorkout,
+                    onPressed: loading ? null : trackWorkout,
                     child: const Text('Track'),
                   ),
                   TextButton(
-                    onPressed: !editable ? openEdit : null,
-                    child: const Text('Edit'),
+                    onPressed: loading
+                        ? null
+                        : editable
+                            ? cancelEdit
+                            : openEdit,
+                    child: Text(editable ? 'Cancel' : 'Edit'),
                   ),
+                  // TextButton(
+                  //   onPressed: editable ? saveEdit : null,
+                  //   child: const Text('Save'),
+                  // ),
+                  // TextButton(
+                  //   onPressed: editable ? cancelEdit : null,
+                  //   child: const Text('Cancel'),
+                  // ),
                   TextButton(
-                    onPressed: editable ? saveEdit : null,
-                    child: const Text('Save'),
-                  ),
-                  TextButton(
-                    onPressed: editable ? cancelEdit : null,
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      deleteWorkout(
-                        (bool result) {
-                          Navigator.of(context).pop(
-                            NavigatorResponse(
-                              result,
-                              NavigatorAction.delete,
-                              null,
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    onPressed: loading
+                        ? null
+                        : () {
+                            deleteWorkout(
+                              (bool result) {
+                                Navigator.of(context).pop(
+                                  NavigatorResponse(
+                                    result,
+                                    NavigatorAction.delete,
+                                    null,
+                                  ),
+                                );
+                              },
+                            );
+                          },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),
@@ -149,33 +164,90 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
                   ),
                 ],
               ),
-            if (loading)
-              loadingSpinner(
-                size: defaultLoadingSpinnerSize,
-                padding: EdgeInsets.zero,
-              ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
-                child: WorkoutForm(
-                  editable: editable,
-                  viewing: true,
-                  workout: widget.workout,
-                  saveWorkout: updateWorkout,
-                  submitController: submitController,
+              // if (loading)
+              //   loadingSpinner(
+              //     size: defaultLoadingSpinnerSize,
+              //     padding: EdgeInsets.zero,
+              //   ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 16.0),
+                  child: CreateRoutine(
+                    routine: editable ? editRoutine! : widget.routine,
+                    editable: editable,
+                    saveWorkout: ({
+                      required BuildContext context,
+                      required Workout routine,
+                      required VoidCallback onComplete,
+                    }) {
+                      setState(() {
+                        loading = true;
+                      });
+
+                      Future.delayed(
+                        globalPseudoDelay,
+                        () async {
+                          if (await updateRoutine(routine)) {
+                            setState(() {
+                              edited = true;
+                              loading = false;
+                              editable = false;
+                              widget.routine = editRoutine!;
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(createFailedSnackBar(context));
+                          }
+
+                          onComplete.call();
+                        },
+                      );
+                    },
+                  ),
+                  // child: WorkoutForm(
+                  //   editable: editable,
+                  //   viewing: true,
+                  //   workout: widget.workout,
+                  //   saveWorkout: updateWorkout,
+                  //   submitController: submitController,
+                  // ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
       onWillPop: () async {
         if (editable) {
-          return await showConfirmationDialog(
+          if (await showConfirmationDialog(
             context,
             confirmCancelDialogTitle,
             confirmCancelDialogMessage,
-          );
+          )) {
+            if (edited) {
+              Navigator.of(context).pop(
+                NavigatorResponse(
+                  true,
+                  NavigatorAction.edit,
+                  null,
+                ),
+              );
+            } else {
+              return true;
+            }
+          } else {
+            return false;
+          }
+        } else {
+          if (edited) {
+            Navigator.of(context).pop(
+              NavigatorResponse(
+                true,
+                NavigatorAction.edit,
+                null,
+              ),
+            );
+          }
         }
 
         return true;

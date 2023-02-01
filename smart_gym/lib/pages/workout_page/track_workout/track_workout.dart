@@ -179,16 +179,14 @@ class RestTimerState extends State<RestTimer> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     getFormattedDuration(
-                      Duration(
-                        seconds:
-                            TimerService.ofSet(context).elapsedMilli ~/ 1000,
-                      ),
+                      TimerService.ofSet(context).elapsed,
                       DurationFormat(
                         TimeFormat.digital,
                         DigitalTimeFormat(
-                          false,
-                          true,
-                          true,
+                          hours: false,
+                          minutes: true,
+                          seconds: true,
+                          twoDigit: false,
                         ),
                       ),
                     ),
@@ -201,10 +199,14 @@ class RestTimerState extends State<RestTimer> {
                   padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 6.0),
                   child: TweenAnimationBuilder(
                     tween: Tween<double>(
-                      begin: 0,
-                      end: TimerService.ofSet(context).elapsedMilli /
-                          (TimerService.ofSet(context).duration! * 1000),
-                    ),
+                        begin: 0,
+                        end:
+                            TimerService.ofSet(context).elapsed.inMilliseconds /
+                                180000
+                        // TimerService.ofSet(context)
+                        //     .endDuration!
+                        //     .inMilliseconds,
+                        ),
                     duration: globalAnimationSpeed,
                     builder: ((context, value, child) {
                       return LinearProgressIndicator(

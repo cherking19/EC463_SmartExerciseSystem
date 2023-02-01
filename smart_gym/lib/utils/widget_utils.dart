@@ -33,15 +33,17 @@ enum TimeFormat {
 }
 
 class DigitalTimeFormat {
-  final bool showHours;
-  final bool showMinutes;
-  final bool showSeconds;
+  final bool hours;
+  final bool minutes;
+  final bool seconds;
+  final bool twoDigit;
 
-  DigitalTimeFormat(
-    this.showHours,
-    this.showMinutes,
-    this.showSeconds,
-  );
+  DigitalTimeFormat({
+    required this.hours,
+    required this.minutes,
+    required this.seconds,
+    required this.twoDigit,
+  });
 }
 
 class DurationFormat {
@@ -58,17 +60,20 @@ String getFormattedDuration(
   Duration duration,
   DurationFormat durationFormat,
 ) {
-  // return prettyDuration(duration)
   if (durationFormat.formatType == TimeFormat.digital) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-
-    String twoDigitHours = twoDigits(duration.inHours);
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-
     DigitalTimeFormat format = durationFormat.format as DigitalTimeFormat;
 
-    return "${format.showHours ? '$twoDigitHours:' : ''}${format.showMinutes ? '$twoDigitMinutes:' : ''}${format.showSeconds ? twoDigitSeconds : ''}";
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+
+    String hours = format.twoDigit
+        ? twoDigits(duration.inHours)
+        : duration.inHours.toString();
+    String minutes = format.hours || format.twoDigit
+        ? twoDigits(duration.inMinutes.remainder(60))
+        : duration.inMinutes.toString();
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return "${format.hours ? '$hours:' : ''}${format.minutes ? '$minutes:' : ''}${format.seconds ? seconds : ''}";
   } else if (durationFormat.formatType == TimeFormat.word) {
     DurationTersity tersity = durationFormat.format as DurationTersity;
 

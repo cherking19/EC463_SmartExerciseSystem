@@ -69,6 +69,8 @@ const List<String> defaultExercises = <String>[
 //   }
 // }
 
+const defaultRestDuration = Duration(seconds: 0);
+
 @JsonSerializable(explicitToJson: true)
 class Workout {
   String _name = '';
@@ -136,7 +138,7 @@ class Workout {
           Set(
             0,
             0,
-            0,
+            defaultRestDuration,
             null,
           )
         ],
@@ -270,7 +272,7 @@ class Exercise {
     Set newSet = Set(
       0,
       0,
-      0,
+      defaultRestDuration,
       null,
     );
 
@@ -359,7 +361,7 @@ class Exercise {
     }
   }
 
-  void setRest(int index, int rest) {
+  void setRest(int index, Duration rest) {
     if (sameRest) {
       for (Set set in sets) {
         set.rest = rest;
@@ -402,14 +404,14 @@ class Set {
   int _reps = 0;
 
   // the rest time in seconds. Should be greater than 0
-  int _rest = 0;
+  Duration _rest = const Duration(seconds: 0);
 
   int? _repsDone;
 
   Set(
     int weight,
     int reps,
-    int rest,
+    Duration rest,
     int? repsDone,
   ) {
     _reps = reps;
@@ -436,12 +438,12 @@ class Set {
   }
 
   // set the rest of this set in seconds. Should be non-negative
-  set rest(int value) {
-    assert(rest >= 0, 'The passed rest is not non-negative');
+  set rest(Duration value) {
+    assert(rest.inSeconds >= 0, 'The passed rest is not non-negative');
     _rest = value;
   }
 
-  int get rest {
+  Duration get rest {
     return _rest;
   }
 
@@ -462,7 +464,7 @@ class Set {
   }
 
   bool validateSet() {
-    return _reps > 0 && _rest > 0 && _weight > 0;
+    return reps > 0 && rest.inSeconds > 0 && weight > 0;
   }
 
   // TrackedSet getTrackedSet() {

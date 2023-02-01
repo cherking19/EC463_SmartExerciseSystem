@@ -60,7 +60,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
       context,
       MaterialPageRoute(
         builder: (context) => ViewWorkoutRoute(
-          workout: workouts[index],
+          routine: workouts[index],
           index: index,
         ),
       ),
@@ -72,6 +72,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
           NavigatorResponse response = value as NavigatorResponse;
 
           if (response.action == NavigatorAction.edit) {
+            loadWorkouts();
             if (response.success) {
               ScaffoldMessenger.of(context).showSnackBar(
                 editSuccessSnackBar(context),
@@ -106,7 +107,7 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
     const double topPadding = 100;
 
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(0.0),
       child: Column(
         children: [
           if (refreshing)
@@ -119,15 +120,14 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
                 ),
               ),
             ),
-          if (!refreshing)
-            if (workouts.isEmpty)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: topPadding),
-                  child: Text('No Routines'),
-                ),
+          if (!refreshing && workouts.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: topPadding),
+                child: Text('No Routines'),
               ),
-          if (workouts.isNotEmpty)
+            ),
+          if (!refreshing && workouts.isNotEmpty)
             Expanded(
               child: Scrollbar(
                 child: ListView.builder(
