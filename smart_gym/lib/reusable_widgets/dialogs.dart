@@ -77,3 +77,26 @@ void showMultipleWorkoutsDialog(
     },
   );
 }
+
+void showInvalidFormDialog({
+  required BuildContext context,
+}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Invalid Form'),
+        content: const Text(
+            'One or more fields is invalid. They have been marked in red.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Ok'),
+          ),
+        ],
+      );
+    },
+  );
+}

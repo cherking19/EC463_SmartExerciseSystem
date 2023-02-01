@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
+import 'package:smart_gym/pages/workout_page/create_routine/create_routine_exercise.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';

@@ -2,7 +2,7 @@ import 'package:duration/duration.dart';
 import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:smart_gym/pages/workout_page/widgets/create_workout_widgets.dart';
+import 'package:smart_gym/pages/workout_page/create_routine/create_routine.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/exercise_widgets/exercise_widget.dart';

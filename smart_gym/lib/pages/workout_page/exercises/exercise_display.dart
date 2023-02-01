@@ -40,9 +40,7 @@ class ExerciseDisplayState extends State<ExerciseDisplay> {
       dense: true,
       // contentPadding: EdgeInsets.zero,
       minLeadingWidth: 0,
-      onTap: () {
-        print('tap');
-      },
+      onTap: () {},
     );
     // Padding(
     //   padding: exerciseDisplayPadding,
