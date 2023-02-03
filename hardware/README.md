@@ -17,3 +17,8 @@ The Haptic Motor is controlled by a simple BJT transitor, modulated by pin D11, 
 
 ![prototype](./circuitprototype2.jpg)
 (Prototype)
+
+
+
+Arduino code:
+In addition to downloadable libraries: https://github.com/FemmeVerbeek/Arduino_LSM9DS1
