@@ -51,11 +51,11 @@ class TimerService extends ChangeNotifier {
               NavigationService.navigatorKey.currentContext!)
           .initialized) {
         print('showing notif');
-        NotificationsService.of(NavigationService.navigatorKey.currentContext!)
-            .notificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()!
-            .requestPermission();
+        // NotificationsService.of(NavigationService.navigatorKey.currentContext!)
+        //     .notificationsPlugin
+        //     .resolvePlatformSpecificImplementation<
+        //         AndroidFlutterLocalNotificationsPlugin>()!
+        //     .requestPermission();
         await NotificationsService.of(
                 NavigationService.navigatorKey.currentContext!)
             .notificationsPlugin

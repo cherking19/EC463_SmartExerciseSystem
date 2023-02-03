@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercises.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
@@ -207,38 +208,9 @@ class WorkoutPageState extends State<WorkoutPage>
                   ),
                   TextButton(
                     onPressed: () async {
-                      const AndroidNotificationDetails
-                          androidNotificationDetails =
-                          AndroidNotificationDetails(
-                        'your channel id',
-                        'your channel name',
-                        channelDescription: 'your channel description',
-                        importance: Importance.max,
-                        priority: Priority.high,
-                        ticker: 'ticker',
-                      );
-                      const NotificationDetails notificationDetails =
-                          NotificationDetails(
-                        android: androidNotificationDetails,
-                      );
-
-                      if (NotificationsService.of(context).initialized) {
-                        print('showing notif');
-                        NotificationsService.of(context)
-                            .notificationsPlugin
-                            .resolvePlatformSpecificImplementation<
-                                AndroidFlutterLocalNotificationsPlugin>()!
-                            .requestPermission();
-                        await NotificationsService.of(context)
-                            .notificationsPlugin
-                            .show(
-                              0,
-                              'Rest time up!',
-                              'Time to start the next set.',
-                              notificationDetails,
-                              payload: 'item x',
-                            );
-                      }
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.clear();
+                      
                     },
                     child: const Text('test notification'),
                   ),
