@@ -171,7 +171,10 @@ class CharacteristicTile extends StatelessWidget {
         final value = snapshot.data;
 
         Uint8List intBytes = Uint8List.fromList(value!.toList());
+        // You need the following statement for this StreamBuilder function to work.
+        // It seems that it requires to get a list from the buffer.
         List<double> floatList = intBytes.buffer.asFloat32List();
+        // double currentVal = intBytes.buffer.asFloat32List().last;
 
         return ExpansionTile(
           title: ListTile(
@@ -179,20 +182,6 @@ class CharacteristicTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text((characteristic.uuid.toString().substring(4, 8) == "2a19")
-                    ? "Temperature"
-                    : "Humidity"),
-                (characteristic.uuid.toString().substring(4, 8) == "2a19")
-                    ? Image.asset(
-                        'assets/temp.png',
-                        height: 100,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        'assets/hum.png',
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
                 Text((floatList.length == 0)
                     ? "Refresh Please"
                     : "${floatList[0].toStringAsFixed(2)}"),

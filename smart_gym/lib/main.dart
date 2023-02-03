@@ -12,7 +12,6 @@ import 'package:smart_gym/utils/widget_utils.dart';
 import 'pages/history_page/history_page.dart';
 import 'pages/workout_page/workout.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -34,50 +33,50 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        Provider<AuthenticationProvider>(
-          create: (_) => AuthenticationProvider(FirebaseAuth.instance),
-        ),
-        StreamProvider(
-          create: (context) => context.read<AuthenticationProvider>().authState,
-          initialData: null,
-        )
-      ],
-    child: MaterialApp(
-      title: 'Smart Gym',
-      scaffoldMessengerKey: rootScaffoldMessengerKey,
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        tabBarTheme: const TabBarTheme(),
-      ),
-      home: Authenticate(),
-    )
-    );
+        providers: [
+          Provider<AuthenticationProvider>(
+            create: (_) => AuthenticationProvider(FirebaseAuth.instance),
+          ),
+          StreamProvider(
+            create: (context) =>
+                context.read<AuthenticationProvider>().authState,
+            initialData: null,
+          )
+        ],
+        child: MaterialApp(
+          title: 'Smart Gym',
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
+          theme: ThemeData(
+            // This is the theme of your application.
+            //
+            // Try running your application with "flutter run". You'll see the
+            // application has a blue toolbar. Then, without quitting the app, try
+            // changing the primarySwatch below to Colors.green and then invoke
+            // "hot reload" (press "r" in the console where you ran "flutter run",
+            // or simply save your changes to "hot reload" in a Flutter IDE).
+            // Notice that the counter didn't reset back to zero; the application
+            // is not restarted.
+            primarySwatch: Colors.blue,
+            tabBarTheme: const TabBarTheme(),
+          ),
+          home: Authenticate(),
+        ));
   }
 }
+
 class Authenticate extends StatelessWidget {
-  const Authenticate ({super.key});
+  const Authenticate({super.key});
   @override
   Widget build(BuildContext context) {
     //Instance to know the authentication state.
     final firebaseUser = context.watch<User?>();
-    
+
     if (firebaseUser != null) {
       return const MyHomePage(title: 'Smart Gym');
     }
     return const SignInScreen();
   }
 }
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -240,26 +239,29 @@ class SettingsPage extends StatelessWidget {
                 'Hello! \n${FirebaseAuth.instance.currentUser!.displayName.toString()}',
                 style: const TextStyle(fontSize: 18.0),
               ),
-               Center(
+              Center(
                 child: Stack(
                   children: [
                     Container(
                       width: 130,
                       height: 130,
-                      child:makeProfilePic(FirebaseAuth.instance.currentUser!.displayName.toString(), 10) ,
+                      child: makeProfilePic(
+                          FirebaseAuth.instance.currentUser!.displayName
+                              .toString(),
+                          10),
                       decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 4,
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                          boxShadow: [
-                            BoxShadow(
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                color: Colors.black.withOpacity(0.1),
-                                offset: const Offset(0, 10))
-                          ],
-                          shape: BoxShape.circle,
-                        ),
+                        border: Border.all(
+                            width: 4,
+                            color: Theme.of(context).scaffoldBackgroundColor),
+                        boxShadow: [
+                          BoxShadow(
+                              spreadRadius: 2,
+                              blurRadius: 10,
+                              color: Colors.black.withOpacity(0.1),
+                              offset: const Offset(0, 10))
+                        ],
+                        shape: BoxShape.circle,
+                      ),
                     ),
                     Positioned(
                         bottom: 0,
@@ -283,12 +285,13 @@ class SettingsPage extends StatelessWidget {
                   ],
                 ),
               ),
-                            ElevatedButton(
+              ElevatedButton(
                 child: const Text("Bluetooth Settings"),
                 onPressed: () {
-                  Navigator.push(context,
-                MaterialPageRoute(builder: (context) => FlutterBlueApp()));
-
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FlutterBlueApp()));
                 },
               ),
               ElevatedButton(
@@ -302,13 +305,10 @@ class SettingsPage extends StatelessWidget {
                   });
                 },
               ),
-
             ],
           ),
         ),
       ),
     );
-    
   }
-  
 }

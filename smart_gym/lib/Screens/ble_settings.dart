@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:math';
 
@@ -168,10 +167,7 @@ class DeviceScreen extends StatelessWidget {
                 .map(
                   (c) => CharacteristicTile(
                     characteristic: c,
-                    onReadPressed: () async {
-                      await c.read();
-                    },
-                    /*
+                    onReadPressed: () => c.read(),
                     onWritePressed: () async {
                       await c.write(_getRandomBytes(), withoutResponse: true);
                       await c.read();
@@ -179,7 +175,7 @@ class DeviceScreen extends StatelessWidget {
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
                       await c.read();
-                    },*/
+                    },
                     descriptorTiles: c.descriptors
                         .map(
                           (d) => DescriptorTile(
