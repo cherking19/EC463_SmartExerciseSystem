@@ -9,7 +9,7 @@ import 'package:smart_gym/reusable_widgets/exercise_widgets/exercise_widget.dart
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-import '../../services/TimerService.dart';
+import '../../services/timer_service.dart';
 
 // this widget is meant to be used in the track and history contexts
 // sets are meant to be animated
@@ -117,7 +117,7 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
         ? Text(
             DateFormat(DateFormat.ABBR_MONTH_DAY)
                 .add_jm()
-                .format(widget.workout.dateStarted!),
+                .format(widget.workout.dateStarted ?? DateTime.now()),
             style: globalTitleTextStyle,
           )
         : const Text('');

@@ -56,10 +56,12 @@ class _SignInScreenState extends State<SignInScreen> {
                         password: _passwordTextController.text)
                     .then((value) {
                   Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const MyHomePage(title: 'Smart Gym')));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const MyHomePage(title: 'Smart Gym'),
+                    ),
+                  );
                 }).onError((error, stackTrace) {
                   showDialog(
                     context: context,

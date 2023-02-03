@@ -80,6 +80,28 @@ class Workout {
   Duration? _duration;
   DateTime? _dateStarted;
 
+  static Workout emptyWorkout() {
+    return Workout(
+      '',
+      [
+        Exercise(
+          defaultExercises.first,
+          [
+            Set(
+              0,
+              0,
+              defaultRestDuration,
+              null,
+            )
+          ],
+          false,
+          false,
+          false,
+        ),
+      ],
+    );
+  }
+
   Workout(String name, List<Exercise> exercises) {
     _name = name;
     _exercises = exercises;

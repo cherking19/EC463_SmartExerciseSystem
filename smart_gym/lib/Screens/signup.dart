@@ -74,9 +74,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const MyHomePage(title: 'Smart Gym')),
-                                  (route) => false);
+                            builder: (context) =>
+                                const MyHomePage(title: 'Smart Gym'),
+                          ),
+                          (route) => false);
                     }).onError((error, stackTrace) {
                       showDialog(
                         context: context,

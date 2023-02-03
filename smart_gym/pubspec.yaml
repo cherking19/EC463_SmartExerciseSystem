@@ -50,6 +50,7 @@ dependencies:
   uuid: ^3.0.7
   duration: ^3.0.12
   duration_picker: ^1.1.1
+  flutter_local_notifications: ^13.0.0
 
 dev_dependencies:
   flutter_test:

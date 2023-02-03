@@ -2,27 +2,35 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
+import 'package:smart_gym/pages/workout_page/workout_page.dart';
+import 'package:smart_gym/services/notifications_service.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 import 'package:smart_gym/utils/user_auth_provider.dart';
-import 'pages/workout_page/workout_page.dart';
 import 'Screens/ble_settings.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_gym/services/TimerService.dart';
+import 'package:smart_gym/services/timer_service.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'pages/history_page/history_page.dart';
-import 'pages/workout_page/workout.dart';
 
+class NavigationService {
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final TimerService setTimerService = TimerService();
   final TimerService workoutTimerService = TimerService();
+  final NotificationsService notificationsService = NotificationsService();
+
   runApp(
     TimerServiceProvider(
       setService: setTimerService,
       workoutService: workoutTimerService,
-      child: const MyApp(),
+      child: NotificationsServiceProvider(
+        notifService: notificationsService,
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -34,52 +42,66 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        Provider<AuthenticationProvider>(
-          create: (_) => AuthenticationProvider(FirebaseAuth.instance),
-        ),
-        StreamProvider(
-          create: (context) => context.read<AuthenticationProvider>().authState,
-          initialData: null,
-        )
-      ],
-    child: MaterialApp(
-      title: 'Smart Gym',
-      scaffoldMessengerKey: rootScaffoldMessengerKey,
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        tabBarTheme: const TabBarTheme(),
-      ),
-      home: Authenticate(),
-    )
-    );
+        providers: [
+          Provider<AuthenticationProvider>(
+            create: (_) => AuthenticationProvider(FirebaseAuth.instance),
+          ),
+          StreamProvider(
+            create: (context) =>
+                context.read<AuthenticationProvider>().authState,
+            initialData: null,
+          ),
+          ChangeNotifierProvider(
+            create: (context) => TrackedWorkoutModel(),
+          )
+        ],
+        child: MaterialApp(
+          navigatorKey: NavigationService.navigatorKey,
+          title: 'Smart Gym',
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
+          theme: ThemeData(
+            // This is the theme of your application.
+            //
+            // Try running your application with "flutter run". You'll see the
+            // application has a blue toolbar. Then, without quitting the app, try
+            // changing the primarySwatch below to Colors.green and then invoke
+            // "hot reload" (press "r" in the console where you ran "flutter run",
+            // or simply save your changes to "hot reload" in a Flutter IDE).
+            // Notice that the counter didn't reset back to zero; the application
+            // is not restarted.
+            primarySwatch: Colors.blue,
+            tabBarTheme: const TabBarTheme(),
+          ),
+          home: const Authenticate(),
+        ));
   }
 }
+
 class Authenticate extends StatelessWidget {
-  const Authenticate ({super.key});
+  const Authenticate({super.key});
   @override
   Widget build(BuildContext context) {
     //Instance to know the authentication state.
     final firebaseUser = context.watch<User?>();
-    
+
+    // final HomePageService homePageService = HomePageService(
+    //   homePage: homePage,
+    // );
+
     if (firebaseUser != null) {
+      // return HomePageServiceProvider(
+      //   homePageService: homePageService,
+      //   child: homePage,
+      // );
       return const MyHomePage(title: 'Smart Gym');
     }
     return const SignInScreen();
   }
 }
 
-
 class MyHomePage extends StatefulWidget {
+  // final workoutPageKey = GlobalKey<WorkoutPageState>();
+
   const MyHomePage({
     super.key,
     required this.title,
@@ -101,7 +123,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Workout? currentWorkout;
+  // Workout? currentWorkout;
   // TrackedWorkout? trackedWorkout;
   int _selectedPage = 0;
   List<Widget> bodyWidgets = [];
@@ -126,9 +148,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     bodyWidgets = [
       WorkoutPage(
-        workout: currentWorkout,
-        // trackedWorkout: trackedWorkout,
-      ),
+          // key: widget.workoutPageKey,
+          // workout: currentWorkout,
+          // trackedWorkout: trackedWorkout,
+          ),
       const HistoryPage(),
       // const SocialPage(),
       const SettingsPage(),
@@ -240,26 +263,29 @@ class SettingsPage extends StatelessWidget {
                 'Hello! \n${FirebaseAuth.instance.currentUser!.displayName.toString()}',
                 style: const TextStyle(fontSize: 18.0),
               ),
-               Center(
+              Center(
                 child: Stack(
                   children: [
                     Container(
                       width: 130,
                       height: 130,
-                      child:makeProfilePic(FirebaseAuth.instance.currentUser!.displayName.toString(), 10) ,
+                      child: makeProfilePic(
+                          FirebaseAuth.instance.currentUser!.displayName
+                              .toString(),
+                          10),
                       decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 4,
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                          boxShadow: [
-                            BoxShadow(
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                color: Colors.black.withOpacity(0.1),
-                                offset: const Offset(0, 10))
-                          ],
-                          shape: BoxShape.circle,
-                        ),
+                        border: Border.all(
+                            width: 4,
+                            color: Theme.of(context).scaffoldBackgroundColor),
+                        boxShadow: [
+                          BoxShadow(
+                              spreadRadius: 2,
+                              blurRadius: 10,
+                              color: Colors.black.withOpacity(0.1),
+                              offset: const Offset(0, 10))
+                        ],
+                        shape: BoxShape.circle,
+                      ),
                     ),
                     Positioned(
                         bottom: 0,
@@ -283,12 +309,13 @@ class SettingsPage extends StatelessWidget {
                   ],
                 ),
               ),
-                            ElevatedButton(
+              ElevatedButton(
                 child: const Text("Bluetooth Settings"),
                 onPressed: () {
-                  Navigator.push(context,
-                MaterialPageRoute(builder: (context) => FlutterBlueApp()));
-
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FlutterBlueApp()));
                 },
               ),
               ElevatedButton(
@@ -302,13 +329,10 @@ class SettingsPage extends StatelessWidget {
                   });
                 },
               ),
-
             ],
           ),
         ),
       ),
     );
-    
   }
-  
 }

@@ -74,27 +74,29 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       ),
     );
 
-    setWidgets.add(
-      Padding(
-        padding: setWidgetPadding,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                widget.exercise.addSet();
-              });
-              SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                scrollController
-                    .jumpTo(scrollController.position.maxScrollExtent);
-              });
-            },
-            style: setButtonStyle(),
-            child: const Icon(Icons.add),
+    if (widget.type == WidgetType.create) {
+      setWidgets.add(
+        Padding(
+          padding: setWidgetPadding,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  widget.exercise.addSet();
+                });
+                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  scrollController
+                      .jumpTo(scrollController.position.maxScrollExtent);
+                });
+              },
+              style: setButtonStyle(),
+              child: const Icon(Icons.add),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
 
     return Container(
       decoration: globalBoxDecoration,

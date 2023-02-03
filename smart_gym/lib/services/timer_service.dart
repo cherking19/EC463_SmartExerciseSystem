@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:smart_gym/main.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/services/notifications_service.dart';
 
 class TimerService extends ChangeNotifier {
   Timer? _timer;
@@ -9,10 +12,6 @@ class TimerService extends ChangeNotifier {
 
   Duration elapsed = defaultRestDuration;
   static const Duration _delta = Duration(milliseconds: 50);
-  // int _elapsed = 0;
-
-  // Duration? get duration => _duration;
-  // Duration get elapsedMilli => elapsed;
 
   bool get isRunning => _timer != null;
 
@@ -23,9 +22,7 @@ class TimerService extends ChangeNotifier {
   ) {
     stop();
     endDuration = duration;
-    // _elapsedMilli = duration * 1000;
     elapsed = const Duration(seconds: 0);
-    // _deltaMilli = 50;
     _timer = Timer.periodic(_delta, (timer) {
       countUp();
     });
@@ -33,12 +30,44 @@ class TimerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void countUp() {
+  void countUp() async {
     elapsed += _delta;
 
-    // if (elapsedMilli == _duration * 1000) {
-    //   // stop();
-    // }
+    if (elapsed == endDuration) {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'your channel id',
+        'your channel name',
+        channelDescription: 'your channel description',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails,
+      );
+
+      if (NotificationsService.of(
+              NavigationService.navigatorKey.currentContext!)
+          .initialized) {
+        print('showing notif');
+        NotificationsService.of(NavigationService.navigatorKey.currentContext!)
+            .notificationsPlugin
+            .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>()!
+            .requestPermission();
+        await NotificationsService.of(
+                NavigationService.navigatorKey.currentContext!)
+            .notificationsPlugin
+            .show(
+              0,
+              'Rest time up!',
+              'Time to start the next set.',
+              notificationDetails,
+              payload: timeUpPayloadNotif,
+            );
+      }
+    }
 
     notifyListeners();
   }
@@ -72,7 +101,10 @@ class TimerServiceProvider extends InheritedWidget {
     required this.setService,
     required this.workoutService,
     required Widget child,
-  }) : super(key: key, child: child);
+  }) : super(
+          key: key,
+          child: child,
+        );
 
   @override
   bool updateShouldNotify(TimerServiceProvider oldWidget) =>

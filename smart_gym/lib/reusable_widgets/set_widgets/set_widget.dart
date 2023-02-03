@@ -5,7 +5,7 @@ import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/input.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
-import 'package:smart_gym/services/TimerService.dart';
+import 'package:smart_gym/services/timer_service.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'weight_tooltip.dart';
 

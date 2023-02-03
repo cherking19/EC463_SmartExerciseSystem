@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_gym/pages/workout_page/create_routine/create_routine.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
-import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
@@ -65,8 +64,6 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
 
   void saveEdit() async {
     FocusManager.instance.primaryFocus?.unfocus();
-
-    print('async');
 
     submitController.saveWorkout!();
   }
