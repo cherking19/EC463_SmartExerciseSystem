@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../pages/workout_page/workout.dart';
@@ -68,35 +69,36 @@ Future<bool> clearCustomExercises() async {
   return await prefs.setString(exercisesKey, exercisesJson);
 }
 
-Future<List<Workout>> loadRoutines() async {
+Future<Map<String, Workout>> loadRoutines() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String routinesJson = prefs.getString(routinesKey) ?? "";
-  List<Workout> routines = [];
+  Map<String, Workout> routines = HashMap();
 
   if (routinesJson.isNotEmpty) {
-    routines = (jsonDecode(routinesJson) as List)
-        .map((i) => Workout.fromJson(i))
-        .toList();
+    routines = (jsonDecode(routinesJson) as Map).map(
+      (key, value) => MapEntry(
+        key,
+        Workout.fromJson(value),
+      ),
+    );
   }
 
   return routines;
 }
 
 Future<bool> saveRoutine(Workout routine) async {
-  List<Workout> routines = await loadRoutines();
+  Map<String, Workout> routines = await loadRoutines();
   routine.generateRandomUuid();
-  routines.add(routine);
+  routines.addAll({routine.uuid!: routine});
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String routinesJson = jsonEncode(routines);
 
   return await prefs.setString(routinesKey, routinesJson);
 }
 
-Future<bool> updateRoutine(Workout workout) async {
-  List<Workout> routines = await loadRoutines();
-  routines[routines.indexWhere(
-    (routine) => routine.uuid == workout.uuid,
-  )] = workout;
+Future<bool> updateRoutine(Workout routine) async {
+  Map<String, Workout> routines = await loadRoutines();
+  routines.update(routine.uuid!, (v) => routine);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String routinesJson = jsonEncode(routines);
 
@@ -104,12 +106,8 @@ Future<bool> updateRoutine(Workout workout) async {
 }
 
 Future<bool> deleteRoutine(String uuid) async {
-  List<Workout> routines = await loadRoutines();
-  routines.removeAt(
-    routines.indexWhere(
-      (routine) => routine.uuid == uuid,
-    ),
-  );
+  Map<String, Workout> routines = await loadRoutines();
+  routines.remove(uuid);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String routinesJson = jsonEncode(routines);
 
