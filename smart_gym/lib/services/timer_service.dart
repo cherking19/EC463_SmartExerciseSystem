@@ -50,12 +50,8 @@ class TimerService extends ChangeNotifier {
       if (NotificationsService.of(
               NavigationService.navigatorKey.currentContext!)
           .initialized) {
-        print('showing notif');
-        // NotificationsService.of(NavigationService.navigatorKey.currentContext!)
-        //     .notificationsPlugin
-        //     .resolvePlatformSpecificImplementation<
-        //         AndroidFlutterLocalNotificationsPlugin>()!
-        //     .requestPermission();
+        // print('showing notif');
+
         await NotificationsService.of(
                 NavigationService.navigatorKey.currentContext!)
             .notificationsPlugin

@@ -5,6 +5,7 @@ import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
 import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
+import 'package:smart_gym/services/notifications_service.dart';
 import 'package:smart_gym/services/timer_service.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
@@ -32,11 +33,8 @@ class TrackWorkoutRoute extends StatelessWidget {
 }
 
 class TrackWorkoutPage extends StatefulWidget {
-  // final Workout workout;
-
   const TrackWorkoutPage({
     Key? key,
-    // required this.workout,
   }) : super(key: key);
 
   @override
@@ -46,6 +44,10 @@ class TrackWorkoutPage extends StatefulWidget {
 class TrackWorkoutPageState extends State<TrackWorkoutPage> {
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      NotificationsService.of(context).requestPermissions();
+    });
+
     return AnimatedBuilder(
       animation: TimerService.ofSet(context),
       builder: (context, child) {

@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercises.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
-import 'package:smart_gym/services/notifications_service.dart';
 import 'package:smart_gym/services/timer_service.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
@@ -208,9 +206,9 @@ class WorkoutPageState extends State<WorkoutPage>
                   ),
                   TextButton(
                     onPressed: () async {
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
                       prefs.clear();
-                      
                     },
                     child: const Text('test notification'),
                   ),

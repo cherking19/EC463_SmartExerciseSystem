@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:smart_gym/main.dart';
@@ -24,6 +25,7 @@ class NotificationsService {
 
   NotificationsService() {
     notificationsPlugin = FlutterLocalNotificationsPlugin();
+
     initialize();
   }
 
@@ -31,30 +33,13 @@ class NotificationsService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
 
-//     final List<DarwinNotificationCategory> darwinNotificationCategories =
-//       <DarwinNotificationCategory>[
-//     DarwinNotificationCategory(
-// 'text category',
-//       actions: <DarwinNotificationAction>[
-//         DarwinNotificationAction.text(
-//           'text_1',
-//           'Action 1',
-//           buttonTitle: 'Send',
-//           placeholder: 'Placeholder',
-//         ),
-//       ],
-//     ),
-//   ];
-        
     const DarwinInitializationSettings initializationSettingsDarwin =
-
         DarwinInitializationSettings(
-          requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-      // notificationCategories: darwinNotificationCategories,
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
     );
-    
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
@@ -67,12 +52,12 @@ class NotificationsService {
 
       if (payload != null) {
         if (payload == timeUpPayloadNotif) {
+          Navigator.of(NavigationService.navigatorKey.currentContext!)
+              .popUntil((route) => route.isFirst);
           Navigator.push(
             NavigationService.navigatorKey.currentContext!,
             MaterialPageRoute(
-              builder: (context) => const TrackWorkoutRoute(
-                  // workout: tracked.workout!,
-                  ),
+              builder: (context) => const TrackWorkoutRoute(),
             ),
           );
         }
@@ -86,6 +71,28 @@ class NotificationsService {
     );
 
     initialized = true;
+  }
+
+  void requestPermissions() async {
+    FlutterLocalNotificationsPlugin notifPlugin =
+        NotificationsService.of(NavigationService.navigatorKey.currentContext!)
+            .notificationsPlugin;
+
+    if (Platform.isAndroid) {
+      notifPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestPermission();
+    } else if (Platform.isIOS) {
+      notifPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
   }
 
   static NotificationsService of(BuildContext context) {
@@ -111,4 +118,3 @@ class NotificationsServiceProvider extends InheritedWidget {
   bool updateShouldNotify(NotificationsServiceProvider oldWidget) =>
       notifService != oldWidget.notifService;
 }
-
