@@ -38,6 +38,8 @@ class DisplaySensorsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //   body:
     return RefreshIndicator(
       onRefresh: () => FlutterBlue.instance.startScan(
         timeout: const Duration(seconds: 4),
@@ -50,6 +52,7 @@ class DisplaySensorsPage extends StatelessWidget {
                   .asyncMap((event) => FlutterBlue.instance.connectedDevices),
               initialData: [],
               builder: (context, snapshot) {
+                print('hello');
                 // filter out the non smart gym sensors
                 final List<BluetoothDevice> smartGymSensors = snapshot.data!
                     .where((device) => isSmartGymSensor(device.name))
@@ -68,6 +71,25 @@ class DisplaySensorsPage extends StatelessWidget {
               }),
         ],
       )),
+      // ),
+      // floatingActionButton: StreamBuilder<bool>(
+      //   stream: FlutterBlue.instance.isScanning,
+      //   initialData: false,
+      //   builder: (c, snapshot) {
+      //     if (snapshot.data!) {
+      //       return FloatingActionButton(
+      //         child: Icon(Icons.stop),
+      //         onPressed: () => FlutterBlue.instance.stopScan(),
+      //         backgroundColor: Colors.red,
+      //       );
+      //     } else {
+      //       return FloatingActionButton(
+      //           child: Icon(Icons.search),
+      //           onPressed: () => FlutterBlue.instance
+      //               .startScan(timeout: Duration(seconds: 4)));
+      //     }
+      //   },
+      // ),
     );
   }
 }
