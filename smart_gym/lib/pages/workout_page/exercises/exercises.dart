@@ -54,7 +54,6 @@ class ViewExercisesState extends State<ViewExercises> {
 
     Future.delayed(globalPseudoDelay, () async {
       customExercises = await loadCustomExercises(false);
-      // await clearCustomExercises();
 
       setState(() {
         refreshing = false;
@@ -138,23 +137,6 @@ class ViewExercisesState extends State<ViewExercises> {
       });
     }
 
-    // List<Widget> exerciseList({
-    //   required List<String> exercises,
-    //   required bool custom,
-    // }) {
-    //   return List.generate(
-    //     exercises.length,
-    //     (int index) {
-    //       return ExerciseDisplay(
-    //         exercise: exercises[index],
-    //         custom: custom, // index >= defaultExercises.length,
-    //         index: index,
-    //         remove: removeExercise,
-    //       );
-    //     },
-    //   );
-    // }
-
     Widget exerciseListTile({
       required String tileTitle,
       required List<String> exercises,
@@ -171,8 +153,7 @@ class ViewExercisesState extends State<ViewExercises> {
         ),
         children: [
           Padding(
-            padding: EdgeInsets
-                .zero, //const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 0.0),
+            padding: EdgeInsets.zero,
             child: Align(
               alignment: Alignment.centerLeft,
               child: Column(
@@ -182,7 +163,7 @@ class ViewExercisesState extends State<ViewExercises> {
                   (int index) {
                     return ExerciseDisplay(
                       exercise: exercises[index],
-                      custom: custom, // index >= defaultExercises.length,
+                      custom: custom,
                       index: index,
                       remove: removeExercise,
                     );

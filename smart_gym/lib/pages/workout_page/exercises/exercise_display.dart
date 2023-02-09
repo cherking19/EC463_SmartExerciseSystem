@@ -7,7 +7,6 @@ import 'package:smart_gym/utils/function_utils.dart';
 const EdgeInsets exerciseDisplayPadding =
     EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0);
 const TextStyle exerciseTextStyle = TextStyle(
-  // fontWeight: FontWeight.bold,
   fontSize: exerciseListFontSize,
 );
 
@@ -38,19 +37,9 @@ class ExerciseDisplayState extends State<ExerciseDisplay> {
         style: exerciseTextStyle,
       ),
       dense: true,
-      // contentPadding: EdgeInsets.zero,
       minLeadingWidth: 0,
       onTap: () {},
     );
-    // Padding(
-    //   padding: exerciseDisplayPadding,
-    //   child: Text(
-    //     style: exerciseTextStyle,
-    //     widget.exercise,
-    //   ),
-    // );
-
-    // print(widget.custom);
 
     return widget.custom
         ? Dismissible(
@@ -122,18 +111,10 @@ class ExerciseInputState extends State<ExerciseInput> {
     const EdgeInsets buttonPadding = EdgeInsets.only(right: 4.0);
     const double buttonSize = 24;
     const double buttonSplashRadius = 20;
-    // const double sidePadding = 12;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(12.0, 0.0, 4.0, 0.0),
-      child:
-          // Column(
-          //   children: [
-          // const Text(
-          //   style: exerciseTextStyle,
-          //   'New Exercise',
-          // ),
-          Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
@@ -195,8 +176,6 @@ class ExerciseInputState extends State<ExerciseInput> {
             ),
         ],
       ),
-      //   ],
-      // ),
     );
   }
 }
