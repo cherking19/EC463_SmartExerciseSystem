@@ -54,7 +54,6 @@ class ViewExercisesState extends State<ViewExercises> {
 
     Future.delayed(globalPseudoDelay, () async {
       customExercises = await loadCustomExercises(false);
-      // await clearCustomExercises();
 
       setState(() {
         refreshing = false;
@@ -68,13 +67,12 @@ class ViewExercisesState extends State<ViewExercises> {
     });
   }
 
-  void addExercise(
-    String name,
-    VoidCallback onSuccess,
-    VoidCallback onFailure,
-  ) async {
-    bool result = await saveCustomExercise(name);
-    result ? onSuccess.call() : onFailure.call();
+  void addExercise({
+    required String name,
+    required VoidCallback onSuccess,
+    required VoidCallback onFailure,
+  }) async {
+    await saveCustomExercise(name) ? onSuccess.call() : onFailure.call();
   }
 
   void cancelAddExercise() {
@@ -107,8 +105,8 @@ class ViewExercisesState extends State<ViewExercises> {
 
       Future.delayed(globalPseudoDelay, () {
         addExercise(
-          name,
-          () {
+          name: name,
+          onSuccess: () {
             ScaffoldMessenger.of(context).showSnackBar(
               createSnackBar(
                 title: 'Create Exercise Success',
@@ -122,7 +120,7 @@ class ViewExercisesState extends State<ViewExercises> {
               customExercises.add(name);
             });
           },
-          () {
+          onFailure: () {
             ScaffoldMessenger.of(context).showSnackBar(
               createSnackBar(
                 title: 'Exercise Exists Already',
@@ -137,23 +135,6 @@ class ViewExercisesState extends State<ViewExercises> {
         );
       });
     }
-
-    // List<Widget> exerciseList({
-    //   required List<String> exercises,
-    //   required bool custom,
-    // }) {
-    //   return List.generate(
-    //     exercises.length,
-    //     (int index) {
-    //       return ExerciseDisplay(
-    //         exercise: exercises[index],
-    //         custom: custom, // index >= defaultExercises.length,
-    //         index: index,
-    //         remove: removeExercise,
-    //       );
-    //     },
-    //   );
-    // }
 
     Widget exerciseListTile({
       required String tileTitle,
@@ -171,8 +152,7 @@ class ViewExercisesState extends State<ViewExercises> {
         ),
         children: [
           Padding(
-            padding: EdgeInsets
-                .zero, //const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 0.0),
+            padding: EdgeInsets.zero,
             child: Align(
               alignment: Alignment.centerLeft,
               child: Column(
@@ -182,7 +162,7 @@ class ViewExercisesState extends State<ViewExercises> {
                   (int index) {
                     return ExerciseDisplay(
                       exercise: exercises[index],
-                      custom: custom, // index >= defaultExercises.length,
+                      custom: custom,
                       index: index,
                       remove: removeExercise,
                     );
