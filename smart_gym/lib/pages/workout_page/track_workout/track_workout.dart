@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
@@ -21,9 +22,56 @@ class TrackWorkoutRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Workout In Progress'),
       ),
-      body: TrackWorkoutPage(
-        workout: workout,
+      body: const DisplaySensorsPage(),
+      // TrackWorkoutPage(
+      //   workout: workout,
+      // ),
+    );
+  }
+}
+
+class DisplaySensorsPage extends StatelessWidget {
+  const DisplaySensorsPage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement function to determine whether a connected device is a Smart Gym sensor based on a prefix in its name
+    bool isSmartGymSensor(String deviceName) {
+      return true;
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => FlutterBlue.instance.startScan(
+        timeout: const Duration(seconds: 4),
       ),
+      child: SingleChildScrollView(
+          child: Column(
+        children: <Widget>[
+          StreamBuilder<List<BluetoothDevice>>(
+              stream: Stream.periodic(const Duration(seconds: 2))
+                  .asyncMap((event) => FlutterBlue.instance.connectedDevices),
+              initialData: [],
+              builder: (context, snapshot) {
+                // filter out the non smart gym sensors
+                final List<BluetoothDevice> smartGymSensors = snapshot.data!
+                    .where((device) => isSmartGymSensor(device.name))
+                    .toList();
+
+                return Column(
+                  children: smartGymSensors
+                      .map((sensor) => ListTile(
+                            title: Text(sensor.name),
+                            subtitle: Text(sensor.id.toString()),
+                            trailing:
+                                const Icon(Icons.circle, color: Colors.green),
+                          ))
+                      .toList(),
+                );
+              }),
+        ],
+      )),
     );
   }
 }
