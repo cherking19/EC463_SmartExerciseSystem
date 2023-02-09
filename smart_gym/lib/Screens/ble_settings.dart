@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import '../reusable_widgets/ble_widgets.dart';
 
+const String sensorPrefix = 'SmartGymBros_';
+
 // TODO: implement function to determine whether a connected device is a Smart Gym sensor based on a prefix in its name
 bool isSmartGymSensor(String deviceName) {
-  return true;
+  return deviceName.length >= sensorPrefix.length &&
+      deviceName.substring(0, sensorPrefix.length) == sensorPrefix;
 }
 
 class FlutterBlueApp extends StatelessWidget {
@@ -78,31 +81,34 @@ class FindDevicesScreen extends StatelessWidget {
                 stream: Stream.periodic(Duration(seconds: 2))
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),
                 initialData: [],
-                builder: (c, snapshot) => Column(
-                  children: snapshot.data!
-                      .map((d) => ListTile(
-                            title: Text(d.name),
-                            subtitle: Text(d.id.toString()),
-                            trailing: StreamBuilder<BluetoothDeviceState>(
-                              stream: d.state,
-                              initialData: BluetoothDeviceState.disconnected,
-                              builder: (c, snapshot) {
-                                if (snapshot.data ==
-                                    BluetoothDeviceState.connected) {
-                                  return ElevatedButton(
-                                    child: Text('OPEN'),
-                                    onPressed: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                DeviceScreen(device: d))),
-                                  );
-                                }
-                                return Text(snapshot.data.toString());
-                              },
-                            ),
-                          ))
-                      .toList(),
-                ),
+                builder: (c, snapshot) {
+                  print(snapshot.data!.length);
+                  return Column(
+                    children: snapshot.data!
+                        .map((d) => ListTile(
+                              title: Text(d.name),
+                              subtitle: Text(d.id.toString()),
+                              trailing: StreamBuilder<BluetoothDeviceState>(
+                                stream: d.state,
+                                initialData: BluetoothDeviceState.disconnected,
+                                builder: (c, snapshot) {
+                                  if (snapshot.data ==
+                                      BluetoothDeviceState.connected) {
+                                    return ElevatedButton(
+                                      child: Text('OPEN'),
+                                      onPressed: () => Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DeviceScreen(device: d))),
+                                    );
+                                  }
+                                  return Text(snapshot.data.toString());
+                                },
+                              ),
+                            ))
+                        .toList(),
+                  );
+                },
               ),
               StreamBuilder<List<ScanResult>>(
                 stream: FlutterBlue.instance.scanResults,
