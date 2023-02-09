@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:smart_gym/Screens/ble_settings.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
@@ -37,11 +38,6 @@ class DisplaySensorsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement function to determine whether a connected device is a Smart Gym sensor based on a prefix in its name
-    bool isSmartGymSensor(String deviceName) {
-      return true;
-    }
-
     return RefreshIndicator(
       onRefresh: () => FlutterBlue.instance.startScan(
         timeout: const Duration(seconds: 4),

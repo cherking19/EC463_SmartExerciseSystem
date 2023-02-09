@@ -1,10 +1,14 @@
-
 import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import '../reusable_widgets/ble_widgets.dart';
+
+// TODO: implement function to determine whether a connected device is a Smart Gym sensor based on a prefix in its name
+bool isSmartGymSensor(String deviceName) {
+  return true;
+}
 
 class FlutterBlueApp extends StatelessWidget {
   @override
