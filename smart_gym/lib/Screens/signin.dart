@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:flutter/src/widgets/framework.dart';
 
 import 'package:flutter/material.dart';
+import 'package:smart_gym/Screens/forgotpasswordscreen.dart';
 import 'package:smart_gym/Screens/signup.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 
@@ -46,6 +47,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               reusableTextField("Enter Password", Icons.lock_outlined, true,
                   _passwordTextController),
+                  forgotPassword(),
               const SizedBox(
                 height: 20,
               ),
@@ -102,6 +104,23 @@ class _SignInScreenState extends State<SignInScreen> {
           },
           child: const Text(
             "Sign Up",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        )
+      ],
+    );
+  }
+    Row forgotPassword() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()));
+          },
+          child: const Text(
+            "Forgot Password?",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         )

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import '../reusable_widgets/reusable_widgets.dart';
@@ -16,6 +17,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          "Forgot Password",
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -29,7 +39,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             padding: EdgeInsets.fromLTRB(
                 20, MediaQuery.of(context).size.height * .2, 20, 0),
             child: Column(children: <Widget>[
-              logoWidget("assets/images/logo1.png"),
               const SizedBox(
                 height: 30,
               ),
@@ -38,17 +47,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(
                 height: 20,
               ),
-              signInSignUpButton(context, true, () {
+              forgotPasswordButton(context, () {
                 FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: _emailTextController.text,
-                        password: _passwordTextController.text)
+                    .sendPasswordResetEmail(email: _emailTextController.text)
                     .then((value) {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              const MyHomePage(title: 'Smart Gym')));
+                              const SignInScreen()));
                 }).onError((error, stackTrace) {
                   showDialog(
                     context: context,
@@ -70,7 +77,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   );
                 });
               }),
-              //signUpOption()
             ]),
           ),
         ),
