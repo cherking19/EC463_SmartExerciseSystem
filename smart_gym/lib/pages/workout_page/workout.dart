@@ -7,65 +7,44 @@ import 'package:uuid/uuid.dart';
 
 part 'workout.g.dart';
 
-const List<String> defaultExercises = <String>[
-  'Squat',
-  'Bench Press',
-  'Deadlift',
-  'Overhead Press',
-  'Barbell Row'
+// const List<String> defaultExercises = <String>[
+//   'Squat',
+//   'Bench Press',
+//   'Deadlift',
+//   'Overhead Press',
+//   'Barbell Row'
+// ];
+
+final Map<String, ExerciseChoice>
+
+final List<ExerciseChoice> defaultExercises = <ExerciseChoice>[
+  ExerciseChoice(name: 'Squat', uuid: '1'),
+  ExerciseChoice(name: 'Bench Press', uuid: '2'),
+  ExerciseChoice(name: 'Deadlift', uuid: '3'),
+  ExerciseChoice(name: 'Overhead Press', uuid: '4'),
+  ExerciseChoice(name: 'Barbell Row', uuid: '5'),
 ];
 
-// @JsonSerializable(explicitToJson: true)
-// class CustomExercises {
-//   List<String> _exercises = [];
+@JsonSerializable(explicitToJson: true)
+class ExerciseChoice {
+  late String _name;
+  // late String _uuid;
 
-//   CustomExercises({
-//     required exercises,
-//   });
-
-//   factory CustomExercises.fromJson(Map<String, dynamic> json) =>
-//       _$CustomExercisesFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$CustomExercisesToJson(this);
-
-//   List<String> get exercises {
-//     return _exercises;
-//   }
-
-//   set exercises(List<String> value) {
-//     _exercises = value;
-//   }
-
-//   // void addExercise()
-// }
+  ExerciseChoice({required String name, required String uuid}) {
+    _name = name;
+    // _uuid = uuid;
+  }
+}
 
 // @JsonSerializable(explicitToJson: true)
-// class Routines {
-//   List<Workout> _workouts = [];
+// class CustomExerciseChoice extends ExerciseChoice {
+//   late String _uuid;
 
-//   Routines(List<Workout> workouts) {
-//     _workouts = workouts;
-//   }
-
-//   factory Routines.fromJson(Map<String, dynamic> json) =>
-//       _$RoutinesFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$RoutinesToJson(this);
-
-//   List<Workout> get workouts {
-//     return _workouts;
-//   }
-
-//   void addWorkout(Workout workout) {
-//     workouts.add(workout);
-//   }
-
-//   void replaceWorkout(Workout workout, int index) {
-//     workouts[index] = workout;
-//   }
-
-//   void deleteWorkout(int index) {
-//     workouts.removeAt(index);
+//   CustomExerciseChoice({
+//     required String name,
+//     required String uuid,
+//   }) : super(name: name) {
+//     _uuid = uuid;
 //   }
 // }
 
@@ -100,19 +79,19 @@ class Workout {
     return Workout.fromJson(jsonDecode(json));
   }
 
-  bool validateRoutine() {
-    if (_name.isEmpty) {
-      return false;
-    }
+  // bool validateRoutine() {
+  //   if (_name.isEmpty) {
+  //     return false;
+  //   }
 
-    for (int i = 0; i < _exercises.length; i++) {
-      if (!_exercises[i].validateExercise()) {
-        return false;
-      }
-    }
+  //   for (int i = 0; i < _exercises.length; i++) {
+  //     if (!_exercises[i].validateExercise()) {
+  //       return false;
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
   String get name {
     return _name;
@@ -216,15 +195,20 @@ class Workout {
 
 @JsonSerializable(explicitToJson: true)
 class Exercise {
-  String _name = '';
+  String _exercise_uuid = '';
   List<Set> _sets = [];
   bool _sameWeight = false;
   bool _sameReps = false;
   bool _sameRest = false;
 
-  Exercise(String name, List<Set> sets, bool sameWeight, bool sameReps,
-      bool sameRest) {
-    _name = name;
+  Exercise({
+    required String exercise_uuid,
+    required List<Set> sets,
+    required bool sameWeight,
+    required bool sameReps,
+    required bool sameRest,
+  }) {
+    _exercise_uuid = exercise_uuid;
     _sets = sets;
     _sameWeight = sameWeight;
     _sameReps = sameReps;
@@ -233,7 +217,7 @@ class Exercise {
 
   @override
   String toString() {
-    return '$_name: $_sets ';
+    return '$_exercise_uuid: $_sets ';
   }
 
   factory Exercise.fromJson(Map<String, dynamic> json) =>
@@ -241,26 +225,26 @@ class Exercise {
 
   Map<String, dynamic> toJson() => _$ExerciseToJson(this);
 
-  bool validateExercise() {
-    if (_name.isEmpty) {
-      return false;
-    }
+  // bool validateExercise() {
+  //   if (_exercise_uuid.isEmpty) {
+  //     return false;
+  //   }
 
-    for (int i = 0; i < _sets.length; i++) {
-      if (!_sets[i].validateSet()) {
-        return false;
-      }
-    }
+  //   for (int i = 0; i < _sets.length; i++) {
+  //     if (!_sets[i].validateSet()) {
+  //       return false;
+  //     }
+  //   }
 
-    return true;
+  //   return true;
+  // }
+
+  String get exercise_uuid {
+    return _exercise_uuid;
   }
 
-  String get name {
-    return _name;
-  }
-
-  set name(String name) {
-    _name = name;
+  set exercise_uuid(String name) {
+    _exercise_uuid = name;
   }
 
   List<Set> get sets {
