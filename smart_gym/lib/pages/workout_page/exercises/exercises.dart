@@ -67,13 +67,12 @@ class ViewExercisesState extends State<ViewExercises> {
     });
   }
 
-  void addExercise(
-    String name,
-    VoidCallback onSuccess,
-    VoidCallback onFailure,
-  ) async {
-    bool result = await saveCustomExercise(name);
-    result ? onSuccess.call() : onFailure.call();
+  void addExercise({
+    required String name,
+    required VoidCallback onSuccess,
+    required VoidCallback onFailure,
+  }) async {
+    await saveCustomExercise(name) ? onSuccess.call() : onFailure.call();
   }
 
   void cancelAddExercise() {
@@ -106,8 +105,8 @@ class ViewExercisesState extends State<ViewExercises> {
 
       Future.delayed(globalPseudoDelay, () {
         addExercise(
-          name,
-          () {
+          name: name,
+          onSuccess: () {
             ScaffoldMessenger.of(context).showSnackBar(
               createSnackBar(
                 title: 'Create Exercise Success',
@@ -121,7 +120,7 @@ class ViewExercisesState extends State<ViewExercises> {
               customExercises.add(name);
             });
           },
-          () {
+          onFailure: () {
             ScaffoldMessenger.of(context).showSnackBar(
               createSnackBar(
                 title: 'Exercise Exists Already',

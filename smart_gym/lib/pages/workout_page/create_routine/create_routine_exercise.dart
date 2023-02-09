@@ -4,6 +4,7 @@ import 'package:smart_gym/pages/workout_page/create_routine/create_routine_set.d
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
 
 class CreateRoutineExercise extends StatefulWidget {
   final Workout workout;
@@ -226,29 +227,40 @@ class ExerciseNameDropdown extends StatefulWidget {
 class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: widget.exercise.name,
-      disabledHint: Text(widget.exercise.name),
-      icon: const Icon(Icons.arrow_downward),
-      isExpanded: true,
-      elevation: 16,
-      underline: Container(
-        height: 2,
-        color: Colors.blue,
-      ),
-      onChanged: widget.editable
-          ? (String? value) {
-              setState(() {
-                widget.exercise.name = value!;
-              });
-            }
-          : null,
-      items: defaultExercises.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+    return FutureBuilder(
+      future: loadCustomExercises(true),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return DropdownButton<String>(
+            value: widget.exercise.name,
+            disabledHint: Text(widget.exercise.name),
+            icon: const Icon(Icons.arrow_downward),
+            isExpanded: true,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+              color: Colors.blue,
+            ),
+            onChanged: widget.editable
+                ? (String? value) {
+                    setState(() {
+                      widget.exercise.name = value!;
+                    });
+                  }
+                : null,
+            items: snapshot.data!.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          );
+        } else if (snapshot.hasError) {
+          return const Text('ERROR LOADING EXERCISES');
+        } else {
+          return const Text('Loading exercises.');
+        }
+      },
     );
   }
 }
