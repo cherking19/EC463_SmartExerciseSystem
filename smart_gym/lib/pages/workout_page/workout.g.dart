@@ -39,7 +39,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
-      'name': instance.name,
+      'name': instance.exercise_uuid,
       'sets': instance.sets.map((e) => e.toJson()).toList(),
       'sameWeight': instance.sameWeight,
       'sameReps': instance.sameReps,
