@@ -83,9 +83,11 @@ class SmartGym_DeviceWidgetState extends State<SmartGym_DeviceWidget> {
       stream: widget.device.services,
       initialData: const [],
       builder: (context, snapshot) {
-        return SmartGym_ServiceWidget(
-          service: snapshot.data!.first,
-        );
+        return snapshot.hasData && snapshot.data!.isNotEmpty
+            ? SmartGym_ServiceWidget(
+                service: snapshot.data!.first,
+              )
+            : const Text('No Service Detected');
       },
     );
   }
