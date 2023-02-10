@@ -5,6 +5,7 @@ import 'package:smart_gym/reusable_widgets/colors.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
+import 'package:smart_gym/services/exercise_service.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 
 const double exerciseListFontSize = 16;
@@ -185,7 +186,7 @@ class ViewExercisesState extends State<ViewExercises> {
                 children: [
                   exerciseListTile(
                     tileTitle: 'Default Exercises',
-                    exercises: defaultExercises,
+                    exercises: ExerciseService.defaultExerciseNames,
                     custom: false,
                   ),
                   if (refreshing)

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_gym/services/exercise_service.dart';
 import '../pages/workout_page/workout.dart';
 
 const String routinesKey = 'routines';
@@ -23,7 +24,7 @@ Future<List<String>> loadCustomExercises(bool appendDefault) async {
   //     customExercises != null ? customExercises.exercises : [];
 
   if (appendDefault) {
-    exercises = defaultExercises + exercises;
+    exercises = ExerciseService.defaultExerciseNames + exercises;
   }
 
   return exercises;
@@ -32,7 +33,7 @@ Future<List<String>> loadCustomExercises(bool appendDefault) async {
 Future<bool> saveCustomExercise(String newExercise) async {
   List<String> exercises = await loadCustomExercises(false);
 
-  if (defaultExercises.indexWhere((defaultExercise) =>
+  if (ExerciseService.defaultExerciseNames.indexWhere((defaultExercise) =>
               defaultExercise.toLowerCase() == newExercise.toLowerCase()) !=
           -1 ||
       exercises.indexWhere((exercise) =>

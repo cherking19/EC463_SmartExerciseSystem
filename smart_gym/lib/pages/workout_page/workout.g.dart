@@ -7,8 +7,8 @@ part of 'workout.dart';
 // **************************************************************************
 
 Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
-      json['name'] as String,
-      (json['exercises'] as List<dynamic>)
+      name: json['name'] as String,
+      exercises: (json['exercises'] as List<dynamic>)
           .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
           .toList(),
     )
@@ -29,17 +29,17 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
     };
 
 Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
-      json['name'] as String,
-      (json['sets'] as List<dynamic>)
+      name: json['name'] as String,
+      sets: (json['sets'] as List<dynamic>)
           .map((e) => Set.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['sameWeight'] as bool,
-      json['sameReps'] as bool,
-      json['sameRest'] as bool,
+      sameWeight: json['sameWeight'] as bool,
+      sameReps: json['sameReps'] as bool,
+      sameRest: json['sameRest'] as bool,
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
-      'name': instance.exercise_uuid,
+      'name': instance.name,
       'sets': instance.sets.map((e) => e.toJson()).toList(),
       'sameWeight': instance.sameWeight,
       'sameReps': instance.sameReps,
