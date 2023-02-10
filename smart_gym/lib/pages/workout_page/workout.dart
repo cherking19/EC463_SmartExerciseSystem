@@ -5,34 +5,19 @@ import 'package:uuid/uuid.dart';
 
 part 'workout.g.dart';
 
-// const List<String> defaultExercises = <String>[
-//   'Squat',
-//   'Bench Press',
-//   'Deadlift',
-//   'Overhead Press',
-//   'Barbell Row'
-// ];
+// @JsonSerializable(explicitToJson: true)
+// class ExerciseChoice {
+//   late String _name;
+//   // late String _uuid;
 
-final Map<String, ExerciseChoice>
-
-final List<ExerciseChoice> defaultExercises = <ExerciseChoice>[
-  ExerciseChoice(name: 'Squat', uuid: '1'),
-  ExerciseChoice(name: 'Bench Press', uuid: '2'),
-  ExerciseChoice(name: 'Deadlift', uuid: '3'),
-  ExerciseChoice(name: 'Overhead Press', uuid: '4'),
-  ExerciseChoice(name: 'Barbell Row', uuid: '5'),
-];
-
-@JsonSerializable(explicitToJson: true)
-class ExerciseChoice {
-  late String _name;
-  // late String _uuid;
-
-  ExerciseChoice({required String name, required String uuid}) {
-    _name = name;
-    // _uuid = uuid;
-  }
-}
+//   ExerciseChoice({
+//     required String name,
+//     // required String uuid,
+//   }) {
+//     _name = name;
+//     // _uuid = uuid;
+//   }
+// }
 
 // @JsonSerializable(explicitToJson: true)
 // class CustomExerciseChoice extends ExerciseChoice {
@@ -190,20 +175,20 @@ class Workout {
 
 @JsonSerializable(explicitToJson: true)
 class Exercise {
-  String _exercise_uuid = '';
+  String _name = '';
   List<Set> _sets = [];
   bool _sameWeight = false;
   bool _sameReps = false;
   bool _sameRest = false;
 
   Exercise({
-    required String exercise_uuid,
+    required String name,
     required List<Set> sets,
     required bool sameWeight,
     required bool sameReps,
     required bool sameRest,
   }) {
-    _exercise_uuid = exercise_uuid;
+    _name = name;
     _sets = sets;
     _sameWeight = sameWeight;
     _sameReps = sameReps;
@@ -212,13 +197,30 @@ class Exercise {
 
   @override
   String toString() {
-    return '$_exercise_uuid: $_sets ';
+    return '$_name: $_sets ';
   }
 
   factory Exercise.fromJson(Map<String, dynamic> json) =>
       _$ExerciseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExerciseToJson(this);
+
+  static Exercise defaultExercise() {
+    return Exercise(
+      name: ExerciseService.defaultExerciseNames.first,
+      sets: [
+        Set(
+          0,
+          0,
+          defaultRestDuration,
+          null,
+        )
+      ],
+      sameWeight: false,
+      sameReps: false,
+      sameRest: false,
+    );
+  }
 
   // bool validateExercise() {
   //   if (_exercise_uuid.isEmpty) {
@@ -234,12 +236,12 @@ class Exercise {
   //   return true;
   // }
 
-  String get exercise_uuid {
-    return _exercise_uuid;
+  String get name {
+    return _name;
   }
 
-  set exercise_uuid(String name) {
-    _exercise_uuid = name;
+  set name(String name) {
+    _name = name;
   }
 
   List<Set> get sets {

@@ -50,7 +50,7 @@ class HistoryListState extends State<HistoryList>
         break;
       }
 
-      widgets.add(Text(workout.exercises[i].exercise_uuid));
+      widgets.add(Text(workout.exercises[i].name));
     }
 
     return widgets;

@@ -111,7 +111,7 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(4.0, 16.0, 0.0, 4.0),
                     child: Text(
-                      widget.exercise.exercise_uuid,
+                      widget.exercise.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
