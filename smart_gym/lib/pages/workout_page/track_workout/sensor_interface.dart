@@ -99,7 +99,7 @@ class SmartGym_DeviceWidgetState extends State<SmartGym_DeviceWidget> {
   }
 }
 
-class SmartGym_ServiceWidget extends StatelessWidget {
+class SmartGym_ServiceWidget extends StatefulWidget {
   final BluetoothService service;
 
   const SmartGym_ServiceWidget({
@@ -108,16 +108,43 @@ class SmartGym_ServiceWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext) {
-    return Column(
-      children: service.characteristics
-          .map(
-            (characteristic) => SmartGym_CharacteristicWidget(
-              characteristic: characteristic,
-            ),
+  SmartGym_ServiceWidgetState createState() => SmartGym_ServiceWidgetState();
+}
+
+class SmartGym_ServiceWidgetState extends State<SmartGym_ServiceWidget> {
+  bool initialized = false;
+
+  void initializeService() async {
+    for (BluetoothCharacteristic characteristic
+        in widget.service.characteristics) {
+      await characteristic.setNotifyValue(true);
+    }
+
+    setState(() {
+      initialized = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    initializeService();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return initialized
+        ? Column(
+            children: widget.service.characteristics
+                .map(
+                  (characteristic) => SmartGym_CharacteristicWidget(
+                    characteristic: characteristic,
+                  ),
+                )
+                .toList(),
           )
-          .toList(),
-    );
+        : const Text('Not initialized yet');
   }
 }
 
@@ -139,14 +166,14 @@ class SmartGym_CharacteristicWidgetState
   void startRead() async {
     print('${widget.characteristic} starting read');
     await widget.characteristic.setNotifyValue(true);
-    await widget.characteristic.read();
+    // await widget.characteristic.read();
   }
 
   @override
   void initState() {
     super.initState();
 
-    startRead();
+    // startRead();
   }
 
   @override
