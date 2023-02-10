@@ -83,11 +83,17 @@ class SmartGym_DeviceWidgetState extends State<SmartGym_DeviceWidget> {
       stream: widget.device.services,
       initialData: const [],
       builder: (context, snapshot) {
-        return snapshot.hasData && snapshot.data!.isNotEmpty
-            ? SmartGym_ServiceWidget(
-                service: snapshot.data!.first,
-              )
-            : const Text('No Service Detected');
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          BluetoothService? sensorService = snapshot.data!.firstWhere(
+              (service) =>
+                  service.uuid.toString().toUpperCase().substring(4, 8) ==
+                  'A123');
+          return SmartGym_ServiceWidget(
+            service: sensorService,
+          );
+        }
+
+        return const Text('No Service Detected');
       },
     );
   }
