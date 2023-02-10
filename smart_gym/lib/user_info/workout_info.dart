@@ -1,59 +1,93 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_gym/services/exercise_service.dart';
+import 'package:uuid/uuid.dart';
 import '../pages/workout_page/workout.dart';
 
 const String routinesKey = 'routines';
 const String finishedWorkoutsKey = 'finishedWorkouts';
 const String exercisesKey = 'exercises';
 
-Future<List<String>> loadCustomExercises(bool appendDefault) async {
+Future<Map<String, String>> loadCustomExercises(
+  BuildContext context, {
+  required bool appendDefault,
+}) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String exercisesJson = prefs.getString(exercisesKey) ?? "";
   // CustomExercises? customExercises;
-  List<String> exercises = [];
+  // List<String> customExercises = [];
+  Map<String, String> customExercises = HashMap();
 
   if (exercisesJson.isNotEmpty) {
     // customExercises = CustomExercises.fromJson(jsonDecode(exercisesJson));
-    exercises = (jsonDecode(exercisesJson) as List)
-        .map((exercise) => exercise as String)
-        .toList();
+    // exercises = (jsonDecode(exercisesJson) as List)
+    //     .map((exercise) => exercise as String)
+    //     .toList();
+    // customExercises = (jsonDecode(exercisesJson) as Map)
+    //     .entries
+    //     .map((e) => e.value as String)
+    //     .toList();
+    customExercises = (jsonDecode(exercisesJson) as Map)
+        .map((key, value) => MapEntry(key, value));
   }
 
   // List<String> exercises =
   //     customExercises != null ? customExercises.exercises : [];
 
   if (appendDefault) {
-    exercises = ExerciseService.defaultExerciseNames + exercises;
+    customExercises.addEntries(
+        Provider.of<ExerciseService>(context, listen: false)
+            .defaultExercises
+            .entries);
+    // ExerciseService.defaultExerciseNames + customExercises;
   }
 
-  return exercises;
+  return customExercises;
 }
 
-Future<bool> saveCustomExercise(String newExercise) async {
-  List<String> exercises = await loadCustomExercises(false);
+Future<bool> saveCustomExercise(
+    String newExercise, BuildContext context) async {
+  Map<String, String> exercises = await loadCustomExercises(
+    appendDefault: true,
+    context,
+  );
 
-  if (ExerciseService.defaultExerciseNames.indexWhere((defaultExercise) =>
-              defaultExercise.toLowerCase() == newExercise.toLowerCase()) !=
-          -1 ||
-      exercises.indexWhere((exercise) =>
-              exercise.toLowerCase() == newExercise.toLowerCase()) !=
-          -1) {
+  String key = const Uuid().v5(ExerciseService.exerciseNamespace, newExercise);
+
+  if (exercises.containsKey(key)) {
     return false;
   } else {
-    exercises.add(newExercise);
+    exercises.addAll({key: newExercise});
   }
+
+  // if (ExerciseService.defaultExerciseNames.indexWhere((defaultExercise) =>
+  //             defaultExercise.toLowerCase() == newExercise.toLowerCase()) !=
+  //         -1 ||
+  //     exercises.indexWhere((exercise) =>
+  //             exercise.toLowerCase() == newExercise.toLowerCase()) !=
+  //         -1) {
+  //   return false;
+  // } else {
+  //   exercises.add(newExercise);
+  // }
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String exercisesJson = jsonEncode(exercises);
 
   return await prefs.setString(exercisesKey, exercisesJson);
 }
 
-Future<bool> deleteCustomExercise(String exercise) async {
-  List<String> exercises = await loadCustomExercises(false);
+Future<bool> deleteCustomExercise(String exercise, BuildContext context) async {
+  Map<String, String> exercises = await loadCustomExercises(
+    appendDefault: false,
+    context,
+  );
 
-  if (exercises.remove(exercise)) {
+  if (exercises.remove(
+          const Uuid().v5(ExerciseService.exerciseNamespace, exercise)) !=
+      null) {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String exercisesJson = jsonEncode(exercises);
 
@@ -65,7 +99,7 @@ Future<bool> deleteCustomExercise(String exercise) async {
 
 Future<bool> clearCustomExercises() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String exercisesJson = jsonEncode([]);
+  String exercisesJson = jsonEncode(HashMap());
 
   return await prefs.setString(exercisesKey, exercisesJson);
 }

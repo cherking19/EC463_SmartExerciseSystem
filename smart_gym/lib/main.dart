@@ -14,6 +14,8 @@ import 'package:smart_gym/utils/widget_utils.dart';
 import 'pages/history_page/history_page.dart';
 import 'pages/workout_page/workout.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -39,8 +41,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final ExerciseService exerciseService = ExerciseService();
-
     return MultiProvider(
         providers: [
           Provider<AuthenticationProvider>(
@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Smart Gym',
           scaffoldMessengerKey: rootScaffoldMessengerKey,
+          navigatorKey: navigatorKey,
           theme: ThemeData(
             // This is the theme of your application.
             //

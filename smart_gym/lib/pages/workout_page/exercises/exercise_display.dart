@@ -60,7 +60,7 @@ class ExerciseDisplayState extends State<ExerciseDisplay> {
             key: ValueKey<String>(widget.exercise),
             onDismissed: (DismissDirection direction) {
               setState(() {
-                widget.remove!(widget.index);
+                widget.remove!(widget.index, context);
               });
             },
             child: text,
