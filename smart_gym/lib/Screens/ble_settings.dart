@@ -302,6 +302,7 @@ class DeviceScreen extends StatelessWidget {
               stream: device.services,
               initialData: [],
               builder: (c, snapshot) {
+                print('DATA: ${snapshot.data!}');
                 return Column(
                   children: _buildServiceTiles(snapshot.data!),
                 );

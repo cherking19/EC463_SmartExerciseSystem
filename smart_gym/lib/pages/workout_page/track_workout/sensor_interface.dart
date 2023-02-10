@@ -28,6 +28,10 @@ class DisplaySensorsPage extends StatelessWidget {
                     .where((device) => isSmartGymSensor(device.name))
                     .toList();
 
+                for (BluetoothDevice device in smartGymSensors) {
+                  device.discoverServices();
+                }
+
                 return Column(
                   children: smartGymSensors
                       .map(
@@ -56,7 +60,7 @@ class DisplaySensorsPage extends StatelessWidget {
   }
 }
 
-class SmartGym_DeviceWidget extends StatefulWidget {
+class SmartGym_DeviceWidget extends StatelessWidget {
   final BluetoothDevice device;
 
   const SmartGym_DeviceWidget({
@@ -64,36 +68,38 @@ class SmartGym_DeviceWidget extends StatefulWidget {
     required this.device,
   }) : super(key: key);
 
-  @override
-  SmartGym_DeviceWidgetState createState() => SmartGym_DeviceWidgetState();
-}
+//   @override
+//   SmartGym_DeviceWidgetState createState() => SmartGym_DeviceWidgetState();
+// }
 
-class SmartGym_DeviceWidgetState extends State<SmartGym_DeviceWidget> {
-  @override
-  void initState() {
-    super.initState();
+// class SmartGym_DeviceWidgetState extends State<SmartGym_DeviceWidget> {
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    print('${widget.device} discovering');
-    widget.device.discoverServices();
-  }
+  //   print('${widget.device} discovering');
+  //   widget.device.discoverServices();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<BluetoothService?>>(
-      stream: widget.device.services,
+    return StreamBuilder<List<BluetoothService>>(
+      stream: device.services,
       initialData: const [],
       builder: (context, snapshot) {
-        BluetoothService? sensorService = snapshot.data!.firstWhere(
-          (service) =>
-              service!.uuid.toString().toUpperCase().substring(4, 8) == 'A123',
-          orElse: () => null,
-        );
+        print('DATA ${snapshot.data!}');
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          BluetoothService sensorService = snapshot.data!.firstWhere(
+            (service) =>
+                service.uuid.toString().toUpperCase().substring(4, 8) == 'A123',
+          );
 
-        return sensorService != null
-            ? SmartGym_ServiceWidget(
-                service: sensorService,
-              )
-            : const Text('No Service');
+          return SmartGym_ServiceWidget(
+            service: sensorService,
+          );
+        }
+
+        return const Text('No Service');
       },
     );
   }
