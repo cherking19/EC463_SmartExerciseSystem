@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/services/sensor_service.dart';
+import 'package:smart_gym/services/exercise_service.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 import 'package:smart_gym/utils/user_auth_provider.dart';
 import 'pages/workout_page/workout_page.dart';
@@ -38,6 +39,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final ExerciseService exerciseService = ExerciseService();
+
     return MultiProvider(
         providers: [
           Provider<AuthenticationProvider>(
@@ -51,6 +54,9 @@ class MyApp extends StatelessWidget {
           // ChangeNotifierProvider(
           //   create: (context) => SensorService(),
           // ),
+          ChangeNotifierProvider(
+            create: (context) => ExerciseService(),
+          ),
         ],
         child: MaterialApp(
           title: 'Smart Gym',

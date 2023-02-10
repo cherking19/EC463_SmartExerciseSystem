@@ -232,8 +232,8 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return DropdownButton<String>(
-            value: widget.exercise.exercise_uuid,
-            disabledHint: Text(widget.exercise.exercise_uuid),
+            value: widget.exercise.name,
+            disabledHint: Text(widget.exercise.name),
             icon: const Icon(Icons.arrow_downward),
             isExpanded: true,
             elevation: 16,
@@ -244,7 +244,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
             onChanged: widget.editable
                 ? (String? value) {
                     setState(() {
-                      widget.exercise.exercise_uuid = value!;
+                      widget.exercise.name = value!;
                     });
                   }
                 : null,
