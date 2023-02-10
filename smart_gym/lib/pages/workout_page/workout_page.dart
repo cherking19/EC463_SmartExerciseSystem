@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercises.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/snackbars.dart';
@@ -191,6 +192,13 @@ class WorkoutPageState extends State<WorkoutPage>
                 text: 'Exercises',
                 onPressed: clickExercises,
               ),
+              workoutPageButton(
+                  text: 'CLEAR SHARED PREFERENCES',
+                  onPressed: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.clear();
+                  }),
               if (widget.workout != null)
                 Expanded(
                   child: Align(
