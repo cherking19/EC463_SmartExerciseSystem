@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/main.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercise_display.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/colors.dart';
@@ -48,13 +49,18 @@ class ViewExercisesState extends State<ViewExercises> {
   bool adding = false;
   bool loading = false;
 
-  void loadExercises() async {
+  void loadExercises(BuildContext context) async {
     setState(() {
       refreshing = true;
     });
 
     Future.delayed(globalPseudoDelay, () async {
-      customExercises = await loadCustomExercises(false);
+      // Map<String, String> customExerciseMap =
+      customExercises =
+          (await loadCustomExercises(appendDefault: false, context))
+              .entries
+              .map((e) => e.value)
+              .toList();
 
       setState(() {
         refreshing = false;
@@ -68,12 +74,15 @@ class ViewExercisesState extends State<ViewExercises> {
     });
   }
 
-  void addExercise({
+  void addExercise(
+    BuildContext context, {
     required String name,
     required VoidCallback onSuccess,
     required VoidCallback onFailure,
   }) async {
-    await saveCustomExercise(name) ? onSuccess.call() : onFailure.call();
+    await saveCustomExercise(name, context)
+        ? onSuccess.call()
+        : onFailure.call();
   }
 
   void cancelAddExercise() {
@@ -82,8 +91,8 @@ class ViewExercisesState extends State<ViewExercises> {
     });
   }
 
-  void removeExercise(int index) {
-    deleteCustomExercise(customExercises[index]);
+  void removeExercise(int index, BuildContext context) {
+    deleteCustomExercise(customExercises[index], context);
 
     setState(() {
       customExercises.removeAt(index);
@@ -92,13 +101,17 @@ class ViewExercisesState extends State<ViewExercises> {
 
   @override
   void initState() {
-    loadExercises();
+    loadExercises(navigatorKey.currentContext!);
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   loadExercises(context);
+    // });
+
     void submitExercise(String name) async {
       setState(() {
         loading = true;
@@ -106,6 +119,7 @@ class ViewExercisesState extends State<ViewExercises> {
 
       Future.delayed(globalPseudoDelay, () {
         addExercise(
+          context,
           name: name,
           onSuccess: () {
             ScaffoldMessenger.of(context).showSnackBar(

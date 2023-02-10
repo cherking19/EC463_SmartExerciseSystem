@@ -228,7 +228,7 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loadCustomExercises(true),
+      future: loadCustomExercises(appendDefault: true, context),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return DropdownButton<String>(
@@ -248,10 +248,11 @@ class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
                     });
                   }
                 : null,
-            items: snapshot.data!.map<DropdownMenuItem<String>>((String value) {
+            items:
+                snapshot.data!.entries.map<DropdownMenuItem<String>>((element) {
               return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
+                value: element.value,
+                child: Text(element.value),
               );
             }).toList(),
           );
