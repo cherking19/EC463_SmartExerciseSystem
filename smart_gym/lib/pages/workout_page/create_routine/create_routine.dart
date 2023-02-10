@@ -15,25 +15,7 @@ class CreateRoutineRoute extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  final Workout routine = Workout(
-    '',
-    [
-      Exercise(
-        defaultExercises.first,
-        [
-          Set(
-            0,
-            0,
-            defaultRestDuration,
-            null,
-          )
-        ],
-        false,
-        false,
-        false,
-      ),
-    ],
-  );
+  final Workout routine = Workout.defaultWorkout();
 
   @override
   Widget build(BuildContext context) {
