@@ -27,7 +27,7 @@ class SensorOrientation {
 
   @override
   String toString() {
-    return 'Yaw: $yaw \t Pitch: $pitch \t Roll: $roll';
+    return 'Yaw: ${yaw?.toStringAsFixed(2)} \t Pitch: ${pitch?.toStringAsFixed(2)} \t Roll: ${roll?.toStringAsFixed(2)}';
   }
 }
 
@@ -59,9 +59,10 @@ class SensorService extends ChangeNotifier {
 
   void initiateListening() {
     deviceStream = Stream.periodic(const Duration(seconds: 2))
-        .asyncMap((event) => FlutterBlue.instance.connectedDevices);
+        .asyncMap((event) => FlutterBlue.instance.connectedDevices)
+        .asBroadcastStream();
 
-    deviceListener = deviceStream.listen((sensors) async {
+    deviceStream.listen((sensors) async {
       final List<BluetoothDevice> smartGymSensors =
           sensors.where((device) => isSmartGymSensor(device.name)).toList();
 
@@ -76,10 +77,10 @@ class SensorService extends ChangeNotifier {
         for (BluetoothCharacteristic characteristic
             in sensorService.characteristics) {
           await characteristic.setNotifyValue(true);
-          Stream<List<int>> characteristicStream = characteristic.value;
+          Stream<List<int>> characteristicStream =
+              characteristic.value.asBroadcastStream();
 
-          StreamSubscription characteristicListener =
-              characteristicStream.listen((data) {
+          characteristicStream.listen((data) {
             Uint8List intBytes = Uint8List.fromList(data.toList());
             List<double> floatList = intBytes.buffer.asFloat32List();
 
@@ -108,7 +109,7 @@ class SensorService extends ChangeNotifier {
             }
           });
 
-          characteristicListeners.add(characteristicListener);
+          // characteristicListeners.add(characteristicListener);
           characteristicStreams.add(characteristicStream);
         }
       }
