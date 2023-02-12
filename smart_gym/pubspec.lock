@@ -36,6 +36,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.9.0"
+  base_codecs:
+    dependency: transitive
+    description:
+      name: base_codecs
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -204,6 +211,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.4"
+  data_serializer:
+    dependency: transitive
+    description:
+      name: data_serializer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.7"
   date_utils:
     dependency: "direct main"
     description:
@@ -644,6 +658,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  statistics:
+    dependency: "direct main"
+    description:
+      name: statistics
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.23"
   stream_channel:
     dependency: transitive
     description:
