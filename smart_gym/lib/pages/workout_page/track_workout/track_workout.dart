@@ -6,6 +6,7 @@ import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart'
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:statistics/statistics.dart';
 
 class TrackWorkoutRoute extends StatelessWidget {
   final Workout workout;
@@ -228,4 +229,62 @@ class RestTimerState extends State<RestTimer> {
       },
     );
   }
+}
+
+void analyzeCurlWorkout(){
+  // Add  timer Carlton ask richard
+  //List<List<double>> = [[[],[],[]],[[],[],[]]];
+  double yav=0;
+  double pav=0;
+  double rav=0;
+  double yaw=0;
+  double pitch=0;
+  double roll=0;
+  List<double> yaws = [];
+  List<double> pitches = [];
+  List<double> rolls = [];
+  int state = 0;
+
+  // add wat ever is in debug 20-23
+ while (1==1) {
+
+  //add the reading from whatever this is where the serial port went in
+    yaws.add(yaw);
+    pitches.add(pitch);
+    rolls.add(roll);
+    //add timer
+    if("addd stuff for time differnece"==""){
+      // add timer
+        double pyav=yav;
+        double ppav=pav;
+        double prav=rav;
+        yav = yaws.statistics.mean;
+        pav = pitches.statistics.mean;
+        rav = rolls.statistics.mean;
+    }
+    switch (state) {
+    case 0:
+    
+      break;
+    
+    case 1:
+      
+      break;
+
+    case 2:
+      
+      break;
+
+    case 3:
+      
+      break;
+    default:
+  }
+   
+ }
+
+
+
+
+
 }
