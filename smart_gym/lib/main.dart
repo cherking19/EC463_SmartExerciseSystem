@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
+import 'package:smart_gym/services/sensor_service.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 import 'package:smart_gym/utils/user_auth_provider.dart';
 import 'pages/workout_page/workout_page.dart';
@@ -17,11 +18,16 @@ void main() async {
   await Firebase.initializeApp();
   final TimerService setTimerService = TimerService();
   final TimerService workoutTimerService = TimerService();
+  final SensorService sensorService = SensorService();
+
   runApp(
     TimerServiceProvider(
       setService: setTimerService,
       workoutService: workoutTimerService,
-      child: const MyApp(),
+      child: SensorServiceProvider(
+        service: sensorService,
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -41,7 +47,10 @@ class MyApp extends StatelessWidget {
             create: (context) =>
                 context.read<AuthenticationProvider>().authState,
             initialData: null,
-          )
+          ),
+          // ChangeNotifierProvider(
+          //   create: (context) => SensorService(),
+          // ),
         ],
         child: MaterialApp(
           title: 'Smart Gym',
