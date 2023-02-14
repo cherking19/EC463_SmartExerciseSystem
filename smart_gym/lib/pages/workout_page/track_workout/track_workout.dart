@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:smart_gym/Screens/ble_settings.dart';
+import 'package:smart_gym/pages/workout_page/track_workout/sensor_interface.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
@@ -23,9 +26,10 @@ class TrackWorkoutRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Workout In Progress'),
       ),
-      body: TrackWorkoutPage(
-        workout: workout,
-      ),
+      body: const DisplaySensorsPage(),
+      // TrackWorkoutPage(
+      //   workout: workout,
+      // ),
     );
   }
 }
