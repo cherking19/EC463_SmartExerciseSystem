@@ -22,10 +22,9 @@ class TrackWorkoutRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Workout In Progress'),
       ),
-      body: const DisplaySensorsPage(),
-      // TrackWorkoutPage(
-      //   workout: workout,
-      // ),
+      body: TrackWorkoutPage(
+        workout: workout,
+      ),
     );
   }
 }

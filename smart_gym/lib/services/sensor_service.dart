@@ -10,13 +10,8 @@ const String rightForearmSuffix = 'RightForearm';
 
 const List<String> device_suffixes = [
   rightShoulderSuffix,
-  'RightForearm',
+  rightForearmSuffix,
 ];
-
-enum SensorName {
-  rightShoulder,
-  rightForearm,
-}
 
 class SensorOrientation {
   double? yaw;
@@ -49,10 +44,10 @@ class SensorService extends ChangeNotifier {
     initiateListening();
 
     timer = Timer.periodic(
-      const Duration(milliseconds: 100),
+      const Duration(milliseconds: 200),
       (timer) async {
         await drainStreams();
-        initiateListening();
+        // initiateListening();
       },
     );
   }
@@ -87,7 +82,6 @@ class SensorService extends ChangeNotifier {
             if (floatList.isNotEmpty) {
               String sensorSuffix = device.name.split('_')[1];
 
-              // Provider.of<SensorService>(context, listen: false).orientations;
               SensorOrientation orientation = orientations[sensorSuffix]!;
 
               String uuid =
@@ -101,15 +95,10 @@ class SensorService extends ChangeNotifier {
                 orientation.roll = floatList[0];
               }
 
-              // Provider.of<SensorService>(context, listen: false)
-              //     .update(sensorSuffix, orientation);
-
               update(sensorSuffix, orientation);
-              // print(SensorService.of(context).toString());
             }
           });
 
-          // characteristicListeners.add(characteristicListener);
           characteristicStreams.add(characteristicStream);
         }
       }
@@ -117,15 +106,10 @@ class SensorService extends ChangeNotifier {
   }
 
   Future<bool> drainStreams() async {
-    // for (StreamSubscription characteristicListener in characteristicListeners) {
-    //   await characteristicListener.cancel();
-    // }
-
     for (Stream<List<int>> characteristicStream in characteristicStreams) {
       await characteristicStream.drain();
     }
 
-    // await deviceListener.cancel();
     await deviceStream.drain();
 
     return true;
@@ -137,7 +121,7 @@ class SensorService extends ChangeNotifier {
 
   void update(String sensorSuffix, SensorOrientation newOrientation) {
     _orientations.update(sensorSuffix, (value) => newOrientation);
-    // print(toString());
+    print(_orientations);
     notifyListeners();
   }
 

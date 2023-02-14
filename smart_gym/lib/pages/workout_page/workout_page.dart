@@ -202,7 +202,7 @@ class WorkoutPageState extends State<WorkoutPage>
                     ),
                   ),
                 ),
-              ProviderWidget(),
+              // ProviderWidget(),
             ],
           ),
         ),
