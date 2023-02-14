@@ -1,28 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/src/widgets/container.dart';
-// import 'package:flutter/src/widgets/framework.dart';
-
-import 'package:flutter/material.dart';
-import 'package:smart_gym/Screens/forgotpasswordscreen.dart';
-import 'package:smart_gym/Screens/signup.dart';
+import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/utils/color_utils.dart';
-
-import '../main.dart';
+import 'package:flutter/material.dart';
 import '../reusable_widgets/reusable_widgets.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailTextController = TextEditingController();
-  final TextEditingController _passwordTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          "Forgot Password",
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -36,7 +39,6 @@ class _SignInScreenState extends State<SignInScreen> {
             padding: EdgeInsets.fromLTRB(
                 20, MediaQuery.of(context).size.height * .2, 20, 0),
             child: Column(children: <Widget>[
-              logoWidget("assets/images/logo1.png"),
               const SizedBox(
                 height: 30,
               ),
@@ -45,23 +47,15 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(
                 height: 20,
               ),
-              reusableTextField("Enter Password", Icons.lock_outlined, true,
-                  _passwordTextController),
-                  forgotPassword(),
-              const SizedBox(
-                height: 20,
-              ),
-              signInSignUpButton(context, true, () {
+              forgotPasswordButton(context, () {
                 FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: _emailTextController.text,
-                        password: _passwordTextController.text)
+                    .sendPasswordResetEmail(email: _emailTextController.text)
                     .then((value) {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              const MyHomePage(title: 'Smart Gym')));
+                              const SignInScreen()));
                 }).onError((error, stackTrace) {
                   showDialog(
                     context: context,
@@ -83,48 +77,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   );
                 });
               }),
-              signUpOption()
             ]),
           ),
         ),
       ),
-    );
-  }
-
-  Row signUpOption() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text("Dont Have An Account? ",
-            style: TextStyle(color: Colors.white70)),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const SignUpScreen()));
-          },
-          child: const Text(
-            "Sign Up",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        )
-      ],
-    );
-  }
-    Row forgotPassword() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()));
-          },
-          child: const Text(
-            "Forgot Password?",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        )
-      ],
     );
   }
 }
