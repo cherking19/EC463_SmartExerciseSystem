@@ -8,6 +8,7 @@ import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:statistics/statistics.dart';
 
+
 class TrackWorkoutRoute extends StatelessWidget {
   final Workout workout;
 
@@ -231,9 +232,25 @@ class RestTimerState extends State<RestTimer> {
   }
 }
 
-void analyzeCurlWorkout(){
+class SensorOrientation {
+  double? yaw;
+  double? pitch;
+  double? roll;
+
+  SensorOrientation();
+
+  @override
+  String toString() {
+    return 'Yaw: $yaw \t Pitch: $pitch \t Roll: $roll';
+  }
+}
+
+void analyzeCurlWorkout(List<SensorOrientation> sensors){
   // Add  timer Carlton ask richard
   //List<List<double>> = [[[],[],[]],[[],[],[]]];
+
+  var start = DateTime.now().toUTC();
+
   double yav=0;
   double pav=0;
   double rav=0;
@@ -245,8 +262,17 @@ void analyzeCurlWorkout(){
   List<double> rolls = [];
   int state = 0;
 
-  // add wat ever is in debug 20-23
+  List<List<List<double>>> data;
+  List<List<double>> prev_average;
+  List<List<double>> data_average;
+
+  
  while (1==1) {
+  for(SensorOrientation sensor in sensors){
+    if(1){
+      data[]
+    }
+  }
 
   //add the reading from whatever this is where the serial port went in
     yaws.add(yaw);
