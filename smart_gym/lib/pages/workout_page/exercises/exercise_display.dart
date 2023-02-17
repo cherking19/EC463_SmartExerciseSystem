@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/main.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercises.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
-import 'package:smart_gym/utils/function_utils.dart';
+import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
 
 const EdgeInsets exerciseDisplayPadding =
     EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0);
@@ -12,16 +14,22 @@ const TextStyle exerciseTextStyle = TextStyle(
 
 class ExerciseDisplay extends StatefulWidget {
   final String exercise;
+  final String uuid;
   final bool custom;
   final int? index;
   final Function? remove;
+  final VoidCallback onRenameSuccess;
+  final VoidCallback onRenameFailure;
 
   const ExerciseDisplay({
     Key? key,
     required this.exercise,
+    required this.uuid,
     required this.custom,
     this.index,
     this.remove,
+    required this.onRenameSuccess,
+    required this.onRenameFailure,
   }) : super(key: key);
 
   @override
@@ -29,16 +37,67 @@ class ExerciseDisplay extends StatefulWidget {
 }
 
 class ExerciseDisplayState extends State<ExerciseDisplay> {
+  bool editable = false;
+  bool loading = false;
+
+  void renameExercise({
+    required String uuid,
+    required String newName,
+  }) async {
+    Future.delayed(globalPseudoDelay, () async {
+      await renameCustomExercise(navigatorKey.currentContext!,
+              uuid: uuid, newName: newName)
+          ? widget.onRenameSuccess.call()
+          : widget.onRenameFailure.call();
+
+      setState(() {
+        loading = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget text = ListTile(
-      title: Text(
-        widget.exercise,
-        style: exerciseTextStyle,
-      ),
+      title: widget.custom && editable
+          ? ExerciseInput(
+              submitPressed: (String? uuid, String name) async {
+                FocusScope.of(context).requestFocus(FocusNode());
+                renameExercise(
+                  uuid: uuid!,
+                  newName: name,
+                );
+                setState(() {
+                  loading = true;
+                });
+              },
+              cancelPressed: () {
+                setState(() {
+                  editable = false;
+                });
+              },
+              uuid: widget.uuid,
+              loading: false)
+          : Text(
+              widget.exercise,
+              style: exerciseTextStyle,
+            ),
       dense: true,
       minLeadingWidth: 0,
-      onTap: () {},
+      // onTap: () {},
+      trailing: loading
+          ? loadingSpinner(
+              padding: EdgeInsets.zero, size: defaultLoadingSpinnerSize)
+          : widget.custom && !editable
+              ? IconButton(
+                  icon: const Icon(Icons.create_outlined),
+                  onPressed: () {
+                    setState(() {
+                      editable = true;
+                    });
+                  },
+                )
+              : null,
     );
 
     return widget.custom
@@ -59,9 +118,9 @@ class ExerciseDisplayState extends State<ExerciseDisplay> {
             direction: DismissDirection.endToStart,
             key: ValueKey<String>(widget.exercise),
             onDismissed: (DismissDirection direction) {
-              setState(() {
-                widget.remove!(widget.index, context);
-              });
+              // setState(() {
+              widget.remove!(widget.uuid, context);
+              // });
             },
             child: text,
           )
@@ -70,15 +129,17 @@ class ExerciseDisplayState extends State<ExerciseDisplay> {
 }
 
 class ExerciseInput extends StatefulWidget {
-  final VoidCallbackString submitPressed;
+  final Function(String? uuid, String name) submitPressed;
   final VoidCallback cancelPressed;
   final bool loading;
+  final String? uuid;
 
   const ExerciseInput({
     Key? key,
     required this.submitPressed,
     required this.cancelPressed,
     required this.loading,
+    this.uuid,
   }) : super(key: key);
 
   @override
@@ -93,6 +154,7 @@ class ExerciseInputState extends State<ExerciseInput> {
   @override
   void dispose() {
     textEditingController.dispose();
+    focusNode.dispose();
 
     super.dispose();
   }
@@ -103,6 +165,12 @@ class ExerciseInputState extends State<ExerciseInput> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(focusNode);
+    });
+
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        widget.cancelPressed();
+      }
     });
   }
 
@@ -160,8 +228,14 @@ class ExerciseInputState extends State<ExerciseInput> {
                   icon: const Icon(Icons.check),
                   padding: buttonPadding,
                   onPressed: () {
+                    textEditingController.text =
+                        textEditingController.text.trim();
+
                     if (formKey.currentState!.validate()) {
-                      widget.submitPressed(textEditingController.text);
+                      widget.submitPressed(
+                        widget.uuid,
+                        textEditingController.text,
+                      );
                     }
                   },
                   size: buttonSize,

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_gym/pages/workout_page/create_routine/create_routine_exercise.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/set_widgets/set_widget.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
+import 'package:smart_gym/services/exercise_service.dart';
 import '../reusable_widgets.dart';
 
 class ExerciseWidget extends StatefulWidget {
@@ -111,7 +113,9 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(4.0, 16.0, 0.0, 4.0),
                     child: Text(
-                      widget.exercise.name,
+                      Provider.of<ExerciseService>(context, listen: false)
+                          .customExercises[widget.exercise.exerciseUuid]!
+                          .name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

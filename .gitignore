@@ -1,1 +1,5 @@
 **/.vscode
+smart_gym/.dart_tool/
+smart_gym/build/
+smart_gym/pubspec.lock  # Except for application packages
+smart_gym/doc/api/

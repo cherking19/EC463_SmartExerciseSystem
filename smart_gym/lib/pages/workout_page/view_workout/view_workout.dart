@@ -65,8 +65,6 @@ class _ViewWorkoutRouteState extends State<ViewWorkoutRoute> {
   void saveEdit() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    print('async');
-
     submitController.saveWorkout!();
   }
 

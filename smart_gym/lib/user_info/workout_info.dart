@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_gym/main.dart';
 import 'package:smart_gym/services/exercise_service.dart';
 import 'package:uuid/uuid.dart';
 import '../pages/workout_page/workout.dart';
@@ -11,87 +12,146 @@ const String routinesKey = 'routines';
 const String finishedWorkoutsKey = 'finishedWorkouts';
 const String exercisesKey = 'exercises';
 
-Future<Map<String, String>> loadCustomExercises(
-  BuildContext context, {
-  required bool appendDefault,
-}) async {
+Future<Map<String, CustomExerciseChoice>> loadCustomExercises(
+  BuildContext context,
+  // {
+  // required bool appendDefault,
+// }
+) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String exercisesJson = prefs.getString(exercisesKey) ?? "";
-  // CustomExercises? customExercises;
-  // List<String> customExercises = [];
-  Map<String, String> customExercises = HashMap();
+  Map<String, CustomExerciseChoice> customExercises = HashMap();
 
   if (exercisesJson.isNotEmpty) {
-    // customExercises = CustomExercises.fromJson(jsonDecode(exercisesJson));
-    // exercises = (jsonDecode(exercisesJson) as List)
-    //     .map((exercise) => exercise as String)
-    //     .toList();
-    // customExercises = (jsonDecode(exercisesJson) as Map)
-    //     .entries
-    //     .map((e) => e.value as String)
-    //     .toList();
-    customExercises = (jsonDecode(exercisesJson) as Map)
-        .map((key, value) => MapEntry(key, value));
+    customExercises = (jsonDecode(exercisesJson) as Map).map(
+      (key, value) => MapEntry<String, CustomExerciseChoice>(
+        key,
+        CustomExerciseChoice.fromJson(value),
+      ),
+    );
   }
 
-  // List<String> exercises =
-  //     customExercises != null ? customExercises.exercises : [];
+  Provider.of<ExerciseService>(
+    navigatorKey.currentContext!,
+    listen: false,
+  ).customExercises = customExercises;
 
-  if (appendDefault) {
-    customExercises.addEntries(
-        Provider.of<ExerciseService>(context, listen: false)
-            .defaultExercises
-            .entries);
-    // ExerciseService.defaultExerciseNames + customExercises;
-  }
+  // if (appendDefault) {
+  //   customExercises.addEntries(Provider.of<ExerciseService>(
+  //     navigatorKey.currentContext!,
+  //     listen: false,
+  //   ).defaultExercises.entries);
+  // }
 
   return customExercises;
 }
 
 Future<bool> saveCustomExercise(
-    String newExercise, BuildContext context) async {
-  Map<String, String> exercises = await loadCustomExercises(
-    appendDefault: true,
+  BuildContext context, {
+  required String newExercise,
+}) async {
+  Map<String, CustomExerciseChoice> exercises = await loadCustomExercises(
+    // appendDefault: false,
     context,
   );
 
-  String key = const Uuid().v5(ExerciseService.exerciseNamespace, newExercise);
+  String defaultKey = const Uuid()
+      .v5(ExerciseService.exerciseNamespace, newExercise.toLowerCase());
 
-  if (exercises.containsKey(key)) {
+  if (ExerciseService.defaultExercises.containsKey(defaultKey) ||
+      exercises.entries
+          .map((exerciseEntry) => exerciseEntry.value.name)
+          .toList()
+          .contains(newExercise)) {
     return false;
   } else {
-    exercises.addAll({key: newExercise});
+    exercises.addAll({
+      uuid.v4(): CustomExerciseChoice(
+        name: newExercise,
+        exercisesUuid: [],
+      ),
+    });
   }
 
-  // if (ExerciseService.defaultExerciseNames.indexWhere((defaultExercise) =>
-  //             defaultExercise.toLowerCase() == newExercise.toLowerCase()) !=
-  //         -1 ||
-  //     exercises.indexWhere((exercise) =>
-  //             exercise.toLowerCase() == newExercise.toLowerCase()) !=
-  //         -1) {
-  //   return false;
-  // } else {
-  //   exercises.add(newExercise);
-  // }
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String exercisesJson = jsonEncode(exercises);
 
-  return await prefs.setString(exercisesKey, exercisesJson);
+  if (await prefs.setString(exercisesKey, exercisesJson)) {
+    Provider.of<ExerciseService>(
+      navigatorKey.currentContext!,
+      listen: false,
+    ).customExercises = exercises;
+
+    return true;
+  }
+
+  return false;
 }
 
-Future<bool> deleteCustomExercise(String exercise, BuildContext context) async {
-  Map<String, String> exercises = await loadCustomExercises(
-    appendDefault: false,
+Future<bool> deleteCustomExercise(
+  BuildContext context, {
+  required String uuid,
+}) async {
+  Map<String, CustomExerciseChoice> exercises = await loadCustomExercises(
+    // appendDefault: false,
     context,
   );
 
-  if (exercises.remove(
-          const Uuid().v5(ExerciseService.exerciseNamespace, exercise)) !=
-      null) {
+  if (exercises.remove(uuid) != null) {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String exercisesJson = jsonEncode(exercises);
 
-    return await prefs.setString(exercisesKey, exercisesJson);
+    if (await prefs.setString(exercisesKey, exercisesJson)) {
+      Provider.of<ExerciseService>(navigatorKey.currentContext!, listen: false)
+          .customExercises = exercises;
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+
+Future<bool> renameCustomExercise(
+  BuildContext context, {
+  required String uuid,
+  required String newName,
+}) async {
+  if (ExerciseService.defaultExercises.containsKey(
+      const Uuid().v5(ExerciseService.exerciseNamespace, newName))) {
+    return false;
+  }
+
+  Map<String, CustomExerciseChoice> customExercises = await loadCustomExercises(
+    context,
+    // appendDefault: false,
+  );
+  Map<String, CustomExerciseChoice> otherCustomExercises =
+      HashMap.from(customExercises);
+  CustomExerciseChoice original = otherCustomExercises.remove(uuid)!;
+
+  if (otherCustomExercises.entries
+      .map((otherCustomExerciseEntry) => otherCustomExerciseEntry.value.name)
+      .toList()
+      .contains(newName)) {
+    return false;
+  }
+
+  CustomExerciseChoice renamed = CustomExerciseChoice(
+    name: newName,
+    exercisesUuid: original.exercisesUuid,
+  );
+
+  customExercises.update(uuid, (value) => renamed);
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String exercisesJson = jsonEncode(customExercises);
+
+  if (await prefs.setString(exercisesKey, exercisesJson)) {
+    Provider.of<ExerciseService>(navigatorKey.currentContext!, listen: false)
+        .customExercises = customExercises;
+    return true;
   } else {
     return false;
   }
@@ -122,6 +182,10 @@ Future<Map<String, Workout>> loadRoutines() async {
 }
 
 Future<bool> saveRoutine(Workout routine) async {
+  for (Exercise exercise in routine.exercises) {
+    if (ExerciseService.isCustomExercise(exercise.exerciseUuid)) {}
+  }
+
   Map<String, Workout> routines = await loadRoutines();
   routine.generateRandomUuid();
   routines.addAll({routine.uuid!: routine});

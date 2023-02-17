@@ -1,4 +1,6 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_gym/main.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercise_display.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
@@ -44,28 +46,34 @@ class ViewExercises extends StatefulWidget {
 }
 
 class ViewExercisesState extends State<ViewExercises> {
-  List<String> customExercises = [];
+  Map<String, CustomExerciseChoice> customExercises = HashMap();
   bool refreshing = false;
   bool adding = false;
   bool loading = false;
 
-  void loadExercises(BuildContext context) async {
+  void loadExercises() async {
     setState(() {
       refreshing = true;
     });
 
-    Future.delayed(globalPseudoDelay, () async {
-      // Map<String, String> customExerciseMap =
-      customExercises =
-          (await loadCustomExercises(appendDefault: false, context))
-              .entries
-              .map((e) => e.value)
-              .toList();
+    customExercises = await loadCustomExercises(
+      navigatorKey.currentContext!,
+    );
+    // appendDefault: false,
 
-      setState(() {
-        refreshing = false;
-      });
-    });
+    Future.delayed(
+      globalPseudoDelay,
+      () {
+        setState(() {
+          refreshing = false;
+        });
+      },
+    );
+  }
+
+  void getExercises(BuildContext context) {
+    customExercises =
+        Provider.of<ExerciseService>(context, listen: false).customExercises;
   }
 
   void startAddExercise() {
@@ -80,7 +88,10 @@ class ViewExercisesState extends State<ViewExercises> {
     required VoidCallback onSuccess,
     required VoidCallback onFailure,
   }) async {
-    await saveCustomExercise(name, context)
+    await saveCustomExercise(
+      context,
+      newExercise: name,
+    )
         ? onSuccess.call()
         : onFailure.call();
   }
@@ -91,28 +102,70 @@ class ViewExercisesState extends State<ViewExercises> {
     });
   }
 
-  void removeExercise(int index, BuildContext context) {
-    deleteCustomExercise(customExercises[index], context);
+  void removeExercise(String uuid, BuildContext context) {
+    Future result = deleteCustomExercise(
+      context,
+      uuid: uuid,
+    );
+
+    result.then((value) {
+      if (value as bool) {
+        ScaffoldMessenger.of(navigatorKey.currentContext!)
+            .showSnackBar(createSnackBar(
+          title: 'Delete Exercise Success',
+          color: successColor,
+        ));
+      } else {
+        ScaffoldMessenger.of(navigatorKey.currentContext!)
+            .showSnackBar(createSnackBar(
+          title: 'Delete Exercise Failed',
+          color: failureColor,
+        ));
+
+        getExercises(context);
+      }
+    });
 
     setState(() {
-      customExercises.removeAt(index);
+      customExercises.remove(uuid);
     });
   }
 
   @override
   void initState() {
-    loadExercises(navigatorKey.currentContext!);
-
     super.initState();
+
+    loadExercises();
   }
 
   @override
   Widget build(BuildContext context) {
-    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //   loadExercises(context);
-    // });
+    void onRenameSuccess() {
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+        createSnackBar(
+          title: 'Rename Exercise Success',
+          color: successColor,
+        ),
+      );
 
-    void submitExercise(String name) async {
+      if (context.mounted) {
+        setState(() {
+          getExercises(context);
+        });
+      }
+    }
+
+    void onRenameFailure() {
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+        createSnackBar(
+          title: 'Exercise Exists Already',
+          color: failureColor,
+        ),
+      );
+    }
+
+    // submit a new exercise to be added or updated
+    void submitExercise(String? uuid, String name) async {
       setState(() {
         loading = true;
       });
@@ -122,30 +175,34 @@ class ViewExercisesState extends State<ViewExercises> {
           context,
           name: name,
           onSuccess: () {
-            ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
               createSnackBar(
                 title: 'Create Exercise Success',
                 color: successColor,
               ),
             );
 
-            setState(() {
-              loading = false;
-              adding = false;
-              customExercises.add(name);
-            });
+            if (context.mounted) {
+              getExercises(context);
+              setState(() {
+                loading = false;
+                adding = false;
+              });
+            }
           },
           onFailure: () {
-            ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
               createSnackBar(
                 title: 'Exercise Exists Already',
                 color: failureColor,
               ),
             );
-            setState(() {
-              loading = false;
-              adding = false;
-            });
+            if (context.mounted) {
+              setState(() {
+                loading = false;
+                adding = false;
+              });
+            }
           },
         );
       });
@@ -153,9 +210,12 @@ class ViewExercisesState extends State<ViewExercises> {
 
     Widget exerciseListTile({
       required String tileTitle,
-      required List<String> exercises,
+      required Map<String, String> exercises,
       required bool custom,
     }) {
+      List<MapEntry<String, String>> exerciseEntries =
+          exercises.entries.toList();
+
       return ExpansionTile(
         initiallyExpanded: true,
         title: Text(
@@ -165,6 +225,9 @@ class ViewExercisesState extends State<ViewExercises> {
             fontWeight: exerciseListHeaderFontWeight,
           ),
         ),
+        onExpansionChanged: (value) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
         children: [
           Padding(
             padding: EdgeInsets.zero,
@@ -173,13 +236,16 @@ class ViewExercisesState extends State<ViewExercises> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: List.generate(
-                  exercises.length,
+                  exerciseEntries.length,
                   (int index) {
                     return ExerciseDisplay(
-                      exercise: exercises[index],
+                      exercise: exerciseEntries[index].value,
+                      uuid: exerciseEntries[index].key,
                       custom: custom,
                       index: index,
                       remove: removeExercise,
+                      onRenameSuccess: onRenameSuccess,
+                      onRenameFailure: onRenameFailure,
                     );
                   },
                 ),
@@ -200,7 +266,7 @@ class ViewExercisesState extends State<ViewExercises> {
                 children: [
                   exerciseListTile(
                     tileTitle: 'Default Exercises',
-                    exercises: ExerciseService.defaultExerciseNames,
+                    exercises: ExerciseService.defaultExercises,
                     custom: false,
                   ),
                   if (refreshing)
@@ -214,7 +280,12 @@ class ViewExercisesState extends State<ViewExercises> {
                   if (!refreshing)
                     exerciseListTile(
                       tileTitle: 'Custom Exercises',
-                      exercises: customExercises,
+                      exercises: customExercises.map(
+                        (key, value) => MapEntry<String, String>(
+                          key,
+                          value.name,
+                        ),
+                      ),
                       custom: true,
                     ),
                 ],

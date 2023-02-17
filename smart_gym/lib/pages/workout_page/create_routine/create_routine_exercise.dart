@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_gym/pages/workout_page/create_routine/create_routine.dart';
 import 'package:smart_gym/pages/workout_page/create_routine/create_routine_set.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
-import 'package:smart_gym/user_info/workout_info.dart';
+import 'package:smart_gym/services/exercise_service.dart';
 
 class CreateRoutineExercise extends StatefulWidget {
   final Workout workout;
@@ -227,41 +228,49 @@ class ExerciseNameDropdown extends StatefulWidget {
 class _ExerciseNameDropdownState extends State<ExerciseNameDropdown> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: loadCustomExercises(appendDefault: true, context),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return DropdownButton<String>(
-            value: widget.exercise.name,
-            disabledHint: Text(widget.exercise.name),
-            icon: const Icon(Icons.arrow_downward),
-            isExpanded: true,
-            elevation: 16,
-            underline: Container(
-              height: 2,
-              color: Colors.blue,
-            ),
-            onChanged: widget.editable
-                ? (String? value) {
-                    setState(() {
-                      widget.exercise.name = value!;
-                    });
-                  }
-                : null,
-            items:
-                snapshot.data!.entries.map<DropdownMenuItem<String>>((element) {
-              return DropdownMenuItem<String>(
-                value: element.value,
-                child: Text(element.value),
-              );
-            }).toList(),
-          );
-        } else if (snapshot.hasError) {
-          return const Text('ERROR LOADING EXERCISES');
-        } else {
-          return const Text('Loading exercises.');
-        }
-      },
+    // return
+    // FutureBuilder(
+    //   future: loadCustomExercises(context),
+    //   builder: (context, snapshot) {
+    //     if (snapshot.hasData) {
+    List<ExerciseChoice> exerciseChoices = Provider.of<ExerciseService>(context)
+        .exercises
+        .entries
+        .map((entry) => ExerciseChoice(name: entry.value, uuid: entry.key))
+        .toList();
+
+    return DropdownButton<ExerciseChoice>(
+      value: exerciseChoices.firstWhere((exerciseChoice) =>
+          exerciseChoice.uuid == widget.exercise.exerciseUuid),
+      disabledHint: Text(Provider.of<ExerciseService>(context)
+          .exercises[widget.exercise.exerciseUuid]!),
+      icon: const Icon(Icons.arrow_downward),
+      isExpanded: true,
+      elevation: 16,
+      underline: Container(
+        height: 2,
+        color: Colors.blue,
+      ),
+      onChanged: widget.editable
+          ? (ExerciseChoice? exerciseChoice) {
+              setState(() {
+                widget.exercise.exerciseUuid = exerciseChoice!.uuid;
+              });
+            }
+          : null,
+      items: exerciseChoices.map((choice) {
+        return DropdownMenuItem<ExerciseChoice>(
+          value: choice,
+          child: Text(choice.name),
+        );
+      }).toList(),
     );
+    //   } else if (snapshot.hasError) {
+    //     return const Text('ERROR LOADING EXERCISES');
+    //   } else {
+    //     return const Text('Loading exercises.');
+    //   }
+    // },
+    // );
   }
 }

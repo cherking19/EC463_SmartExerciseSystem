@@ -1,5 +1,7 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/user_info/workout_info.dart';
 import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
@@ -15,22 +17,41 @@ class ExerciseService extends ChangeNotifier {
     'Barbell Row'
   ];
 
-  Map<String, String> defaultExercises = HashMap();
+  static Map<String, String> defaultExercises = HashMap();
+  Map<String, CustomExerciseChoice> customExercises = HashMap();
 
-  ExerciseService() {
+  ExerciseService(BuildContext context) {
     for (int i = 0; i < defaultExerciseNames.length; i++) {
-      defaultExercises.addAll({
-        uuid.v5(exerciseNamespace, defaultExerciseNames[i]):
-            defaultExerciseNames[i]
-      });
+      String key =
+          uuid.v5(exerciseNamespace, defaultExerciseNames[i].toLowerCase());
+      defaultExercises.addAll(
+        {
+          key: defaultExerciseNames[i],
+        },
+      );
     }
+
+    loadCustomExercises(
+      context,
+      // appendDefault: false,
+    );
   }
 
-  // static ExerciseService of(BuildContext context) {
-  //   var provider =
-  //       context.dependOnInheritedWidgetOfExactType<ExerciseServiceProvider>();
-  //   return provider!.exerciseService;
-  // }
+  Map<String, String> get exercises {
+    Map<String, String> allExercises = defaultExercises;
+    allExercises.addEntries(customExercises.entries.map(
+      (customExerciseEntry) => MapEntry(
+        customExerciseEntry.key,
+        customExerciseEntry.value.name,
+      ),
+    ));
+
+    return allExercises;
+  }
+
+  static bool isCustomExercise(String uuid) {
+    return !defaultExercises.containsKey(uuid);
+  }
 }
 
 class ExerciseServiceProvider extends InheritedWidget {

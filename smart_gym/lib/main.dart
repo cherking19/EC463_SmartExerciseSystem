@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           //   create: (context) => SensorService(),
           // ),
           ChangeNotifierProvider(
-            create: (context) => ExerciseService(),
+            create: (context) => ExerciseService(context),
           ),
         ],
         child: MaterialApp(

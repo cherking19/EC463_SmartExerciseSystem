@@ -6,6 +6,22 @@ part of 'workout.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+CustomExerciseChoice _$CustomExerciseChoiceFromJson(
+        Map<String, dynamic> json) =>
+    CustomExerciseChoice(
+      name: json['name'] as String,
+      exercisesUuid: (json['exercisesUuid'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+    );
+
+Map<String, dynamic> _$CustomExerciseChoiceToJson(
+        CustomExerciseChoice instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'exercisesUuid': instance.exercisesUuid,
+    };
+
 Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
       name: json['name'] as String,
       exercises: (json['exercises'] as List<dynamic>)
@@ -29,7 +45,7 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
     };
 
 Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
-      name: json['name'] as String,
+      exerciseUuid: json['exerciseUuid'] as String,
       sets: (json['sets'] as List<dynamic>)
           .map((e) => Set.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -39,7 +55,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
-      'name': instance.name,
+      'exerciseUuid': instance.exerciseUuid,
       'sets': instance.sets.map((e) => e.toJson()).toList(),
       'sameWeight': instance.sameWeight,
       'sameReps': instance.sameReps,

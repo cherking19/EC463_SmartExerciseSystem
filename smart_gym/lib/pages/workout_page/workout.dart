@@ -6,30 +6,80 @@ import 'package:uuid/uuid.dart';
 part 'workout.g.dart';
 
 // @JsonSerializable(explicitToJson: true)
-// class ExerciseChoice {
-//   late String _name;
-//   // late String _uuid;
+class ExerciseChoice {
+  late String _name;
+  late String _uuid;
 
-//   ExerciseChoice({
-//     required String name,
-//     // required String uuid,
-//   }) {
-//     _name = name;
-//     // _uuid = uuid;
-//   }
-// }
+  ExerciseChoice({
+    required String name,
+    required String uuid,
+  }) {
+    _name = name;
+    _uuid = uuid;
+  }
 
-// @JsonSerializable(explicitToJson: true)
-// class CustomExerciseChoice extends ExerciseChoice {
-//   late String _uuid;
+  // factory ExerciseChoice.fromJson(Map<String, dynamic> json) =>
+  //     _$ExerciseChoiceFromJson(json);
 
-//   CustomExerciseChoice({
-//     required String name,
-//     required String uuid,
-//   }) : super(name: name) {
-//     _uuid = uuid;
-//   }
-// }
+  // Map<String, dynamic> toJson() => _$ExerciseChoiceToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      other is ExerciseChoice && other.name == name && other.uuid == uuid;
+
+  String get name {
+    return _name;
+  }
+
+  set name(String value) {
+    _name = value;
+  }
+
+  String get uuid {
+    return _uuid;
+  }
+
+  set uuid(String value) {
+    _uuid = uuid;
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class CustomExerciseChoice {
+  String _name = '';
+
+  // a list of the uuid's of exercises that use this custom exercise
+  List<String> _exercisesUuid = [];
+
+  CustomExerciseChoice({
+    required String name,
+    required List<String> exercisesUuid,
+  }) {
+    _name = name;
+    _exercisesUuid = exercisesUuid;
+  }
+
+  factory CustomExerciseChoice.fromJson(Map<String, dynamic> json) =>
+      _$CustomExerciseChoiceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CustomExerciseChoiceToJson(this);
+
+  String get name {
+    return _name;
+  }
+
+  set name(String value) {
+    _name = value;
+  }
+
+  List<String> get exercisesUuid {
+    return _exercisesUuid;
+  }
+
+  set exercisesUuid(List<String> value) {
+    _exercisesUuid = exercisesUuid;
+  }
+}
 
 const defaultRestDuration = Duration(seconds: 0);
 
@@ -73,20 +123,6 @@ class Workout {
     String json = jsonEncode(toJson());
     return Workout.fromJson(jsonDecode(json));
   }
-
-  // bool validateRoutine() {
-  //   if (_name.isEmpty) {
-  //     return false;
-  //   }
-
-  //   for (int i = 0; i < _exercises.length; i++) {
-  //     if (!_exercises[i].validateExercise()) {
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // }
 
   String get name {
     return _name;
@@ -161,34 +197,27 @@ class Workout {
 
     return true;
   }
-
-  // TrackedWorkout getTrackedWorkout() {
-  //   List<TrackedExercise> trackedExercises = [];
-
-  //   for (Exercise exercise in exercises) {
-  //     trackedExercises.add(exercise.getTrackedExercise());
-  //   }
-
-  //   return TrackedWorkout(name, trackedExercises);
-  // }
 }
 
 @JsonSerializable(explicitToJson: true)
 class Exercise {
-  String _name = '';
+  String _exerciseUuid = '';
+  // late ExerciseChoice _exerciseChoice;
   List<Set> _sets = [];
   bool _sameWeight = false;
   bool _sameReps = false;
   bool _sameRest = false;
 
   Exercise({
-    required String name,
+    required String exerciseUuid,
+    // required ExerciseChoice exerciseChoice,
     required List<Set> sets,
     required bool sameWeight,
     required bool sameReps,
     required bool sameRest,
   }) {
-    _name = name;
+    _exerciseUuid = exerciseUuid;
+    // _exerciseChoice = exerciseChoice;
     _sets = sets;
     _sameWeight = sameWeight;
     _sameReps = sameReps;
@@ -197,7 +226,7 @@ class Exercise {
 
   @override
   String toString() {
-    return '$_name: $_sets ';
+    return '$_exerciseUuid: $_sets ';
   }
 
   factory Exercise.fromJson(Map<String, dynamic> json) =>
@@ -207,7 +236,8 @@ class Exercise {
 
   static Exercise defaultExercise() {
     return Exercise(
-      name: ExerciseService.defaultExerciseNames.first,
+      exerciseUuid: const Uuid().v5(ExerciseService.exerciseNamespace,
+          ExerciseService.defaultExerciseNames.first.toLowerCase()),
       sets: [
         Set(
           0,
@@ -222,26 +252,15 @@ class Exercise {
     );
   }
 
-  // bool validateExercise() {
-  //   if (_exercise_uuid.isEmpty) {
-  //     return false;
-  //   }
+  // returns whether the linked exercise choice is still in the data model
+  // bool isValidExercise() {}
 
-  //   for (int i = 0; i < _sets.length; i++) {
-  //     if (!_sets[i].validateSet()) {
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // }
-
-  String get name {
-    return _name;
+  String get exerciseUuid {
+    return _exerciseUuid;
   }
 
-  set name(String name) {
-    _name = name;
+  set exerciseUuid(String value) {
+    _exerciseUuid = value;
   }
 
   List<Set> get sets {
@@ -277,17 +296,14 @@ class Exercise {
   }
 
   bool get sameWeight {
-    // print('weight $_sameWeight');
     return _sameWeight;
   }
 
   bool get sameReps {
-    // print('reps $_sameReps');
     return _sameReps;
   }
 
   bool get sameRest {
-    // print('rest $_sameRest');
     return _sameRest;
   }
 
@@ -323,7 +339,6 @@ class Exercise {
 
   void setWeight(int index, int weight) {
     if (sameWeight) {
-      // print('same weight');
       for (Set set in sets) {
         set.weight = weight;
       }
@@ -365,16 +380,6 @@ class Exercise {
 
     return true;
   }
-
-  // TrackedExercise getTrackedExercise() {
-  //   List<TrackedSet> trackedSets = [];
-
-  //   for (Set set in sets) {
-  //     trackedSets.add(set.getTrackedSet());
-  //   }
-
-  //   return TrackedExercise(name, trackedSets);
-  // }
 }
 
 @JsonSerializable()
@@ -447,196 +452,4 @@ class Set {
   bool validateSet() {
     return reps > 0 && rest.inSeconds > 0 && weight > 0;
   }
-
-  // TrackedSet getTrackedSet() {
-  //   return TrackedSet(
-  //     null,
-  //     reps,
-  //     weight,
-  //   );
-  // }
 }
-
-// @JsonSerializable()
-// class TrackedWorkout {
-//   String _name = '';
-//   // in seconds
-//   int? _totalTime;
-//   DateTime? _dateStarted;
-//   List<TrackedExercise> _exercises = [];
-
-//   TrackedWorkout(
-//     String name,
-//     List<TrackedExercise> exercises,
-//   ) {
-//     _name = name;
-//     _exercises = exercises;
-//   }
-
-//   @override
-//   String toString() {
-//     return '$name: time: $totalTime, date: $dateStarted $exercises ';
-//   }
-
-//   factory TrackedWorkout.fromJson(Map<String, dynamic> json) =>
-//       _$TrackedWorkoutFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$TrackedWorkoutToJson(this);
-
-//   String get name {
-//     return _name;
-//   }
-
-//   set name(String name) {
-//     _name = name;
-//   }
-
-//   int? get totalTime {
-//     return _totalTime;
-//   }
-
-//   set totalTime(int? time) {
-//     _totalTime = time;
-//   }
-
-//   DateTime? get dateStarted {
-//     return _dateStarted;
-//   }
-
-//   set dateStarted(DateTime? date) {
-//     _dateStarted = date;
-//   }
-
-//   List<TrackedExercise> get exercises {
-//     return _exercises;
-//   }
-
-//   set exercises(List<TrackedExercise> exercises) {
-//     _exercises = exercises;
-//   }
-
-//   bool isWorkoutStarted() {
-//     for (TrackedExercise exercise in exercises) {
-//       if (exercise.isExerciseStarted()) {
-//         return true;
-//       }
-//     }
-
-//     return false;
-//   }
-
-//   bool isWorkoutDone() {
-//     for (TrackedExercise exercise in exercises) {
-//       if (!exercise.isExerciseDone()) {
-//         return false;
-//       }
-//     }
-
-//     return true;
-//   }
-// }
-
-// @JsonSerializable()
-// class TrackedExercise {
-//   String _name = '';
-//   List<TrackedSet> _sets = [];
-
-//   TrackedExercise(
-//     String name,
-//     List<TrackedSet> sets,
-//   ) {
-//     _name = name;
-//     _sets = sets;
-//   }
-
-//   @override
-//   String toString() {
-//     return '$name: $sets ';
-//   }
-
-//   factory TrackedExercise.fromJson(Map<String, dynamic> json) =>
-//       _$TrackedExerciseFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$TrackedExerciseToJson(this);
-
-//   String get name {
-//     return _name;
-//   }
-
-//   set name(String name) {
-//     _name = name;
-//   }
-
-//   List<TrackedSet> get sets {
-//     return _sets;
-//   }
-
-//   set sets(List<TrackedSet> sets) {
-//     _sets = sets;
-//   }
-
-//   bool isExerciseStarted() {
-//     return sets[0].repsDone != null;
-//   }
-
-//   bool isExerciseDone() {
-//     for (TrackedSet set in sets) {
-//       if (set.repsDone == null) {
-//         return false;
-//       }
-//     }
-
-//     return true;
-//   }
-// }
-
-// @JsonSerializable()
-// class TrackedSet {
-//   int? _repsDone;
-//   int _totalReps = 0;
-//   int _weight = 0;
-
-//   TrackedSet(
-//     int? repsDone,
-//     int totalReps,
-//     int weight,
-//   ) {
-//     _repsDone = repsDone;
-//     _totalReps = totalReps;
-//     _weight = weight;
-//   }
-
-//   @override
-//   String toString() {
-//     return ('reps done: $repsDone, total reps: $totalReps, weight: $weight');
-//   }
-
-//   factory TrackedSet.fromJson(Map<String, dynamic> json) =>
-//       _$TrackedSetFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$TrackedSetToJson(this);
-
-//   int? get repsDone {
-//     return _repsDone;
-//   }
-
-//   set repsDone(int? repsDone) {
-//     _repsDone = repsDone;
-//   }
-
-//   int get totalReps {
-//     return _totalReps;
-//   }
-
-//   set totalReps(int totalReps) {
-//     _totalReps = totalReps;
-//   }
-
-//   int get weight {
-//     return _weight;
-//   }
-
-//   set weight(int weight) {
-//     _weight = weight;
-//   }
-// }

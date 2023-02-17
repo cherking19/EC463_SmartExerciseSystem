@@ -1,9 +1,11 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/reusable_widgets/refresh_widgets.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
+import 'package:smart_gym/services/exercise_service.dart';
 
 class HistoryList extends StatefulWidget {
   final List<Workout> workouts;
@@ -50,7 +52,8 @@ class HistoryListState extends State<HistoryList>
         break;
       }
 
-      widgets.add(Text(workout.exercises[i].name));
+      widgets.add(Text(Provider.of<ExerciseService>(context, listen: false)
+          .exercises[workout.exercises[i].exerciseUuid]!));
     }
 
     return widgets;
