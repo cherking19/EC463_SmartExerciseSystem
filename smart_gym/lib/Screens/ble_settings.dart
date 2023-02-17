@@ -88,38 +88,41 @@ class FindDevicesScreen extends StatelessWidget {
                 return ExpansionTile(
                   title: const Text('Connected Devices'),
                   initiallyExpanded: snapshot.data!.isNotEmpty,
-                  children: snapshot.data!
-                      .map(
-                        (device) => ListTile(
-                          title: Text(device.name),
-                          trailing: StreamBuilder<BluetoothDeviceState>(
-                            stream: device.state,
-                            initialData: BluetoothDeviceState.disconnecting,
-                            builder: (innerContext, snapshot) {
-                              void Function()? onPressed;
-                              String text = 'Disconnecting';
+                  children: snapshot.data!.map(
+                    (device) {
+                      Stream<BluetoothDeviceState> deviceStateStream =
+                          device.state.asBroadcastStream();
 
-                              if (snapshot.data! ==
-                                  BluetoothDeviceState.connected) {
-                                text = 'Disconnect';
-                                onPressed = () {
-                                  device.disconnect();
-                                };
-                              } else if (snapshot.data! ==
-                                  BluetoothDeviceState.disconnecting) {
-                                text = 'Disconnecting';
-                                onPressed = null;
-                              }
+                      return ListTile(
+                        title: Text(device.name),
+                        trailing: StreamBuilder<BluetoothDeviceState>(
+                          stream: deviceStateStream,
+                          initialData: BluetoothDeviceState.disconnecting,
+                          builder: (innerContext, snapshot) {
+                            void Function()? onPressed;
+                            String text = 'Disconnecting';
 
-                              return ElevatedButton(
-                                onPressed: onPressed,
-                                child: Text(text),
-                              );
-                            },
-                          ),
+                            if (snapshot.data! ==
+                                BluetoothDeviceState.connected) {
+                              text = 'Disconnect';
+                              onPressed = () {
+                                device.disconnect();
+                              };
+                            } else if (snapshot.data! ==
+                                BluetoothDeviceState.disconnecting) {
+                              text = 'Disconnecting';
+                              onPressed = null;
+                            }
+
+                            return ElevatedButton(
+                              onPressed: onPressed,
+                              child: Text(text),
+                            );
+                          },
                         ),
-                      )
-                      .toList(),
+                      );
+                    },
+                  ).toList(),
                 );
               },
             ),

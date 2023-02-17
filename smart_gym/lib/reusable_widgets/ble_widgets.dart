@@ -88,11 +88,14 @@ class ScanResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Stream<BluetoothDeviceState> deviceStateStream =
+        scanResult.device.state.asBroadcastStream();
+
     return ExpansionTile(
       title: _buildTitle(context),
       leading: Text(scanResult.rssi.toString()),
       trailing: StreamBuilder<BluetoothDeviceState>(
-        stream: scanResult.device.state,
+        stream: deviceStateStream,
         initialData: BluetoothDeviceState.disconnected,
         builder: (context, snapshot) {
           void Function()? onPressed;
