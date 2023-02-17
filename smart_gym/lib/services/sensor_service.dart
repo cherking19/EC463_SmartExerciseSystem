@@ -47,13 +47,15 @@ class SensorService extends ChangeNotifier {
     BluetoothDevice device = scanResult.device;
 
     await device.connect();
-    beginListening(device);
+    beginListening(scanResult);
 
     return;
   }
 
   // Listen to the bluetooth devices and store the orientation data in the map
-  Future<void> beginListening(BluetoothDevice device) async {
+  Future<void> beginListening(ScanResult scanResult) async {
+    BluetoothDevice device = scanResult.device;
+
     List<BluetoothService> services = await device.discoverServices();
     BluetoothService sensorService = services.firstWhere(
       (service) =>
@@ -70,7 +72,8 @@ class SensorService extends ChangeNotifier {
         List<double> floatList = intBytes.buffer.asFloat32List();
 
         if (floatList.isNotEmpty) {
-          String sensorSuffix = device.name.split('_')[1];
+          String sensorSuffix =
+              scanResult.advertisementData.localName.split('_')[1];
 
           SensorOrientation orientation = orientations[sensorSuffix]!;
 
