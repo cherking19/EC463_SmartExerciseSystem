@@ -35,6 +35,9 @@ bool isSmartGymSensor(String deviceName) {
 class SensorService extends ChangeNotifier {
   final Map<String, SensorOrientation> _orientations = HashMap();
 
+  StreamController<Map<String, SensorOrientation>> orientationsStream =
+      StreamController<Map<String, SensorOrientation>>();
+
   SensorService() {
     _orientations.addAll({
       rightShoulderSuffix: SensorOrientation(),
@@ -101,6 +104,7 @@ class SensorService extends ChangeNotifier {
   void update(String sensorSuffix, SensorOrientation newOrientation) {
     _orientations.update(sensorSuffix, (value) => newOrientation);
     // print(_orientations);
+    orientationsStream.add(_orientations);
     notifyListeners();
   }
 
