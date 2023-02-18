@@ -140,6 +140,8 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
         //output time curl held
         //any additional feedback
         state=1;
+        //if(signal or done)
+          //return
         break;
       default:
     }
