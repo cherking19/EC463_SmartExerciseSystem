@@ -50,8 +50,6 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
   // }
   void analyzeCurlWorkout(BuildContext context){
     Map<String,SensorOrientation> map = SensorService.of(context).orientations;
-    const String rightShoulderSuffix = 'RightShoulder';
-    const String rightForearmSuffix = 'RightForearm';
 
     DateTime start = DateTime.now();
     DateTime curlstart = start, curlend = start;
