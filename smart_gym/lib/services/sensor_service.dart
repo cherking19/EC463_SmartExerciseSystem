@@ -3,12 +3,11 @@ import 'dart:collection';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:smart_gym/Screens/ble_settings.dart';
 
 const String rightShoulderSuffix = 'RightShoulder';
 const String rightForearmSuffix = 'RightForearm';
 
-const List<String> device_suffixes = [
+const List<String> deviceSuffixes = [
   rightShoulderSuffix,
   rightForearmSuffix,
 ];
@@ -26,93 +25,73 @@ class SensorOrientation {
   }
 }
 
-class SensorService extends ChangeNotifier {
-  Map<String, SensorOrientation> _orientations = HashMap();
-  late Stream<List<BluetoothDevice>> deviceStream;
-  late StreamSubscription deviceListener;
-  List<StreamSubscription> characteristicListeners = [];
-  List<Stream<List<int>>> characteristicStreams = [];
+const String sensorPrefix = 'SmartGymBros_';
 
-  Timer? timer;
+bool isSmartGymSensor(String deviceName) {
+  return deviceName.length >= sensorPrefix.length &&
+      deviceName.substring(0, sensorPrefix.length) == sensorPrefix;
+}
+
+class SensorService extends ChangeNotifier {
+  final Map<String, SensorOrientation> _orientations = HashMap();
 
   SensorService() {
     _orientations.addAll({
       rightShoulderSuffix: SensorOrientation(),
       rightForearmSuffix: SensorOrientation(),
     });
+  }
 
-    initiateListening();
+  // Connect to the sensor and begin listening to its data
+  Future<void> connectDevice(ScanResult scanResult) async {
+    BluetoothDevice device = scanResult.device;
 
-    timer = Timer.periodic(
-      const Duration(milliseconds: 200),
-      (timer) async {
-        await drainStreams();
-        // initiateListening();
-      },
+    await device.connect();
+    beginListening(scanResult);
+
+    return;
+  }
+
+  // Listen to the bluetooth devices and store the orientation data in the map
+  Future<void> beginListening(ScanResult scanResult) async {
+    BluetoothDevice device = scanResult.device;
+
+    List<BluetoothService> services = await device.discoverServices();
+    BluetoothService sensorService = services.firstWhere(
+      (service) =>
+          service.uuid.toString().toUpperCase().substring(4, 8) == 'A123',
     );
-  }
 
-  void initiateListening() {
-    deviceStream = Stream.periodic(const Duration(seconds: 2))
-        .asyncMap((event) => FlutterBlue.instance.connectedDevices)
-        .asBroadcastStream();
+    for (BluetoothCharacteristic characteristic
+        in sensorService.characteristics) {
+      await characteristic.setNotifyValue(true);
+      Stream<List<int>> characteristicStream = characteristic.value;
 
-    deviceStream.listen((sensors) async {
-      final List<BluetoothDevice> smartGymSensors =
-          sensors.where((device) => isSmartGymSensor(device.name)).toList();
+      characteristicStream.listen((data) {
+        Uint8List intBytes = Uint8List.fromList(data.toList());
+        List<double> floatList = intBytes.buffer.asFloat32List();
 
-      for (BluetoothDevice device in smartGymSensors) {
-        List<BluetoothService> services = await device.discoverServices();
+        if (floatList.isNotEmpty) {
+          String sensorSuffix =
+              scanResult.advertisementData.localName.split('_')[1];
 
-        BluetoothService sensorService = services.firstWhere(
-          (service) =>
-              service.uuid.toString().toUpperCase().substring(4, 8) == 'A123',
-        );
+          SensorOrientation orientation = orientations[sensorSuffix]!;
 
-        for (BluetoothCharacteristic characteristic
-            in sensorService.characteristics) {
-          await characteristic.setNotifyValue(true);
-          Stream<List<int>> characteristicStream =
-              characteristic.value.asBroadcastStream();
+          String uuid =
+              characteristic.uuid.toString().toUpperCase().substring(4, 8);
 
-          characteristicStream.listen((data) {
-            Uint8List intBytes = Uint8List.fromList(data.toList());
-            List<double> floatList = intBytes.buffer.asFloat32List();
+          if (uuid == '2A21') {
+            orientation.yaw = floatList[0];
+          } else if (uuid == '2A20') {
+            orientation.pitch = floatList[0];
+          } else if (uuid == '2A19') {
+            orientation.roll = floatList[0];
+          }
 
-            if (floatList.isNotEmpty) {
-              String sensorSuffix = device.name.split('_')[1];
-
-              SensorOrientation orientation = orientations[sensorSuffix]!;
-
-              String uuid =
-                  characteristic.uuid.toString().toUpperCase().substring(4, 8);
-
-              if (uuid == '2A21') {
-                orientation.yaw = floatList[0];
-              } else if (uuid == '2A20') {
-                orientation.pitch = floatList[0];
-              } else if (uuid == '2A19') {
-                orientation.roll = floatList[0];
-              }
-
-              update(sensorSuffix, orientation);
-            }
-          });
-
-          characteristicStreams.add(characteristicStream);
+          update(sensorSuffix, orientation);
         }
-      }
-    });
-  }
-
-  Future<bool> drainStreams() async {
-    for (Stream<List<int>> characteristicStream in characteristicStreams) {
-      await characteristicStream.drain();
+      });
     }
-
-    await deviceStream.drain();
-
-    return true;
   }
 
   Map<String, SensorOrientation> get orientations {
@@ -121,7 +100,7 @@ class SensorService extends ChangeNotifier {
 
   void update(String sensorSuffix, SensorOrientation newOrientation) {
     _orientations.update(sensorSuffix, (value) => newOrientation);
-    print(_orientations);
+    // print(_orientations);
     notifyListeners();
   }
 
@@ -130,7 +109,7 @@ class SensorService extends ChangeNotifier {
     String string = '';
 
     for (MapEntry<String, SensorOrientation> entry in orientations.entries) {
-      string = string + '${entry.key}: \t ${entry.value.toString()}\n';
+      string = '$string${entry.key}: \t ${entry.value.toString()}\n';
     }
 
     return string;

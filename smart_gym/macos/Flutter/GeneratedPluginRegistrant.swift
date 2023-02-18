@@ -9,7 +9,7 @@ import cloud_functions
 import firebase_auth
 import firebase_core
 import flutter_blue
-import shared_preferences_foundation
+import shared_preferences_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FLTFirebaseFunctionsPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseFunctionsPlugin"))

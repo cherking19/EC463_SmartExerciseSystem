@@ -41,7 +41,8 @@ class ViewWorkoutsState extends State<ViewWorkouts> {
       refreshing = true;
     });
     Future.delayed(globalPseudoDelay, () async {
-      workouts = await loadRoutines();
+      Map<String, Workout> routinesMap = await loadRoutines();
+      workouts = routinesMap.entries.map((element) => element.value).toList();
 
       setState(() {
         refreshing = false;
