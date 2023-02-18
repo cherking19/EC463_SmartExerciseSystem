@@ -8,6 +8,7 @@ import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:statistics/statistics.dart';
 
+import '../../../services/sensor_service.dart';
 
 class TrackWorkoutRoute extends StatelessWidget {
   final Workout workout;
@@ -43,6 +44,111 @@ class TrackWorkoutPage extends StatefulWidget {
 }
 
 class TrackWorkoutPageState extends State<TrackWorkoutPage> {
+  // void blah(BuildContext context) {
+  //   Map<String, SensorOrientation> map = SensorService.of(context).orientations
+  // }
+  void analyzeCurlWorkout(BuildContext context){
+    Map<String,SensorOrientation> map = SensorService.of(context).orientations;
+    const String rightShoulderSuffix = 'RightShoulder';
+    const String rightForearmSuffix = 'RightForearm';
+
+    DateTime start = DateTime.now();
+    DateTime curlstart = start, curlend = start;
+    int curldiff = 0;
+    // List<double> yaws = [];
+    // List<double> pitches = [];
+    // List<double> rolls = [];
+    int state = 0;
+    int holdup = 0;
+    int curls = 0;
+
+    // List<List<List<double>>> data;
+    List<List<double>> data_per = List.generate(2, (i) => [0,0,0], growable: false);
+    List<List<double>> data_prev = List.generate(2, (i) => [0,0,0], growable: false);
+    List<List<double>> data_temp = List.generate(2, (i) => [0,0,0], growable: false);
+    double dy, dp, dr;
+
+    
+  while (1==1) {
+    //Get data
+    map = SensorService.of(context).orientations;
+    if(map[rightShoulderSuffix ] !=null && map[rightShoulderSuffix]?.yaw != null){
+      data_temp[0][0] = map[rightShoulderSuffix]!.yaw!;
+      data_temp[0][1] = map[rightShoulderSuffix]!.pitch!;
+      data_temp[0][2] = map[rightShoulderSuffix]!.roll!;
+      //copy previous
+      data_prev[0][0] = data_per[0][0];
+      data_prev[0][1] = data_per[0][1];
+      data_prev[0][2] = data_per[0][2];
+      //copy temp -> data
+      data_per[0][0] = data_temp[0][0];
+      data_per[0][1] = data_temp[0][1];
+      data_per[0][2] = data_temp[0][2];
+    }
+    if(map[rightForearmSuffix ] !=null && map[rightForearmSuffix]?.yaw != null){
+      data_temp[1][0] = map[rightForearmSuffix]!.yaw!;
+      data_temp[1][1] = map[rightForearmSuffix]!.pitch!;
+      data_temp[1][2] = map[rightForearmSuffix]!.roll!;
+      //copy previous
+      data_prev[1][0] = data_per[1][0];
+      data_prev[1][1] = data_per[1][1];
+      data_prev[1][2] = data_per[1][2];
+      //copy temp -> data
+      data_per[1][0] = data_temp[1][0];
+      data_per[1][1] = data_temp[1][1];
+      data_per[1][2] = data_temp[1][2];
+    }
+    
+      // //add timer
+      // if("addd stuff for time differnece"==""){
+      //   // add timer
+      
+      //calculate difference between 2 sensors
+      dy = (data_per[0][0]-data_per[1][0]);
+      dp = (data_per[0][1]-data_per[1][1]);
+      dr = (data_per[0][2]-data_per[1][2]);
+      switch (state) {
+      case 0:
+        //Add Calibration
+        //go to down state
+        state=1;
+        break;
+      
+      case 1: //Down State
+        
+        //hold time?
+        //check boundary for up state
+        if(dp>60){
+          state=2;
+          holdup=0;
+          curlstart = DateTime.now();
+        }
+        //recalibrate if necessary
+        break;
+
+      case 2://up state
+        holdup++;
+        if(dp<30){
+          state=3;
+          curlend = DateTime.now();
+          curldiff = (curlend.difference(curlstart)).inSeconds;
+        }
+        break;
+  
+      case 3://finish state
+        curls++;
+        //output number of curls
+        //output time curl held
+        //any additional feedback
+        state=1;
+        break;
+      default:
+    }
+    
+  }
+
+  }
+
   void stopWorkout(BuildContext context) {
     if (!widget.workout.isWorkoutStarted()) {
       Future result = showConfirmationDialog(
@@ -232,85 +338,17 @@ class RestTimerState extends State<RestTimer> {
   }
 }
 
-class SensorOrientation {
-  double? yaw;
-  double? pitch;
-  double? roll;
+// class SensorOrientation {
+//   double? yaw;
+//   double? pitch;
+//   double? roll;
 
-  SensorOrientation();
+//   SensorOrientation();
 
-  @override
-  String toString() {
-    return 'Yaw: $yaw \t Pitch: $pitch \t Roll: $roll';
-  }
-}
-
-void analyzeCurlWorkout(List<SensorOrientation> sensors){
-  // Add  timer Carlton ask richard
-  //List<List<double>> = [[[],[],[]],[[],[],[]]];
-
-  var start = DateTime.now().toUTC();
-
-  double yav=0;
-  double pav=0;
-  double rav=0;
-  double yaw=0;
-  double pitch=0;
-  double roll=0;
-  List<double> yaws = [];
-  List<double> pitches = [];
-  List<double> rolls = [];
-  int state = 0;
-
-  List<List<List<double>>> data;
-  List<List<double>> prev_average;
-  List<List<double>> data_average;
-
-  
- while (1==1) {
-  for(SensorOrientation sensor in sensors){
-    if(1){
-      data[]
-    }
-  }
-
-  //add the reading from whatever this is where the serial port went in
-    yaws.add(yaw);
-    pitches.add(pitch);
-    rolls.add(roll);
-    //add timer
-    if("addd stuff for time differnece"==""){
-      // add timer
-        double pyav=yav;
-        double ppav=pav;
-        double prav=rav;
-        yav = yaws.statistics.mean;
-        pav = pitches.statistics.mean;
-        rav = rolls.statistics.mean;
-    }
-    switch (state) {
-    case 0:
-    
-      break;
-    
-    case 1:
-      
-      break;
-
-    case 2:
-      
-      break;
-
-    case 3:
-      
-      break;
-    default:
-  }
-   
- }
+//   @override
+//   String toString() {
+//     return 'Yaw: $yaw \t Pitch: $pitch \t Roll: $roll';
+//   }
+// }
 
 
-
-
-
-}
