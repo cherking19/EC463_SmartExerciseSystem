@@ -17,7 +17,7 @@ BLEByteCharacteristic switchCharacteristic("2A57", BLERead | BLEWrite);
 #define haptic 11
 
 unsigned long start_time;
-char* deviceName = "SmartGymBros_kidney";
+char* deviceName = "SmartGymBros_RightShoulder";
 bool hapticState = true;
 
 void setup() {
