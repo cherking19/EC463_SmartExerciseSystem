@@ -56,6 +56,7 @@ void setup() {
   // BLE Setup  
   BLE.begin();
   BLE.setLocalName(deviceName);
+
   BLE.setAdvertisedService(AHRSfilter);
   AHRSfilter.addCharacteristic(RollCharacteristic);
   AHRSfilter.addCharacteristic(PitchCharacteristic);
@@ -63,8 +64,10 @@ void setup() {
   BLE.addService(AHRSfilter);
   BLE.advertise();
 
+  // BLE.setAdvertisedService(HapticFeedback);
   HapticFeedback.addCharacteristic(switchCharacteristic);
   BLE.addService(HapticFeedback);
+  // BLE.advertise();
 
   // Serial
   Serial.begin(9600);
@@ -123,14 +126,14 @@ void loop() {
   PitchCharacteristic.writeValue(pitch);
   HeadingCharacteristic.writeValue(heading);
 
-  if (central) {
-    while (central.connected()) {
-      if (switchCharacteristic.written() && hapticState) {
-        digitalWrite(LEDR, LOW);
-      } else {
-        digitalWrite(LEDR, HIGH);        
-      }
-    }
+  if (switchCharacteristic.written() && hapticState) {
+    digitalWrite(LEDR, LOW);
+    //delay(1000); // the delay causes the lightBlue app to not connect with the Arduino
+    hapticState = false;
+  } else {
+    digitalWrite(LEDR, HIGH);
+    //delay(1000);
+    hapticState = true;
   }
 
 }
