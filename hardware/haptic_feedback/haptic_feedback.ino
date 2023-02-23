@@ -20,6 +20,25 @@ unsigned long start_time;
 char* deviceName = "SmartGymBros_RightShoulder";
 bool hapticState = true;
 
+void switchCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
+  if (hapticState) {
+    digitalWrite(haptic, HIGH);
+    //delay(1000); // the delay causes the lightBlue app to not connect with the Arduino
+    hapticState = false;
+  } else {
+    digitalWrite(haptic, LOW);
+    hapticState = true;
+  }
+}
+
+switchCharacteristic.setEventHandler(BLEWritten, switchCharacteristicWritten);
+//   // if (switchCharacteristic.valueUpdated() && !hapticState) {
+//   //   digitalWrite(haptic, LOW);
+//   //   //delay(1000);
+//   //   hapticState = true;
+//   // }
+// }
+
 void setup() {
   pinMode(powerdrain, OUTPUT);
   pinMode(haptic, OUTPUT);
@@ -85,10 +104,10 @@ void loop() {
   if ( nowtime - start_time >= 10000)
     digitalWrite(powerdrain, HIGH);
  
-  if(nowtime%1000 < 400)
-    digitalWrite(haptic,HIGH);
-  else
-    digitalWrite(haptic,LOW);
+  // if(nowtime%1000 < 400)
+  //   digitalWrite(haptic,HIGH);
+  // else
+  //   digitalWrite(haptic,LOW);
   //----------------------------
   
   BLEDevice central = BLE.central();
@@ -125,15 +144,5 @@ void loop() {
   RollCharacteristic.writeValue(roll);
   PitchCharacteristic.writeValue(pitch);
   HeadingCharacteristic.writeValue(heading);
-
-  if (switchCharacteristic.written() && hapticState) {
-    digitalWrite(haptic, HIGH);
-    //delay(1000); // the delay causes the lightBlue app to not connect with the Arduino
-    hapticState = false;
-  } else {
-    digitalWrite(haptic, LOW);
-    //delay(1000);
-    hapticState = true;
-  }
 
 }
