@@ -74,8 +74,8 @@ void setup() {
   //temporary counter
   start_time = millis();
 
-  pinMode(LEDR, OUTPUT);
-  digitalWrite(LEDR, HIGH);
+  // pinMode(LEDR, OUTPUT); // for testing with LEDR instead of haptic
+  // digitalWrite(LEDR, HIGH);
 }
 
 void loop() {
@@ -127,11 +127,11 @@ void loop() {
   HeadingCharacteristic.writeValue(heading);
 
   if (switchCharacteristic.written() && hapticState) {
-    digitalWrite(LEDR, LOW);
+    digitalWrite(haptic, HIGH);
     //delay(1000); // the delay causes the lightBlue app to not connect with the Arduino
     hapticState = false;
   } else {
-    digitalWrite(LEDR, HIGH);
+    digitalWrite(haptic, LOW);
     //delay(1000);
     hapticState = true;
   }
