@@ -26,7 +26,7 @@
 #include <Arduino_LSM9DS1.h> 
 
 
-float EarthMagnetStrength = 49.0;  //= µT
+float EarthMagnetStrength = 51.514;  //= µT
 
 boolean magnetOK=false;
 uint8_t magnetODRindex=8;  // (0..8)->{0.625,1.25,2.5,5.0,10,20,40,80,400}Hz

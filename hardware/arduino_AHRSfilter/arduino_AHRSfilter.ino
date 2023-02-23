@@ -14,7 +14,7 @@ BLEFloatCharacteristic HeadingCharacteristic("2A21", BLERead | BLENotify); //cre
 #define haptic 11
 
 unsigned long start_time;
-char* deviceName = "SmartGymBros_kidney";
+char* deviceName = "SmartGymBros_RightForearm";
 
 void setup() {
   pinMode(powerdrain, OUTPUT);
@@ -28,6 +28,7 @@ void setup() {
     // stop here if you can't access the IMU:
     while (true);
   }
+  //Calibration: go to https://github.com/cherking19/EC463_SmartExerciseSystem/blob/main/hardware/arduino_calibrations to see appropriate values
   // Calibration:
   // Gyroscope code
    IMU.setGyroFS(2);
