@@ -103,9 +103,9 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
       //   // add timer
       
       //calculate difference between 2 sensors
-      dy = (data_per[0][0]-data_per[1][0]);
-      dp = (data_per[0][1]-data_per[1][1]);
-      dr = (data_per[0][2]-data_per[1][2]);
+      dy = (data_per[0][0]-data_per[1][0]).abs();
+      dp = (data_per[0][1]-data_per[1][1]).abs();
+      dr = (data_per[0][2]-data_per[1][2]).abs();
       switch (state) {
       case 0:
         //Add Calibration
