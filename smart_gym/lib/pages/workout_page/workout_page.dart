@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_gym/pages/workout_page/exercises/exercises.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/sensor_interface.dart';
@@ -8,6 +10,7 @@ import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/services/sensor_service.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../../utils/widget_utils.dart';
 import 'create_routine/create_routine.dart';
@@ -144,6 +147,13 @@ class WorkoutPageState extends State<WorkoutPage>
         }
       });
     }
+    void sendData(BluetoothCharacteristic characteristic) {
+    String exampleCode = "01";
+    characteristic
+        .write(utf8
+        .encode(exampleCode));
+    ScaffoldMessenger.of(context).showSnackBar(createSuccessSnackBar(context));
+  }
 
     void clickExercises() {
       Navigator.push(
@@ -200,6 +210,12 @@ class WorkoutPageState extends State<WorkoutPage>
                         await SharedPreferences.getInstance();
                     prefs.clear();
                   }),
+              workoutPageButton(
+                text: "Cycle Light", 
+                onPressed: () async {
+                  sendData(SensorService.of(context).hapticCharacteristics['RightShoulder']!);
+                  }
+                ),
               if (widget.workout != null)
                 Expanded(
                   child: Align(
