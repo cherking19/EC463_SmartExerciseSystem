@@ -56,8 +56,9 @@ class SetWidgetState extends State<SetWidget>
         TimerService.ofSet(context).restart(widget.set.rest);
       }
 
-      if (widget.set.repsDone == null || widget.set.repsDone == 0) {
-        widget.set.repsDone = widget.set.reps;
+      if (widget.set.repsDone == null ||
+          widget.set.repsDone == widget.set.reps) {
+        widget.set.repsDone = 1;
         widget.updateParent();
       } else {
         widget.set.repsDone = widget.set.repsDone! - 1;

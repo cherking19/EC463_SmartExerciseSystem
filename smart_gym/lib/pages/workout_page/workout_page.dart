@@ -8,6 +8,7 @@ import 'package:smart_gym/reusable_widgets/snackbars.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_workout.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
+import 'package:smart_gym/services/sensor_service.dart';
 import 'package:smart_gym/user_info/workout_info.dart';
 import '../../utils/widget_utils.dart';
 import 'create_routine/create_routine.dart';
@@ -200,6 +201,12 @@ class WorkoutPageState extends State<WorkoutPage>
                         await SharedPreferences.getInstance();
                     prefs.clear();
                   }),
+              workoutPageButton(
+                text: 'Mock Data',
+                onPressed: () {
+                  SensorService.of(context).mockData();
+                },
+              ),
               if (widget.workout != null)
                 Expanded(
                   child: Align(
