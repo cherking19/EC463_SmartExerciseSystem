@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:smart_gym/main.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_widgets/track_set.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/services/sensor_service.dart';
@@ -19,6 +22,12 @@ class TrackWorkoutService extends ChangeNotifier {
 
   TrackWorkoutService() {
     initializeAnalysis();
+  }
+  void sendData(BluetoothCharacteristic characteristic) {
+    String exampleCode = "01";
+    characteristic
+        .write(utf8
+        .encode(exampleCode));
   }
 
   void initializeAnalysis() {
@@ -136,6 +145,8 @@ class TrackWorkoutService extends ChangeNotifier {
           holdup = 0;
           curlstart = DateTime.now();
           print('curl up');
+          // Here add thing ben
+        sendData(SensorService.of(navigatorKey.currentState!.context).hapticCharacteristics['RightShoulder']!);
         }
         //recalibrate if necessary
         break;
