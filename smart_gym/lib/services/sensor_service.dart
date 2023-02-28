@@ -34,6 +34,7 @@ bool isSmartGymSensor(String deviceName) {
 
 class SensorService extends ChangeNotifier {
   final Map<String, SensorOrientation> _orientations = HashMap();
+  final Map<String, BluetoothCharacteristic> _hapticCharacteristics = HashMap();
 
   StreamController<Map<String, SensorOrientation>>
       orientationsStreamController =
@@ -44,6 +45,11 @@ class SensorService extends ChangeNotifier {
       rightShoulderSuffix: SensorOrientation(),
       rightForearmSuffix: SensorOrientation(),
     });
+    // _hapticCharacteristics.addAll({
+    //   rightShoulderSuffix: BluetoothCharacteristic?,
+    //   rightForearmSuffix: BluetoothCharacteristic()?,
+    // }
+    // )
   }
 
   // Connect to the sensor and begin listening to its data
@@ -65,6 +71,17 @@ class SensorService extends ChangeNotifier {
       (service) =>
           service.uuid.toString().toUpperCase().substring(4, 8) == 'A123',
     );
+      BluetoothService sensorServiceHaptic = services.firstWhere(
+      (service) =>
+          service.uuid.toString().toUpperCase().substring(4, 8) == 'A124',
+    );
+    for (BluetoothCharacteristic characteristic
+        in sensorServiceHaptic.characteristics) {
+          String sensorSuffix =
+              scanResult.advertisementData.localName.split('_')[1];
+            _hapticCharacteristics[sensorSuffix] =characteristic;
+
+        }
 
     for (BluetoothCharacteristic characteristic
         in sensorService.characteristics) {
@@ -96,10 +113,17 @@ class SensorService extends ChangeNotifier {
         }
       });
     }
+
+
+
   }
 
   Map<String, SensorOrientation> get orientations {
     return _orientations;
+  }
+
+    Map<String, BluetoothCharacteristic> get hapticCharacteristics {
+    return _hapticCharacteristics;
   }
 
   void update(String sensorSuffix, SensorOrientation newOrientation) {

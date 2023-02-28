@@ -23,3 +23,5 @@ The Haptic Motor is controlled by a simple BJT transitor, modulated by pin D11, 
 Arduino code:
 In addition to library manager libraries: https://github.com/FemmeVerbeek/Arduino_LSM9DS1
 library manager libraries: Adafruit_AHRS, ArduinoBLE
+
+NOTE: In order to use the 5V pin, you must solder the VUSB pad
