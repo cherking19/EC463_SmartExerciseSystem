@@ -12,11 +12,6 @@ BLEFloatCharacteristic HeadingCharacteristic("2A21", BLERead | BLENotify);  //cr
 BLEService HapticFeedback("A124");
 BLEByteCharacteristic switchCharacteristic("2A57", BLERead | BLEWrite);
 
-
-
-
-
-
 //PINS
 #define powerdrain 12
 #define haptic 11
@@ -83,6 +78,7 @@ void setup() {
   // pinMode(LEDR, OUTPUT); // for testing with LEDR instead of haptic
   // digitalWrite(LEDR, HIGH);
 }
+
 void switchCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
   if (hapticState) {
     digitalWrite(haptic, HIGH);
