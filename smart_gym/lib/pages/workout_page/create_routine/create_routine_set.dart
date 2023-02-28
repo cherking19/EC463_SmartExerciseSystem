@@ -250,7 +250,7 @@ class CreateRoutineSetState extends State<CreateRoutineSet> {
                   }
                 : null,
             style: minimalButtonStyle(
-              context: context,
+              context,
               padding: const EdgeInsets.all(4.0),
               textColorOverride: restValid ? null : Colors.red,
             ),

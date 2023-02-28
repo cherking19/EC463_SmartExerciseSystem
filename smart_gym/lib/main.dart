@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gym/Screens/signin.dart';
 import 'package:smart_gym/services/sensor_service.dart';
+import 'package:smart_gym/services/track_workout_service.dart';
 import 'package:smart_gym/utils/color_utils.dart';
 import 'package:smart_gym/utils/user_auth_provider.dart';
 import 'pages/workout_page/workout_page.dart';
@@ -13,12 +14,15 @@ import 'package:smart_gym/utils/widget_utils.dart';
 import 'pages/history_page/history_page.dart';
 import 'pages/workout_page/workout.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final TimerService setTimerService = TimerService();
   final TimerService workoutTimerService = TimerService();
   final SensorService sensorService = SensorService();
+  final TrackWorkoutService trackWorkoutService = TrackWorkoutService();
 
   runApp(
     TimerServiceProvider(
@@ -26,7 +30,10 @@ void main() async {
       workoutService: workoutTimerService,
       child: SensorServiceProvider(
         service: sensorService,
-        child: const MyApp(),
+        child: TrackWorkoutServiceProvider(
+          service: trackWorkoutService,
+          child: const MyApp(),
+        ),
       ),
     ),
   );
@@ -54,6 +61,7 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp(
           title: 'Smart Gym',
+          navigatorKey: navigatorKey,
           scaffoldMessengerKey: rootScaffoldMessengerKey,
           theme: ThemeData(
             // This is the theme of your application.

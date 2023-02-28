@@ -211,11 +211,18 @@ class WorkoutPageState extends State<WorkoutPage>
                     prefs.clear();
                   }),
               workoutPageButton(
+                text: 'Mock Data',
+                onPressed: () {
+                  SensorService.of(context).mockData();
+                },
+              ),
+              workoutPageButton(
                 text: "Cycle Light", 
                 onPressed: () async {
                   sendData(SensorService.of(context).hapticCharacteristics['RightShoulder']!);
                   }
                 ),
+
               if (widget.workout != null)
                 Expanded(
                   child: Align(

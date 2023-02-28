@@ -14,6 +14,7 @@ BLEFloatCharacteristic HeadingCharacteristic("2A21", BLERead | BLENotify); //cre
 #define haptic 11
 
 unsigned long start_time;
+char* deviceName = "SmartGymBros_RightForearm";
 
 void setup() {
   pinMode(powerdrain, OUTPUT);
@@ -27,20 +28,23 @@ void setup() {
     // stop here if you can't access the IMU:
     while (true);
   }
+  //Calibration: go to https://github.com/cherking19/EC463_SmartExerciseSystem/blob/main/hardware/arduino_calibrations to see appropriate values
   // Calibration:
   // Gyroscope code
    IMU.setGyroFS(2);
    IMU.setGyroODR(5);
-   IMU.setGyroOffset (1.370026, -0.591858, 0.469818);
-   IMU.setGyroSlope (1.205162, 1.202537, 1.155080);
+   IMU.setGyroOffset (0.202271, -0.971649, 0.442047);
+   IMU.setGyroSlope (1.202876, 1.170078, 1.419463);
   // Magnetometer code
    IMU.setMagnetFS(0);
    IMU.setMagnetODR(8);
-   IMU.setMagnetOffset(5.055542, 24.595947, 13.364258);
-   IMU.setMagnetSlope (1.345936, 1.178488, 1.197922);
+   IMU.setMagnetOffset(-10.064087, 18.947754, 18.128662);
+   IMU.setMagnetSlope (1.145179, 1.314404, 1.053118);
   // Accelerometer code
    IMU.setAccelFS(3);
    IMU.setAccelODR(5);
+   IMU.setAccelOffset(0.003756, -0.012898, 0.019816);
+   IMU.setAccelSlope (0.989642, 0.994564, 0.977860);
    
   // start the filter to run at the sample rate:
   filter.begin(sensorRate);
@@ -48,7 +52,7 @@ void setup() {
 
   // BLE Setup  
   BLE.begin();
-  BLE.setLocalName("Node1");
+  BLE.setLocalName(deviceName);
   BLE.setAdvertisedService(AHRSfilter);
   AHRSfilter.addCharacteristic(RollCharacteristic);
   AHRSfilter.addCharacteristic(PitchCharacteristic);
@@ -98,7 +102,8 @@ void loop() {
   pitch = filter.getPitch();
   heading = filter.getYaw();
   //print values
-  Serial.print("heading: ");
+  Serial.print(deviceName);
+  Serial.print("\theading: ");
   Serial.print(heading);
   Serial.print("\tpitch: ");
   Serial.print(pitch);

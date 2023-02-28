@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/utils/function_utils.dart';
 
-ButtonStyle minimalButtonStyle({
-  required BuildContext context,
+ButtonStyle minimalButtonStyle(
+  BuildContext context, {
   EdgeInsets? padding,
   Color? textColorOverride,
+  Color? backgroundColorOverride,
 }) {
   return TextButton.styleFrom(
     foregroundColor: textColorOverride ?? Theme.of(context).primaryColor,
+    // backgroundColor:
+    //     backgroundColorOverride ?? Theme.of(context).colorScheme.background,
     minimumSize: Size.zero,
     padding: padding ?? EdgeInsets.zero,
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,

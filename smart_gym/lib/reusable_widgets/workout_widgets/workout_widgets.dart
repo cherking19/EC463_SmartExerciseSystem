@@ -8,6 +8,7 @@ import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/exercise_widgets/exercise_widget.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
+import 'package:smart_gym/services/track_workout_service.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import '../../services/TimerService.dart';
 
@@ -112,6 +113,15 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      TrackWorkoutService.of(context).loadWorkout(widget.workout);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     Text dateTextWidget = widget.type != WidgetType.create
         ? Text(
@@ -122,102 +132,100 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
           )
         : const Text('');
 
-    return AnimatedBuilder(
-      animation: TimerService.ofSet(context),
-      builder: (context, child) {
-        return Flexible(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                child: widget.type == WidgetType.create
-                    ? Row(
-                        children: [
-                          Expanded(
-                            child: WorkoutName(
-                              // key: widget.key,
-                              // formKey: widget.formKey!,
-                              workout: widget.workout,
-                              editable: true,
-                            ),
-                          ),
-
-                          // Text('hi'),
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Text(
-                            '${widget.workout.name} - ',
-                            style: globalTitleTextStyle,
-                          ),
-                          if (!widget.editable) dateTextWidget,
-                          if (widget.editable)
-                            TextButton(
-                              style: minimalButtonStyle(
-                                context: context,
-                              ),
-                              onPressed: () async {
-                                changeDateStarted();
-                              },
-                              child: dateTextWidget,
-                            ),
-                          if (widget.type == WidgetType.track ||
-                              widget.type == WidgetType.history)
-                            Expanded(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Text('Duration - '),
-                                  if (!widget.editable)
-                                    AnimatedBuilder(
-                                      animation:
-                                          TimerService.ofWorkout(context),
-                                      builder: (context, child) =>
-                                          Text(getDuration()),
-                                    ),
-                                  if (widget.editable)
-                                    TextButton(
-                                      style: minimalButtonStyle(
-                                        context: context,
-                                      ),
-                                      onPressed: () {
-                                        changeDuration();
-                                      },
-                                      child: Text(getDuration()),
-                                    ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-              ),
-              Expanded(
-                child: Scrollbar(
-                  child: ListView.builder(
-                    itemCount: widget.workout.exercises.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                        child: ExerciseWidget(
-                          type: widget.type,
-                          editable: widget.editable,
-                          index: index,
-                          exercise: widget.workout.exercises[index],
-                          // startSetTimer: startSetTimer,
-                          // editWorkout: () {},
+    // return AnimatedBuilder(
+    //   animation: TimerService.ofSet(context),
+    //   builder: (context, child) {
+    return Flexible(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+            child: widget.type == WidgetType.create
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: WorkoutName(
+                          // key: widget.key,
+                          // formKey: widget.formKey!,
+                          workout: widget.workout,
+                          editable: true,
                         ),
-                      );
-                    },
+                      ),
+
+                      // Text('hi'),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Text(
+                        '${widget.workout.name} - ',
+                        style: globalTitleTextStyle,
+                      ),
+                      if (!widget.editable) dateTextWidget,
+                      if (widget.editable)
+                        TextButton(
+                          style: minimalButtonStyle(
+                            context,
+                          ),
+                          onPressed: () async {
+                            changeDateStarted();
+                          },
+                          child: dateTextWidget,
+                        ),
+                      if (widget.type == WidgetType.track ||
+                          widget.type == WidgetType.history)
+                        Expanded(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              const Text('Duration - '),
+                              if (!widget.editable)
+                                AnimatedBuilder(
+                                  animation: TimerService.ofWorkout(context),
+                                  builder: (context, child) =>
+                                      Text(getDuration()),
+                                ),
+                              if (widget.editable)
+                                TextButton(
+                                  style: minimalButtonStyle(
+                                    context,
+                                  ),
+                                  onPressed: () {
+                                    changeDuration();
+                                  },
+                                  child: Text(getDuration()),
+                                ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ),
-            ],
           ),
-        );
-      },
+          Expanded(
+            child: Scrollbar(
+              child: ListView.builder(
+                itemCount: widget.workout.exercises.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                    child: ExerciseWidget(
+                      type: widget.type,
+                      editable: widget.editable,
+                      index: index,
+                      exercise: widget.workout.exercises[index],
+                      // startSetTimer: startSetTimer,
+                      // editWorkout: () {},
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+    // },
+    // );
   }
 }

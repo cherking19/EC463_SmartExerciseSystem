@@ -36,6 +36,10 @@ class SensorService extends ChangeNotifier {
   final Map<String, SensorOrientation> _orientations = HashMap();
   final Map<String, BluetoothCharacteristic> _hapticCharacteristics = HashMap();
 
+  StreamController<Map<String, SensorOrientation>>
+      orientationsStreamController =
+      StreamController<Map<String, SensorOrientation>>.broadcast();
+
   SensorService() {
     _orientations.addAll({
       rightShoulderSuffix: SensorOrientation(),
@@ -125,7 +129,43 @@ class SensorService extends ChangeNotifier {
   void update(String sensorSuffix, SensorOrientation newOrientation) {
     _orientations.update(sensorSuffix, (value) => newOrientation);
     // print(_orientations);
+    orientationsStreamController.add(_orientations);
     notifyListeners();
+  }
+
+  late Timer? mockTimer;
+  int direction = 0; //0 going up, 1 going down
+
+  void mockData() {
+    SensorOrientation rightShoulderOrientation =
+        orientations[rightShoulderSuffix]!;
+    rightShoulderOrientation.pitch = 0;
+
+    SensorOrientation rightForearmOrientation =
+        orientations[rightForearmSuffix]!;
+    rightForearmOrientation.pitch = 0;
+
+    mockTimer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
+      mockIncrementData();
+    });
+  }
+
+  void mockIncrementData() {
+    SensorOrientation forearmOrientation = orientations[rightForearmSuffix]!;
+
+    if (forearmOrientation.pitch! >= 80 && direction == 0) {
+      direction = 1;
+    } else if (forearmOrientation.pitch! <= 10 && direction == 1) {
+      direction = 0;
+    }
+
+    if (direction == 0) {
+      forearmOrientation.pitch = forearmOrientation.pitch! + 1.0;
+    } else {
+      forearmOrientation.pitch = forearmOrientation.pitch! - 1.0;
+    }
+
+    update(rightForearmSuffix, forearmOrientation);
   }
 
   @override

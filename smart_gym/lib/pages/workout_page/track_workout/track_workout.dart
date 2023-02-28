@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/track_workout/track_widgets/track_workout_widget.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
+import 'package:smart_gym/services/track_workout_service.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 
@@ -50,9 +51,15 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
       );
 
       result.then((value) {
+        TrackWorkoutService.of(context).stopListening(context);
+
         if (value) {
           Navigator.of(context).pop(
-            NavigatorResponse(true, NavigatorAction.cancel, null),
+            NavigatorResponse(
+              true,
+              NavigatorAction.cancel,
+              null,
+            ),
           );
         }
       });
@@ -66,6 +73,8 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
       result.then(
         (value) {
           if (value) {
+            TrackWorkoutService.of(context).stopListening(context);
+
             Navigator.of(context).pop(
               NavigatorResponse(
                 true,
@@ -77,6 +86,8 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
         },
       );
     } else {
+      TrackWorkoutService.of(context).stopListening(context);
+
       Navigator.of(context).pop(
         NavigatorResponse(
           true,
@@ -97,8 +108,14 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
     result.then(
       (value) {
         if (value) {
+          TrackWorkoutService.of(context).stopListening(context);
+
           Navigator.of(context).pop(
-            NavigatorResponse(true, NavigatorAction.cancel, null),
+            NavigatorResponse(
+              true,
+              NavigatorAction.cancel,
+              null,
+            ),
           );
         }
       },
@@ -106,50 +123,61 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: TimerService.ofSet(context),
-      builder: (context, child) {
-        return Column(
-          children: [
-            WorkoutWidget(
-              type: WidgetType.track,
-              workout: widget.workout,
-              editable: false,
-            ),
-            if (TimerService.ofSet(context).isRunning)
-              const Padding(
+    return Column(
+      children: [
+        // WorkoutWidget(
+        //   type: WidgetType.track,
+        //   workout: widget.workout,
+        //   editable: false,
+        // ),
+        TrackWorkoutWidget(
+          workout: widget.workout,
+        ),
+        AnimatedBuilder(
+          animation: TimerService.ofSet(context),
+          builder: (context, child) {
+            if (TimerService.ofSet(context).isRunning) {
+              return const Padding(
                 padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
                 child: SizedBox(
                   width: double.infinity,
                   child: RestTimer(),
                 ),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                cancelWorkout(context);
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 255, 0, 0),
+                ),
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    cancelWorkout(context);
-                  },
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 255, 0, 0),
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    stopWorkout(context);
-                  },
-                  child: const Text('Finish'),
-                ),
-              ],
+            ),
+            TextButton(
+              onPressed: () {
+                stopWorkout(context);
+              },
+              child: const Text('Finish'),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 }
@@ -229,3 +257,18 @@ class RestTimerState extends State<RestTimer> {
     );
   }
 }
+
+// class SensorOrientation {
+//   double? yaw;
+//   double? pitch;
+//   double? roll;
+
+//   SensorOrientation();
+
+//   @override
+//   String toString() {
+//     return 'Yaw: $yaw \t Pitch: $pitch \t Roll: $roll';
+//   }
+// }
+
+
