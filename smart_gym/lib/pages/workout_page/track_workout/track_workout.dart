@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/track_workout/track_widgets/track_workout_widget.dart';
 import 'package:smart_gym/reusable_widgets/dialogs.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
-import 'package:smart_gym/reusable_widgets/workout_widgets/workout_widgets.dart';
 import 'package:smart_gym/services/TimerService.dart';
 import 'package:smart_gym/services/track_workout_service.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
@@ -125,20 +125,19 @@ class TrackWorkoutPageState extends State<TrackWorkoutPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      TrackWorkoutService.of(context).beginListening(context);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        WorkoutWidget(
-          type: WidgetType.track,
+        // WorkoutWidget(
+        //   type: WidgetType.track,
+        //   workout: widget.workout,
+        //   editable: false,
+        // ),
+        TrackWorkoutWidget(
           workout: widget.workout,
-          editable: false,
         ),
         AnimatedBuilder(
           animation: TimerService.ofSet(context),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:smart_gym/pages/workout_page/track_workout/track_widgets/track_set.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/services/sensor_service.dart';
 
@@ -9,11 +10,12 @@ class TrackWorkoutService extends ChangeNotifier {
   late List<List<double>> data_per, data_prev, data_temp;
   late double dy, dp, dr;
 
+  bool isListening = false;
   late StreamSubscription<Map<String, SensorOrientation>>
       orientationSubscription;
 
-  bool workoutLoaded = false;
-  late Workout trackedWorkout;
+  Workout? trackedWorkout;
+  TrackSetController? setController;
 
   TrackWorkoutService() {
     initializeAnalysis();
@@ -37,17 +39,35 @@ class TrackWorkoutService extends ChangeNotifier {
     data_temp = List.generate(2, (i) => [0, 0, 0], growable: false);
   }
 
-  void beginListening(BuildContext context) {
+  void beginListening(
+    BuildContext context, {
+    required TrackSetController controller,
+  }) {
+    if (isListening) {
+      stopListening(context);
+    }
+    setController = controller;
     Stream<Map<String, SensorOrientation>> orientationsStream =
         SensorService.of(context).orientationsStreamController.stream;
     orientationSubscription =
         orientationsStream.asBroadcastStream().listen((newMap) {
-      analyzeCurlWorkout(map: newMap);
+      analyzeCurlWorkout(
+        map: newMap,
+      );
     });
+
+    isListening = true;
+  }
+
+  void updateSetController({
+    required TrackSetController controller,
+  }) {
+    setController = controller;
   }
 
   void stopListening(BuildContext context) {
     orientationSubscription.cancel();
+    isListening = false;
   }
 
   void analyzeCurlWorkout(
@@ -136,19 +156,17 @@ class TrackWorkoutService extends ChangeNotifier {
         //any additional feedback
         state = 1;
         print('CURL $curls DONE, HELD FOR $curldiff SECONDS ---------------');
+        if (setController?.context?.mounted ?? false) {
+          setController?.repCount!();
+        }
         break;
       default:
     }
     // }
   }
 
-  void loadWorkout(Workout workout) {
-    if (!workoutLoaded) {
-      trackedWorkout = workout;
-      workoutLoaded = true;
-
-      print(trackedWorkout);
-    }
+  loadWorkout(Workout workout) {
+    trackedWorkout = workout;
   }
 
   static TrackWorkoutService of(BuildContext context) {

@@ -165,7 +165,7 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                       if (widget.editable)
                         TextButton(
                           style: minimalButtonStyle(
-                            context: context,
+                            context,
                           ),
                           onPressed: () async {
                             changeDateStarted();
@@ -189,7 +189,7 @@ class WorkoutWidgetState extends State<WorkoutWidget> {
                               if (widget.editable)
                                 TextButton(
                                   style: minimalButtonStyle(
-                                    context: context,
+                                    context,
                                   ),
                                   onPressed: () {
                                     changeDuration();

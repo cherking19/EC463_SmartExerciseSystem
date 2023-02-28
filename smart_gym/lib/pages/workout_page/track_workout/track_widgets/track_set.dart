@@ -5,66 +5,69 @@ import 'package:smart_gym/reusable_widgets/buttons.dart';
 import 'package:smart_gym/reusable_widgets/input.dart';
 import 'package:smart_gym/reusable_widgets/reusable_widgets.dart';
 import 'package:smart_gym/reusable_widgets/decoration.dart';
+import 'package:smart_gym/reusable_widgets/set_widgets/weight_tooltip.dart';
 import 'package:smart_gym/services/TimerService.dart';
+import 'package:smart_gym/services/track_workout_service.dart';
 import 'package:smart_gym/utils/widget_utils.dart';
-import 'weight_tooltip.dart';
 
-class SetWidget extends StatefulWidget {
-  final WidgetType type;
-  final bool editable;
+class TrackSetController {
+  Function()? repCount;
+  BuildContext? context;
+}
+
+class TrackSetWidget extends StatefulWidget {
   final int index;
   final Exercise exercise;
   final Set set;
   final Function updateParent;
+  final TrackSetController controller;
 
-  const SetWidget({
+  const TrackSetWidget({
     Key? key,
-    required this.type,
-    required this.editable,
     required this.index,
     required this.exercise,
     required this.set,
     required this.updateParent,
+    required this.controller,
   }) : super(key: key);
 
   @override
-  State<SetWidget> createState() {
-    return SetWidgetState();
+  State<TrackSetWidget> createState() {
+    return TrackSetWidgetState();
   }
 }
 
-class SetWidgetState extends State<SetWidget>
+class TrackSetWidgetState extends State<TrackSetWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController progressController;
   late TextEditingController repsController;
   late FocusNode repsFocusNode;
 
   bool isSetIndicatorEnabled() {
-    if (widget.type == WidgetType.track ||
-        (widget.type == WidgetType.history && widget.editable)) {
-      return widget.index != 0
-          ? (widget.exercise.sets[widget.index - 1].repsDone != null)
-          : true;
-    }
+    return widget.index != 0
+        ? (widget.exercise.sets[widget.index - 1].repsDone != null)
+        : true;
+  }
 
-    return false;
+  void finishSet() {
+    TrackWorkoutService.of(context).stopListening(context);
+    TimerService.ofSet(context).restart(widget.set.rest);
   }
 
   void clickSet() {
-    if (widget.type == WidgetType.track || widget.type == WidgetType.history) {
-      if (widget.set.repsDone == null) {
-        TimerService.ofSet(context).restart(widget.set.rest);
+    if (widget.set.repsDone == null) {
+      widget.set.repsDone = 1;
+      widget.updateParent();
+    } else if (widget.set.repsDone == widget.set.reps) {
+      widget.set.repsDone = 0;
+    } else {
+      widget.set.repsDone = widget.set.repsDone! + 1;
+      if (widget.set.repsDone == widget.set.reps) {
+        finishSet();
       }
-
-      if (widget.set.repsDone == null || widget.set.repsDone == 0) {
-        widget.set.repsDone = widget.set.reps;
-        widget.updateParent();
-      } else {
-        widget.set.repsDone = widget.set.repsDone! - 1;
-      }
-
-      animateProgress();
     }
+
+    animateProgress();
   }
 
   void animateProgress() {
@@ -77,6 +80,8 @@ class SetWidgetState extends State<SetWidget>
 
   @override
   void initState() {
+    super.initState();
+
     progressController = AnimationController(
       vsync: this,
       duration: globalAnimationSpeed,
@@ -101,7 +106,14 @@ class SetWidgetState extends State<SetWidget>
 
     repsController = TextEditingController();
 
-    super.initState();
+    widget.controller.repCount = clickSet;
+    widget.controller.context = context;
+
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   TrackWorkoutService.of(context).updateSetController(
+    //     controller: widget.controller,
+    //   );
+    // });
   }
 
   @override
@@ -112,8 +124,11 @@ class SetWidgetState extends State<SetWidget>
   }
 
   @override
-  void didUpdateWidget(SetWidget oldWidget) {
+  void didUpdateWidget(TrackSetWidget oldWidget) {
     animateProgress();
+
+    widget.controller.repCount = clickSet;
+    widget.controller.context = context;
 
     super.didUpdateWidget(oldWidget);
   }
@@ -137,55 +152,49 @@ class SetWidgetState extends State<SetWidget>
             TextButton(
               onPressed: isSetIndicatorEnabled() ? clickSet : null,
               style: setButtonStyle(),
-              child: widget.type != WidgetType.create
-                  ? Text(
-                      widget.set.repsDone != null
-                          ? widget.set.repsDone.toString()
-                          : widget.set.reps.toString(),
-                    )
-                  : SizedBox(
-                      width: 30,
-                      child: TextFormField(
-                        controller: repsController,
-                        focusNode: repsFocusNode,
-                        autofocus: widget.type != WidgetType.create,
-                        inputFormatters: positiveInteger,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null ||
-                              value.isEmpty ||
-                              int.parse(repsController.text) <= 0) {
-                            return '';
-                          }
-
-                          return null;
-                        },
-                        decoration: minimalInputDecoration(
-                          hint: 'reps',
-                          errorStyle: minimalTextStyling,
-                        ),
-                        style: const TextStyle(fontSize: 14.0),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+              child: Text(
+                widget.set.repsDone != null
+                    ? widget.set.repsDone.toString()
+                    : widget.set.reps.toString(),
+              ),
             ),
           ],
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
           child: SetWeight(
-            type: widget.type,
+            type: WidgetType.track,
             set: widget.set,
-            editable: widget.editable,
+            editable: false,
           ),
         ),
-        if (widget.type == WidgetType.create)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
-            child: SetRest(
-              set: widget.set,
-            ),
+        TextButton(
+          onPressed: isSetIndicatorEnabled()
+              ? () {
+                  TrackWorkoutService.of(context).beginListening(
+                    context,
+                    controller: widget.controller,
+                  );
+                }
+              : null,
+          style: minimalButtonStyle(
+            context,
+            textColorOverride: Colors.green,
           ),
+          child: const Text('Analyze'),
+        ),
+        TextButton(
+          onPressed: isSetIndicatorEnabled()
+              ? () {
+                  finishSet();
+                }
+              : null,
+          style: minimalButtonStyle(
+            context,
+            textColorOverride: Colors.red,
+          ),
+          child: const Text('Stop'),
+        ),
       ],
     );
   }
