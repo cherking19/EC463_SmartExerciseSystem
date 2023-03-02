@@ -17,8 +17,9 @@ BLEByteCharacteristic switchCharacteristic("2A57", BLERead | BLEWrite);
 #define haptic 11
 
 unsigned long start_time;
-char* deviceName = "SmartGymBros_RightShoulder";
-bool hapticState = true;
+unsigned long hapticTime;
+char* deviceName = "SmartGymBros_RightForearm";
+bool hapticState = false; // true means vibration is on
 
 void setup() {
   pinMode(powerdrain, OUTPUT);
@@ -80,18 +81,15 @@ void setup() {
 }
 
 void switchCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
-  if (hapticState) {
-    digitalWrite(haptic, HIGH);
-    //delay(1000); // the delay causes the lightBlue app to not connect with the Arduino
-    hapticState = false;
-  } else {
-    digitalWrite(haptic, LOW);
-    hapticState = true;
-  }
-
-  // if (switchCharacteristic.valueUpdated() && !hapticState) {
+  digitalWrite(haptic, HIGH);
+  hapticTime = millis();
+  hapticState = true;
+  // if (hapticState) {
+  //   digitalWrite(haptic, HIGH);
+  //   //delay(1000); // the delay causes the lightBlue app to not connect with the Arduino
+  //   hapticState = false;
+  // } else {
   //   digitalWrite(haptic, LOW);
-  //   //delay(1000);
   //   hapticState = true;
   // }
 }
@@ -108,6 +106,13 @@ void loop() {
   // else
   //   digitalWrite(haptic,LOW);
   //----------------------------
+
+  // Turn off vibration after 200 milliseconds
+  if (hapticState) {
+    if (millis() - hapticTime > 200) {
+      digitalWrite(haptic, LOW);
+    }
+  }
 
   BLEDevice central = BLE.central();
 
