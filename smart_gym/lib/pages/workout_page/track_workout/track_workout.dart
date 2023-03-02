@@ -230,10 +230,9 @@ class RestTimerState extends State<RestTimer> {
                         begin: 0,
                         end:
                             TimerService.ofSet(context).elapsed.inMilliseconds /
-                                180000
-                        // TimerService.ofSet(context)
-                        //     .endDuration!
-                        //     .inMilliseconds,
+                              TimerService.ofSet(context)
+                              .endDuration!
+                              .inMilliseconds,
                         ),
                     duration: globalAnimationSpeed,
                     builder: ((context, value, child) {
