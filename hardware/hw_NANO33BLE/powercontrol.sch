@@ -7487,6 +7487,7 @@ http://www.ee.siue.edu/~alozows/library/datasheets/BFR96.pdf</description>
 <approved hash="204,1,77.724,118.364,MODUL1,AREF,,,,"/>
 <approved hash="204,1,72.644,118.364,MODUL1,3V3,,,,"/>
 <approved hash="113,1,3.85064,72.136,S1,,,,,"/>
+<approved hash="113,1,127.97,63.8912,MOTORCONTROLLER,,,,,"/>
 </errors>
 </schematic>
 </drawing>
