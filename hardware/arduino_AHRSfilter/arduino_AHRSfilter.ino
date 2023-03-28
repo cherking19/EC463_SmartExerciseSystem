@@ -14,6 +14,7 @@ BLEFloatCharacteristic HeadingCharacteristic("2A21", BLERead | BLENotify); //cre
 #define haptic 11
 
 unsigned long start_time;
+unsigned long last_connected_time;
 char* deviceName = "SmartGymBros_RightForearm";
 
 void setup() {
@@ -64,14 +65,12 @@ void setup() {
   Serial.begin(9600);
   //temporary counter
   start_time = millis();
+  last_connected_time=start_time;
 }
 
 void loop() {
   //power control---------------
   unsigned long nowtime=millis();
-  
-  if ( nowtime - start_time >= 10000)
-    digitalWrite(powerdrain, HIGH);
  
   if(nowtime%1000 < 400)
     digitalWrite(haptic,HIGH);
@@ -113,5 +112,15 @@ void loop() {
   RollCharacteristic.writeValue(roll);
   PitchCharacteristic.writeValue(pitch);
   HeadingCharacteristic.writeValue(heading);
+  if(BLE.connected()){
+    Serial.println("CONNECtED");
+    last_connected_time=nowtime;
 
+  }
+  else
+    Serial.println("NOT CONNECTED");
+    if(nowtime-last_connected_time > 30000){
+      Serial.println("POWERING OFF");
+      digitalWrite(powerdrain, HIGH);
+    }
 }
