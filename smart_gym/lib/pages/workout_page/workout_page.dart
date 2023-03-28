@@ -220,6 +220,7 @@ class WorkoutPageState extends State<WorkoutPage>
                 text: "Cycle Light", 
                 onPressed: () async {
                   sendData(SensorService.of(context).hapticCharacteristics['RightShoulder']!);
+                  sendData(SensorService.of(context).hapticCharacteristics['RightForearm']!);
                   }
                 ),
 
