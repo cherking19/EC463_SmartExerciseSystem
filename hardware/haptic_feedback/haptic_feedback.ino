@@ -12,11 +12,6 @@ BLEFloatCharacteristic HeadingCharacteristic("2A21", BLERead | BLENotify);  //cr
 BLEService HapticFeedback("A124");
 BLEByteCharacteristic switchCharacteristic("2A57", BLERead | BLEWrite);
 
-
-
-
-
-
 //PINS
 #define powerdrain 12
 #define haptic 11
