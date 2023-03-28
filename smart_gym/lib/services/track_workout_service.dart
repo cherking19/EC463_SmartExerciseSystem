@@ -147,6 +147,7 @@ class TrackWorkoutService extends ChangeNotifier {
           print('curl up');
           // Here add thing ben
         sendData(SensorService.of(navigatorKey.currentState!.context).hapticCharacteristics['RightShoulder']!);
+        sendData(SensorService.of(navigatorKey.currentState!.context).hapticCharacteristics['RightForearm']!);
         }
         //recalibrate if necessary
         break;
@@ -167,6 +168,8 @@ class TrackWorkoutService extends ChangeNotifier {
         //any additional feedback
         state = 1;
         print('CURL $curls DONE, HELD FOR $curldiff SECONDS ---------------');
+        sendData(SensorService.of(navigatorKey.currentState!.context).hapticCharacteristics['RightShoulder']!);
+        sendData(SensorService.of(navigatorKey.currentState!.context).hapticCharacteristics['RightForearm']!);
         if (setController?.context?.mounted ?? false) {
           setController?.repCount!();
         }
