@@ -22,6 +22,7 @@ char* deviceName = "SmartGymBros_RightShoulder";
 bool hapticState = false; // true means vibration is on
 
 void setup() {
+  Serial.begin(9600);
   pinMode(powerdrain, OUTPUT);
   pinMode(haptic, OUTPUT);
   digitalWrite(powerdrain, LOW);
@@ -34,22 +35,22 @@ void setup() {
     while (true)
       ;
   }
-  // Calibration:
-  // Gyroscope code
-  IMU.setGyroFS(2);
-  IMU.setGyroODR(5);
-  IMU.setGyroOffset(0.202271, -0.971649, 0.442047);
-  IMU.setGyroSlope(1.202876, 1.170078, 1.419463);
-  // Magnetometer code
-  IMU.setMagnetFS(0);
-  IMU.setMagnetODR(8);
-  IMU.setMagnetOffset(-10.064087, 18.947754, 18.128662);
-  IMU.setMagnetSlope(1.145179, 1.314404, 1.053118);
-  // Accelerometer code
-  IMU.setAccelFS(3);
-  IMU.setAccelODR(5);
-  IMU.setAccelOffset(0.003756, -0.012898, 0.019816);
-  IMU.setAccelSlope(0.989642, 0.994564, 0.977860);
+ //Calibration:
+// Accelerometer code
+   IMU.setAccelFS(3);
+   IMU.setAccelODR(5);
+   IMU.setAccelOffset(0.001735, -0.012192, -0.012185);
+   IMU.setAccelSlope (1.000306, 0.995948, 1.002211);
+// Gyroscope code
+   IMU.setGyroFS(2);
+   IMU.setGyroODR(5);
+   IMU.setGyroOffset (2.022766, -0.711365, -0.057831);
+   IMU.setGyroSlope (1.161969, 1.147859, 1.110514);
+// Magnetometer code
+   IMU.setMagnetFS(0);
+   IMU.setMagnetODR(8);
+   IMU.setMagnetOffset(13.804932, 15.117188, 13.090820);
+   IMU.setMagnetSlope (1.997173, 1.978539, 2.018379);
 
   // start the filter to run at the sample rate:
   filter.begin(sensorRate);
@@ -72,7 +73,7 @@ void setup() {
   // BLE.advertise();
   switchCharacteristic.setEventHandler(BLEWritten, switchCharacteristicWritten);
   // Serial
-  Serial.begin(9600);
+  
   //temporary counter
   start_time = millis();
 
@@ -109,7 +110,7 @@ void loop() {
 
   // Turn off vibration after 200 milliseconds
   if (hapticState) {
-    if (millis() - hapticTime > 200) {
+    if (nowtime - hapticTime > 200) {
       digitalWrite(haptic, LOW);
     }
   }

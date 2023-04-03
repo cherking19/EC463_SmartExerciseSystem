@@ -20,6 +20,6 @@ void loop() {
   else
     digitalWrite(haptic,LOW);
   
-  // Serial.print(String(nowtime));
-  // Serial.print("\n");
+   Serial.print(String(nowtime));
+   Serial.print("\n");
 }
