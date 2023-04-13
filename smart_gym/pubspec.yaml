@@ -51,6 +51,7 @@ dependencies:
   duration: ^3.0.12
   duration_picker: ^1.1.1
   statistics: ^1.0.23
+  vector_math: ^2.1.4
 
 dev_dependencies:
   flutter_test:

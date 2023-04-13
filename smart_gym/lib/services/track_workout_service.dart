@@ -6,6 +6,8 @@ import 'package:smart_gym/main.dart';
 import 'package:smart_gym/pages/workout_page/track_workout/track_widgets/track_set.dart';
 import 'package:smart_gym/pages/workout_page/workout.dart';
 import 'package:smart_gym/services/sensor_service.dart';
+import 'dart:math';
+import 'package:vector_math/vector_math.dart';
 
 class TrackWorkoutService extends ChangeNotifier {
   late DateTime start, curlstart, curlend;
@@ -91,29 +93,29 @@ class TrackWorkoutService extends ChangeNotifier {
     // map = SensorService.of(context).orientations;
     if (map[rightShoulderSuffix] != null &&
         map[rightShoulderSuffix]?.pitch != null) {
-      // data_temp[0][0] = map[rightShoulderSuffix]!.yaw!;
+      data_temp[0][0] = map[rightShoulderSuffix]!.yaw!;
       data_temp[0][1] = map[rightShoulderSuffix]!.pitch!;
       // data_temp[0][2] = map[rightShoulderSuffix]!.roll!;
       //copy previous
-      // data_prev[0][0] = data_per[0][0];
+      data_prev[0][0] = data_per[0][0];
       data_prev[0][1] = data_per[0][1];
       // data_prev[0][2] = data_per[0][2];
       //copy temp -> data
-      // data_per[0][0] = data_temp[0][0];
+      data_per[0][0] = data_temp[0][0];
       data_per[0][1] = data_temp[0][1];
       // data_per[0][2] = data_temp[0][2];
     }
     if (map[rightForearmSuffix] != null &&
         map[rightForearmSuffix]?.pitch != null) {
-      // data_temp[1][0] = map[rightForearmSuffix]!.yaw!;
+      data_temp[1][0] = map[rightForearmSuffix]!.yaw!;
       data_temp[1][1] = map[rightForearmSuffix]!.pitch!;
       // data_temp[1][2] = map[rightForearmSuffix]!.roll!;
       //copy previous
-      // data_prev[1][0] = data_per[1][0];
+      data_prev[1][0] = data_per[1][0];
       data_prev[1][1] = data_per[1][1];
       // data_prev[1][2] = data_per[1][2];
       //copy temp -> data
-      // data_per[1][0] = data_temp[1][0];
+      data_per[1][0] = data_temp[1][0];
       data_per[1][1] = data_temp[1][1];
       // data_per[1][2] = data_temp[1][2];
     }
@@ -128,6 +130,18 @@ class TrackWorkoutService extends ChangeNotifier {
     // dr = (data_per[0][2] - data_per[1][2]).abs();
 
     // print('DP: $dp ');
+    //Benjamin Math
+    double yawForCartesianVector1 = data_per[0][0];
+    double yawForCartesianVector2 = data_per[1][0];
+    double pitchForCartesianVector1 = data_per[0][1];
+    double pitchForCartesianVector2 = data_per[1][1];
+    Vector3 vector1 = new Vector3(sin(yawForCartesianVector1)*cos(pitchForCartesianVector1), cos(yawForCartesianVector1)*cos(pitchForCartesianVector1), sin(pitchForCartesianVector1));
+    Vector3 vector2 = new Vector3(sin(yawForCartesianVector2)*cos(pitchForCartesianVector2), cos(yawForCartesianVector2)*cos(pitchForCartesianVector2), sin(pitchForCartesianVector2));
+    double angle;
+    double magnitude1 = sqrt(pow(vector1.x,2)+pow(vector1.y,2)+pow(vector1.z,2));
+    double magnitude2 = sqrt(pow(vector2.x,2)+pow(vector2.y,2)+pow(vector2.z,2));
+    angle = degrees(acos(dot3(vector1,vector2)/(magnitude1*magnitude2)));
+    //print(angle);
 
     switch (state) {
       case 0:
@@ -140,7 +154,7 @@ class TrackWorkoutService extends ChangeNotifier {
 
         //hold time?
         //check boundary for up state
-        if (dp > 70) {
+        if (dp > 68) {
           state = 2;
           holdup = 0;
           curlstart = DateTime.now();
@@ -154,10 +168,11 @@ class TrackWorkoutService extends ChangeNotifier {
 
       case 2: //up state
         holdup++;
-        if (dp < 20) {
+        if (dp < 30) {
           state = 3;
           curlend = DateTime.now();
           curldiff = (curlend.difference(curlstart)).inSeconds;
+          
         }
         break;
 
