@@ -18,7 +18,7 @@ BLEByteCharacteristic switchCharacteristic("2A57", BLERead | BLEWrite);
 
 unsigned long start_time;
 unsigned long hapticTime;
-char* deviceName = "SmartGymBros_RightShoulder";
+char* deviceName = "SmartGymBros_RightForearm";
 bool hapticState = false; // true means vibration is on
 
 void setup() {
@@ -72,7 +72,7 @@ void setup() {
   BLE.addService(HapticFeedback);
   // BLE.advertise();
   switchCharacteristic.setEventHandler(BLEWritten, switchCharacteristicWritten);
-  // Serial
+
   
   //temporary counter
   start_time = millis();
@@ -123,7 +123,7 @@ void loop() {
   float xAcc, yAcc, zAcc,
     xGyro, yGyro, zGyro,
     xMag, yMag, zMag;
-  if (IMU.accelerationAvailable() && IMU.gyroscopeAvailable() && IMU.magneticFieldAvailable()) {
+  if(IMU.accelerationAvailable() && IMU.gyroscopeAvailable() && IMU.magneticFieldAvailable()) {
     IMU.readAcceleration(xAcc, yAcc, zAcc);
     IMU.readGyroscope(xGyro, yGyro, zGyro);
     IMU.readMagneticField(xMag, yMag, zMag);
