@@ -60,7 +60,7 @@ class TrackWorkoutService extends ChangeNotifier {
         SensorService.of(context).orientationsStreamController.stream;
     orientationSubscription =
         orientationsStream.asBroadcastStream().listen((newMap) {
-      analyzeCurlWorkout(
+      analyzePressWorkout(
         map: newMap,
       );
     });
