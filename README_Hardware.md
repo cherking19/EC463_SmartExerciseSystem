@@ -1,5 +1,7 @@
 # Smart Gym Hardware
 
+The Smart Gym hardware consists of sensor nodes that connect to the phone via Bluetooth. Each sensor node contains electronics centered around an Arduino Nano 33 BLE and a PCB, enclosed in a 3D-printed enclosure. 
+
 Circuit Diagram of Arduino Nano 33 BLE, and connected power control circuit and haptic motor controller.
 
 ![Image](./hardware/hw_NANO33BLE/circuit.png)
@@ -18,9 +20,7 @@ The Haptic Motor is controlled by a simple BJT transitor, modulated by pin D11, 
 ![prototype](./hardware/circuitprototype2.jpg)
 (Prototype)
 
-Physical description.   
-	The Smart Gym hardware consists of sensor nodes that connect to the phone via Bluetooth. Each sensor node contains electronics centered around an Arduino Nano 33 BLE and a PCB, enclosed in a 3D-printed enclosure. 
-
+![pcb_assembled](./hardware/pcb_assembled.png)
 Figure 3 - Assembled sensor node, with Arduino Nano 33 BLE connected to haptic motor and power control circuits via PCB
 
 
