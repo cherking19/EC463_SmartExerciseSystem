@@ -39,3 +39,7 @@ The History module displays the results of recorded workouts in both a List and 
 #### Settings
 
 Within the Settings module, the user can edit their profile and connect to the Smart Gym sensors. The Bluetooth settings page will display all the Smart Gym sensors in range that are connectable, as well as those that are already connected. This system makes use of the FlutterBlue plugin which takes care of many of the lower level Bluetooth system calls to enable cross platform Bluetooth functionality. Upon opening the Bluetooth settings page, the app periodically listens for newly connected and scanned Bluetooth devices. These results are filtered so that only devices with a preset device name prefix are displayed, ensuring that within the app the user can only interact with Smart Gym sensors. When a device is connected, the app begins listening to the orientation service as named in the Arduino code, and continuously retrieves the measurement data. This data is then passed to the previously mentioned sensor service and made available to the entirety of the app. 
+
+### Software Flowchart
+
+![Flowchart](images/software_flowchart.png)
