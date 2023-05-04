@@ -36,21 +36,23 @@ void setup() {
     while (true);
   }
   //Calibration: go to https://github.com/cherking19/EC463_SmartExerciseSystem/blob/main/hardware/arduino_calibrations to see appropriate values
-  // Accelerometer code
+  //Final PCB+bpx
+// Accelerometer code
    IMU.setAccelFS(3);
    IMU.setAccelODR(5);
-   IMU.setAccelOffset(0.001735, -0.012192, -0.012185);
-   IMU.setAccelSlope (1.000306, 0.995948, 1.002211);
+   IMU.setAccelOffset(0.014126, -0.035187, -0.000804);
+   IMU.setAccelSlope (0.998022, 0.993426, 1.000934);
 // Gyroscope code
    IMU.setGyroFS(2);
    IMU.setGyroODR(5);
-   IMU.setGyroOffset (2.022766, -0.711365, -0.057831);
-   IMU.setGyroSlope (1.161969, 1.147859, 1.110514);
-// Magnetometer code
+   IMU.setGyroOffset (-0.420929, -0.346832, -0.530182);
+   IMU.setGyroSlope (266.880188, 1.118256, 1.114424);
+ // Magnetometer code
    IMU.setMagnetFS(0);
    IMU.setMagnetODR(8);
-   IMU.setMagnetOffset(13.804932, 15.117188, 13.090820);
-   IMU.setMagnetSlope (1.997173, 1.978539, 2.018379);
+   IMU.setMagnetOffset(-5.938110, 13.554688, 39.260864);
+   IMU.setMagnetSlope (1.868137, 1.904086, 2.080932);
+
    
   // start the filter to run at the sample rate:
   filter.begin(sensorRate);
