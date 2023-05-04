@@ -77,8 +77,13 @@ class TrackWorkoutService extends ChangeNotifier {
   }
 
   void stopListening(BuildContext context) {
+    try {
     orientationSubscription.cancel();
+
+    } finally {
     isListening = false;
+
+    }
   }
 
   void analyzeCurlWorkout(
