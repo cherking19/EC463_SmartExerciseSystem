@@ -173,7 +173,7 @@ class TrackWorkoutService extends ChangeNotifier {
 
       case 2: //up state
         holdup++;
-        if (dp < 30) {
+        if (dp < 35) {
           state = 3;
           curlend = DateTime.now();
           curldiff = (curlend.difference(curlstart)).inSeconds;

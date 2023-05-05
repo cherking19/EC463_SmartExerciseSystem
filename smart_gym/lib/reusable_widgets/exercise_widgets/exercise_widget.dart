@@ -74,7 +74,8 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       ),
     );
 
-    setWidgets.add(
+    if (widget.type == WidgetType.create) {
+setWidgets.add(
       Padding(
         padding: setWidgetPadding,
         child: Align(
@@ -95,6 +96,9 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
         ),
       ),
     );
+    }
+
+    
 
     return Container(
       decoration: globalBoxDecoration,

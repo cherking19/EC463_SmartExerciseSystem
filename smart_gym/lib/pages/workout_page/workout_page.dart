@@ -203,26 +203,26 @@ class WorkoutPageState extends State<WorkoutPage>
                 text: 'Exercises',
                 onPressed: clickExercises,
               ),
-              workoutPageButton(
-                  text: 'CLEAR SHARED PREFERENCES',
-                  onPressed: () async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    prefs.clear();
-                  }),
-              workoutPageButton(
-                text: 'Mock Data',
-                onPressed: () {
-                  SensorService.of(context).mockData();
-                },
-              ),
-              workoutPageButton(
-                text: "Cycle Light", 
-                onPressed: () async {
-                  sendData(SensorService.of(context).hapticCharacteristics['RightShoulder']!);
-                  sendData(SensorService.of(context).hapticCharacteristics['RightForearm']!);
-                  }
-                ),
+              // workoutPageButton(
+              //     text: 'CLEAR SHARED PREFERENCES',
+              //     onPressed: () async {
+              //       SharedPreferences prefs =
+              //           await SharedPreferences.getInstance();
+              //       prefs.clear();
+              //     }),
+              // workoutPageButton(
+              //   text: 'Mock Data',
+              //   onPressed: () {
+              //     SensorService.of(context).mockData();
+              //   },
+              // ),
+              // workoutPageButton(
+              //   text: "Cycle Light", 
+              //   onPressed: () async {
+              //     sendData(SensorService.of(context).hapticCharacteristics['RightShoulder']!);
+              //     sendData(SensorService.of(context).hapticCharacteristics['RightForearm']!);
+              //     }
+              //   ),
 
               if (widget.workout != null)
                 Expanded(

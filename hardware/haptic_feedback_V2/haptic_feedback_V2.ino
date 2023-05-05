@@ -20,7 +20,7 @@ unsigned long start_time;
 unsigned long hapticTime;
 char* deviceName = "SmartGymBros_RightShoulder";
 bool hapticState = false; // true means vibration is on
-
+//Shoulder Forearm
 void setup() {
   Serial.begin(9600);
   pinMode(powerdrain, OUTPUT);
